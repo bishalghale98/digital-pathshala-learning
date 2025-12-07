@@ -7,6 +7,10 @@ if (!MONGODB) {
 }
 
 const dbConnect = () => {
+  if (mongoose.connection.readyState === 1) {
+    console.log("Database is already connected 😘😘😘😘");
+    return;
+  }
   try {
     mongoose.connect(MONGODB);
     console.log("Database is connected successfully ❤️❤️");
