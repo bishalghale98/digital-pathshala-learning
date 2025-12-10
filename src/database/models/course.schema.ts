@@ -1,26 +1,36 @@
-import { ICourse } from "@/types/course";
+import { ICourse } from "@/types/mongoose";
 import { model, models, Schema } from "mongoose";
 
 const courseSchema = new Schema<ICourse>(
   {
-    courseName: {
+    title: {
       type: String,
       required: true,
       trim: true,
     },
-    courseDescription: {
+    description: {
       type: String,
       required: true,
       trim: true,
     },
-    coursePrice: {
+    duration: {
+      type: String,
+    },
+    price: {
       type: Number,
       required: true,
     },
-    courseDuration: {
-      type: String,
-      default: "",
+    category: {
+      type: Schema.Types.ObjectId,
+      ref: "Category",
+      required: true,
     },
+    lessons: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Lesson",
+      },
+    ],
   },
   {
     timestamps: true,
