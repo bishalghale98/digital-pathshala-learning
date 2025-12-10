@@ -37,11 +37,7 @@ export const auth = betterAuth({
           return {
             data: {
               ...user,
-              role:
-                user.role &&
-                Object.values(Roles).includes(user.role as RoleType)
-                  ? (user.role as RoleType)
-                  : Roles.Student,
+              role: Roles.Student,
             },
           };
         },

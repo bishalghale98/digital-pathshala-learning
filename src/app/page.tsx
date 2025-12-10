@@ -9,16 +9,14 @@ export default function Home() {
   const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
 
-  // 👇 Smooth redirect handled inside useEffect
   useEffect(() => {
     if (session?.user) {
-      router.replace("/home"); // replace = no back button flicker
+      router.replace("/home"); 
     }
   }, [session, router]);
 
   if (isPending || session?.user) {
     return <div style={{ display: "none" }}></div>;
-    // Hides everything while redirecting
   }
 
   return (
