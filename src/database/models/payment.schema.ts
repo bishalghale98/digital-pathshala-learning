@@ -1,4 +1,4 @@
-import { IPayment, Status } from "@/types/mongoose";
+import { IPayment, Status } from "@/types/models";
 import { model, models, Schema } from "mongoose";
 
 const paymentSchema = new Schema<IPayment>(

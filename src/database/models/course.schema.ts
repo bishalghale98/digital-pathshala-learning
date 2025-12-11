@@ -1,4 +1,4 @@
-import { ICourse } from "@/types/mongoose";
+import { ICourse } from "@/types/models";
 import { model, models, Schema } from "mongoose";
 
 const courseSchema = new Schema<ICourse>(

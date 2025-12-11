@@ -1,4 +1,4 @@
-import { ILesson } from "@/types/mongoose";
+import { ILesson } from "@/types/models";
 import { model, models, Schema } from "mongoose";
 
 const lessonSchema = new Schema<ILesson>(

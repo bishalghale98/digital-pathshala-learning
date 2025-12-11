@@ -1,4 +1,4 @@
-import { IEnrollment } from "@/types/mongoose";
+import { IEnrollment } from "@/types/models";
 import { Schema,  model, models } from "mongoose";
 
 

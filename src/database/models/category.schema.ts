@@ -1,4 +1,4 @@
-import { ICategory } from "@/types/mongoose";
+import { ICategory } from "@/types/models";
 import {  model, models, Schema } from "mongoose";
 
 
