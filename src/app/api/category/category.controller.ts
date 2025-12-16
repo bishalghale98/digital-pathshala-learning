@@ -5,15 +5,24 @@ import { tryCatch } from "@/utils/tryCatch";
 import { NextRequest } from "next/server";
 import { authMiddleware } from "../../../../middleware/auth.middleware";
 import { Roles } from "@/lib/constants";
+import { categoryCreateSchema } from "@/schemas/categorySchema";
 
 export const createCategory = tryCatch(async (req: NextRequest) => {
-  const checkAuth = authMiddleware(req, Roles.Admin);
+  // const checkAuth = authMiddleware(req, Roles.Admin);
 
-  if (checkAuth) return checkAuth;
+  // if (checkAuth) return checkAuth;
 
   await dbConnect();
+  const body = await req.json();
 
-  const { name, description } = await req.json();
+  const parshed = categoryCreateSchema.safeParse(body);
+
+  if (!parshed.success) {
+    console.error("Invalid API data:", parshed.error.issues);
+    throw new Error("Invalid data received from API");
+  }
+
+  const { name, description } = parshed.data;
 
   if (!name || !name.trim()) {
     return errorResponse("Name is required", 400);

@@ -23,13 +23,12 @@ export const getCategory = tryCatch(async (req: NextRequest, id: string) => {
 });
 
 export const deleteCategroy = tryCatch(async (req: NextRequest, id: string) => {
-  const checkAuth = authMiddleware(req, Roles.Admin);
+  // const checkAuth = authMiddleware(req, Roles.Admin);
 
-  if (checkAuth) return checkAuth;
+  // if (checkAuth) return checkAuth;
 
   await dbConnect();
 
-  //   mongodo id length is 24 so i check that
   if (!id || id.length !== 24) {
     return errorResponse("Category id is not provided or id is not valid", 400);
   }
@@ -40,8 +39,8 @@ export const deleteCategroy = tryCatch(async (req: NextRequest, id: string) => {
 });
 
 export const updateCategory = tryCatch(async (req: NextRequest, id: string) => {
-  const checkAuth = authMiddleware(req, Roles.Admin);
-  if (checkAuth) return checkAuth;
+  // const checkAuth = authMiddleware(req, Roles.Admin);
+  // if (checkAuth) return checkAuth;
 
   await dbConnect();
 
