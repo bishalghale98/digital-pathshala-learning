@@ -7,14 +7,10 @@ import Modal from '@/components/category/modal'
 import { Activity } from 'react'
 import EmptyState from '@/components/category/EmptyState'
 import ConfirmationModal from '@/components/common/delete-modal'
+import { ICategory } from '@/store/category/types'
 
-// Define category type for better type safety
-interface Category {
-    _id: string
-    name: string
-    description: string
-    createdAt: string
-}
+
+
 
 const CategoriesPage = () => {
     const { Categories } = useAppSelector((store) => store.categories)
@@ -22,9 +18,9 @@ const CategoriesPage = () => {
 
     const [isAddModalOpen, setIsAddModalOpen] = useState(false)
     const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-    const [editingCategory, setEditingCategory] = useState<Category | null>(null)
+    const [editingCategory, setEditingCategory] = useState<ICategory | null>(null)
     const [searchTerm, setSearchTerm] = useState('')
-    const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null)
+    const [categoryToDelete, setCategoryToDelete] = useState<ICategory | null>(null)
 
     // Memoize filtered categories to avoid recalculating on every render
     const filteredCategories = useMemo(() => {
@@ -36,7 +32,7 @@ const CategoriesPage = () => {
         )
     }, [Categories, searchTerm])
 
-    const openEditModal = useCallback((category: Category) => {
+    const openEditModal = useCallback((category: ICategory) => {
         setEditingCategory(category)
         setIsEditModalOpen(true)
     }, [])
@@ -52,7 +48,7 @@ const CategoriesPage = () => {
     }, [])
 
     // Handle opening delete modal
-    const openDeleteModal = useCallback((category: Category) => {
+    const openDeleteModal = useCallback((category: ICategory) => {
         setCategoryToDelete(category)
     }, [])
 

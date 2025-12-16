@@ -1,6 +1,6 @@
 import { Status } from "../types";
 
-export interface ICategories {
+export interface ICategory {
   _id: string;
   name: string;
   description: string;
@@ -8,6 +8,6 @@ export interface ICategories {
 }
 
 export interface ICategoryInitialState {
-  Categories: ICategories[];
+  Categories: ICategory[];
   status: Status;
 }
