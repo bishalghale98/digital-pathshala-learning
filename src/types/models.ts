@@ -21,7 +21,7 @@ export interface ICourse extends Document {
   description: string;
   duration?: string;
   price: number;
-  category?: Types.ObjectId;
+  categoryId?: Types.ObjectId;
   lessons?: Types.ObjectId[];
   createdAt?: Date;
   updatedAt?: Date;

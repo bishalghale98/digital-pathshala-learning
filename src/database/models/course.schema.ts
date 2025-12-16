@@ -15,22 +15,23 @@ const courseSchema = new Schema<ICourse>(
     },
     duration: {
       type: String,
+      required: true,
     },
     price: {
       type: Number,
       required: true,
     },
-    category: {
+    categoryId: {
       type: Schema.Types.ObjectId,
       ref: "Category",
       required: true,
     },
-    lessons: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Lesson",
-      },
-    ],
+    // lessons: [
+    //   {
+    //     type: Schema.Types.ObjectId,
+    //     ref: "Lesson",
+    //   },
+    // ],
   },
   {
     timestamps: true,
