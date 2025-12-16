@@ -1,6 +1,5 @@
-import { IEnrollment } from "@/types/models";
-import { Schema,  model, models } from "mongoose";
-
+import { EnrollmentStatus, IEnrollment } from "@/types/models";
+import { Schema, model, models } from "mongoose";
 
 const enrollmentSchema = new Schema<IEnrollment>(
   {
@@ -18,6 +17,18 @@ const enrollmentSchema = new Schema<IEnrollment>(
       type: Date,
       default: Date.now,
     },
+    enrollmentStatus: {
+      type: String,
+      enum: [
+        EnrollmentStatus.Approved,
+        EnrollmentStatus.Pending,
+        EnrollmentStatus.rejected,
+      ],
+      default: EnrollmentStatus.Pending,
+    },
+    whatsapp: {
+      type: String,
+    }
   },
   {
     timestamps: true,

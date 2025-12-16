@@ -4,11 +4,11 @@ import Lesson from "@/database/models/lesson.schema";
 import { createCourseSchema } from "@/schemas/courseSchema";
 import { errorResponse, successResponse } from "@/utils/response";
 import { tryCatch } from "@/utils/tryCatch";
+import { isValidObjectId } from "mongoose";
 import { NextRequest } from "next/server";
 // import { authMiddleware } from "../../../../../middleware/auth.middleware";
 // import { Roles } from "@/lib/constants";
 
-const isValidObjectId = (id: string) => id?.length === 24;
 
 export const getCourse = tryCatch(async (req: NextRequest, id: string) => {
   await dbConnect();

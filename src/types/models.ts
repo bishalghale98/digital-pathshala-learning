@@ -38,10 +38,20 @@ export interface ILesson extends Document {
 }
 
 // ====== Enrollment Interface ======
+
+// Enrollment status
+export enum EnrollmentStatus {
+  Approved = "approved",
+  Pending = "pending",
+  rejected = "rejected",
+}
+
 export interface IEnrollment extends Document {
   student: Types.ObjectId;
   course: Types.ObjectId;
+  enrollmentStatus: EnrollmentStatus;
   enrolledAt: Date;
+  whatsapp: string;
 }
 
 // ====== Payment Interface ======
