@@ -5,7 +5,6 @@ import { lessonCreateSchema, lessonUpdateSchema } from "@/schemas/lessonSchema";
 import { errorResponse, successResponse } from "@/utils/response";
 import { tryCatch } from "@/utils/tryCatch";
 import { NextRequest } from "next/server";
-import { parsedType } from "zod/v4/locales/bg.cjs";
 
 export const getLessons = tryCatch(async (req: NextRequest) => {
   await dbConnect();
@@ -18,7 +17,7 @@ export const getLessons = tryCatch(async (req: NextRequest) => {
   return successResponse("Successfully fetched lessons", lessons, 200);
 });
 
-export const createLessons = tryCatch(async (req: NextRequest) => {
+export const createLesson = tryCatch(async (req: NextRequest) => {
   await dbConnect();
 
   const body = await req.json();

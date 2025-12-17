@@ -47,8 +47,8 @@ export enum EnrollmentStatus {
 }
 
 export interface IEnrollment extends Document {
-  student: Types.ObjectId;
-  course: Types.ObjectId;
+  studentId: Types.ObjectId;
+  courseId: Types.ObjectId;
   enrollmentStatus: EnrollmentStatus;
   enrolledAt: Date;
   whatsapp: string;

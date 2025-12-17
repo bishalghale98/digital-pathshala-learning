@@ -1,10 +1,10 @@
 import { NextRequest } from "next/server";
-import { createLesson, getLessons } from "./lesson.controller";
+import { createEnrollment, getEnrollments } from "./enrollment.controller";
 
 export async function GET(req: NextRequest) {
-  return getLessons(req);
+  return getEnrollments(req);
 }
 
 export async function POST(req: NextRequest) {
-  return createLesson(req);
+  return createEnrollment(req);
 }

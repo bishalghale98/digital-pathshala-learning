@@ -3,12 +3,12 @@ import { Schema, model, models } from "mongoose";
 
 const enrollmentSchema = new Schema<IEnrollment>(
   {
-    student: {
+    studentId: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-    course: {
+    courseId: {
       type: Schema.Types.ObjectId,
       ref: "Course",
       required: true,
