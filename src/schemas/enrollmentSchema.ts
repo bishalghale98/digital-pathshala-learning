@@ -30,3 +30,11 @@ export const enrollmentUpdateSchema = z.object({
   courseId: enrollmentBase.courseId.optional(),
   whatsapp: enrollmentBase.whatsapp.optional(),
 });
+
+export const enrollmentStatusSchema = z.object({
+  enrollmentStatus: z.enum([
+    EnrollmentStatus.Approved,
+    EnrollmentStatus.Pending,
+    EnrollmentStatus.Rejected,
+  ]),
+});

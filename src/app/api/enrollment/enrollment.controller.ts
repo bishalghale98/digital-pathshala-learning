@@ -1,7 +1,10 @@
 import dbConnect from "@/database/dbConnection";
 import Enrollment from "@/database/models/enrollment.schema";
 import { isValidObjectId } from "@/lib/helper/isValidObjectId";
-import { enrollmentCreateSchema } from "@/schemas/enrollmentSchema";
+import {
+  enrollmentCreateSchema,
+  enrollmentStatusSchema,
+} from "@/schemas/enrollmentSchema";
 import { errorResponse, successResponse } from "@/utils/response";
 import { tryCatch } from "@/utils/tryCatch";
 import { NextRequest } from "next/server";
@@ -48,7 +51,7 @@ export const createEnrollment = tryCatch(async (req: NextRequest) => {
   return successResponse("Enrollment created successfully", enrollment, 201);
 });
 
-export const getEnrollment = tryCatch(async (req: NextRequest, id: string) => {
+export const getEnrollment = tryCatch(async (_req: NextRequest, id: string) => {
   await dbConnect();
 
   if (!isValidObjectId(id)) {
@@ -56,31 +59,30 @@ export const getEnrollment = tryCatch(async (req: NextRequest, id: string) => {
   }
 
   const enrollment = await Enrollment.findById(id)
-    .populate("courseId")
-    .populate("studentId")
+    .populate("courseId", "title description")
+    .populate("studentId", "name email")
     .lean();
 
   if (!enrollment) {
-    return errorResponse("Enrollment with that ID not found", 404);
+    return errorResponse("Enrollment not found", 404);
   }
 
   return successResponse("Successfully fetched enrollment", enrollment, 200);
 });
 
 export const deleteEnrollment = tryCatch(
-  async (req: NextRequest, id: string) => {
+  async (_req: NextRequest, id: string) => {
     await dbConnect();
 
     if (!isValidObjectId(id)) {
       return errorResponse("Invalid enrollment ID", 400);
     }
 
-    const enrollment = await Enrollment.findById(id);
-    if (!enrollment) {
-      return errorResponse("enrollment with that ID not found", 404);
-    }
+    const enrollment = await Enrollment.findByIdAndDelete(id);
 
-    await Enrollment.findByIdAndDelete(id);
+    if (!enrollment) {
+      return errorResponse("Enrollment not found", 404);
+    }
 
     return successResponse("Enrollment successfully deleted", null, 200);
   }
@@ -94,29 +96,31 @@ export const changeEnrollmentStatus = tryCatch(
       return errorResponse("Invalid enrollment ID", 400);
     }
 
-    const { enrollmentStatus } = await req.json();
+    const body = await req.json();
+    const parsed = enrollmentStatusSchema.safeParse(body);
 
-    if (!enrollmentStatus) {
-      return errorResponse("Enrollment is id is required");
+    if (!parsed.success) {
+      return errorResponse("Invalid enrollment status", 400);
     }
 
     const updatedEnrollment = await Enrollment.findByIdAndUpdate(
       id,
-      { enrollmentStatus },
+      { enrollmentStatus: parsed.data.enrollmentStatus },
       {
         new: true,
+        runValidators: true,
       }
     )
-      .lean()
       .populate("courseId")
-      .populate("studentId");
+      .populate("studentId")
+      .lean();
 
     if (!updatedEnrollment) {
-      return errorResponse("enrollment with that ID not found", 404);
+      return errorResponse("Enrollment not found", 404);
     }
 
     return successResponse(
-      "Enrollment successfully updated",
+      "Enrollment status updated successfully",
       updatedEnrollment,
       200
     );
