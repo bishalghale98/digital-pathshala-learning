@@ -12,7 +12,7 @@ export default function UserProfile() {
 
   useEffect(() => {
     if (!isPending && !session?.user) {
-      router.replace("/");
+      router.replace("/sign-in");
     }
   }, [session, isPending, router]);
 
@@ -32,7 +32,7 @@ export default function UserProfile() {
   const handleSignOut = async () => {
     try {
       await authClient.signOut();
-      router.replace("/");
+      router.replace("/sign-in");
     } catch (err) {
       console.error("Sign out failed:", err);
     }

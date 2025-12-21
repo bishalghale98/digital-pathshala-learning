@@ -4,6 +4,7 @@ import { createCourseSchema } from "@/schemas/courseSchema";
 import { errorResponse, successResponse } from "@/utils/response";
 import { tryCatch } from "@/utils/tryCatch";
 import { NextRequest } from "next/server";
+import "@/database/models/category.schema"; // ✅ FORCE REGISTER
 
 export const createCourse = tryCatch(async (req: NextRequest) => {
   await dbConnect();
@@ -36,14 +37,14 @@ export const createCourse = tryCatch(async (req: NextRequest) => {
   return successResponse("Course created successfully", course, 201);
 });
 
-export const getCourses = tryCatch(async (req: NextRequest) => {
+export const getCourses = tryCatch(async () => {
   await dbConnect();
 
-  // ✅ Optimized query
   const courses = await Course.find()
-    .populate("categoryId")
+    .populate("categoryId") // ✅ THIS IS CORRECT
     .sort({ createdAt: -1 })
     .lean();
+
 
   return successResponse("Courses fetched successfully", courses, 200);
 });

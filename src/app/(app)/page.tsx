@@ -1,6 +1,6 @@
 'use client'
 
-import { authClient } from '../lib/auth-client';
+import { authClient } from '../../lib/auth-client';
 
 
 export default function Home() {
@@ -9,7 +9,7 @@ export default function Home() {
 
 
   if (isPending || session?.user) {
-    return <div style={{ display: "none" }}></div>;
+    return <div > hey</div>;
   }
 
   return (

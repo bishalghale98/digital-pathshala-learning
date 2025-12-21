@@ -7,6 +7,7 @@ import { z } from 'zod'
 import { categoryCreateSchema } from '@/schemas/categorySchema'
 import { useAppDispatch } from '@/store/hooks'
 import { createCategory, updateCategory } from '@/store/category/categorySlice'
+import { getInputClass } from '@/lib/utils/form'
 
 interface ModalProps {
     closeModal: () => void
@@ -112,23 +113,17 @@ const Modal: React.FC<ModalProps> = ({ closeModal, categoryData }) => {
                                         htmlFor="name"
                                         className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
                                     >
-                                        Category Name
-                                        <span className="text-red-500 ml-1">*</span>
+                                        Category Name <span className="text-red-500 ml-1">*</span>
                                     </label>
                                     <input
                                         id="name"
                                         type="text"
                                         placeholder="Enter category name"
-                                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${errors.name
-                                            ? 'border-red-500 focus:ring-red-200 dark:focus:ring-red-900'
-                                            : 'border-gray-300 dark:border-gray-600 focus:ring-blue-200 dark:focus:ring-blue-900'
-                                            } bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+                                        className={getInputClass(!!errors.name, "text-white")}
                                         {...register('name')}
                                     />
                                     {errors.name && (
-                                        <p className="mt-1 text-sm text-red-500">
-                                            {errors.name.message}
-                                        </p>
+                                        <p className="mt-1 text-sm text-red-500">{errors.name.message}</p>
                                     )}
                                 </div>
 
@@ -144,16 +139,11 @@ const Modal: React.FC<ModalProps> = ({ closeModal, categoryData }) => {
                                         id="description"
                                         rows={3}
                                         placeholder="Enter description (optional)"
-                                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${errors.description
-                                            ? 'border-red-500 focus:ring-red-200 dark:focus:ring-red-900'
-                                            : 'border-gray-300 dark:border-gray-600 focus:ring-blue-200 dark:focus:ring-blue-900'
-                                            } bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+                                        className={getInputClass(!!errors.description , "text-white")}
                                         {...register('description')}
                                     />
                                     {errors.description && (
-                                        <p className="mt-1 text-sm text-red-500">
-                                            {errors.description.message}
-                                        </p>
+                                        <p className="mt-1 text-sm text-red-500">{errors.description.message}</p>
                                     )}
                                 </div>
                             </div>
@@ -187,6 +177,7 @@ const Modal: React.FC<ModalProps> = ({ closeModal, categoryData }) => {
                 </div>
             </div>
         </div>
+
     )
 }
 
