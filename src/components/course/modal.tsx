@@ -9,6 +9,7 @@ import { ICourse } from "@/store/course/types";
 import { createCourseSchema } from "@/schemas/courseSchema";
 import { fetchCategory } from "@/store/category/categorySlice";
 import { getInputClass } from "@/lib/utils/form";
+import { createCourse, updateCourse } from "@/store/course/courseSlice";
 
 interface CourseModalProps {
     closeModal: () => void;
@@ -62,13 +63,13 @@ const CourseModal: React.FC<CourseModalProps> = ({
 
     const onSubmit = async (data: CourseFormData) => {
         try {
-            console.log("Form Data:", data);
 
-            // if (isEditMode && courseData?._id) {
-            //   await dispatch(updateCourse({ id: courseData._id, data }));
-            // } else {
-            //   await dispatch(createCourse(data));
-            // }
+            if (isEditMode && courseData?._id) {
+                await dispatch(updateCourse(courseData._id, data));
+
+            } else {
+                await dispatch(createCourse(data));
+            }
 
             reset();
             closeModal();
@@ -76,6 +77,8 @@ const CourseModal: React.FC<CourseModalProps> = ({
             console.error("Error submitting course:", error);
         }
     };
+
+
 
     return (
         <div className="fixed inset-0 z-50 overflow-y-auto">

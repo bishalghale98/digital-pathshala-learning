@@ -47,7 +47,7 @@ export const createCategory = tryCatch(async (req: NextRequest) => {
 export const getCategories = tryCatch(async (req: NextRequest) => {
   await dbConnect();
 
-  const categories = await Category.find();
+  const categories = await Category.find().sort({ createdAt: -1 }).lean();
 
   if (!categories || categories.length === 0) {
     return errorResponse("No categories found", 404);
