@@ -18,7 +18,7 @@ export const createCourse = tryCatch(async (req: NextRequest) => {
     return errorResponse("Invalid course data", 400);
   }
 
-  const { categoryId, description, duration, price, title } = parsed.data;
+  const { title } = parsed.data;
 
   // ✅ Prevent duplicate courses
   const existingCourse = await Course.findOne({ title });
@@ -26,13 +26,9 @@ export const createCourse = tryCatch(async (req: NextRequest) => {
     return errorResponse("Course already exists", 409);
   }
 
-  const course = await Course.create({
-    categoryId,
-    description,
-    duration,
-    price,
-    title,
-  });
+  const createdData = await Course.create(parsed.data);
+
+  const course = await Course.findById(createdData._id).populate("categoryId");
 
   return successResponse("Course created successfully", course, 201);
 });
@@ -44,7 +40,6 @@ export const getCourses = tryCatch(async () => {
     .populate("categoryId") // ✅ THIS IS CORRECT
     .sort({ createdAt: -1 })
     .lean();
-
 
   return successResponse("Courses fetched successfully", courses, 200);
 });
