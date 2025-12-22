@@ -47,8 +47,8 @@ const studentSlice = createSlice({
 export const { setStudents, setStatus } = studentSlice.actions;
 export default studentSlice.reducer;
 
-export function fetchStudnets() {
-  return async function fetchStudnetsThunk(dispatch: AppDispatch) {
+export function fetchStudents() {
+  return async function fetchStudentsThunk(dispatch: AppDispatch) {
     dispatch(setStatus(Status.Loading));
 
     try {

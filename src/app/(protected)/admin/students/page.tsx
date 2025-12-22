@@ -1,17 +1,23 @@
 'use client'
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
-import { fetchStudnets } from '@/store/student/studentSlice'
+import { fetchStudents } from '@/store/student/studentSlice'
 import Image from 'next/image'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 
 const StudentsPage = () => {
     const { Students } = useAppSelector((store) => store.students)
     const dispatch = useAppDispatch()
+    const [searchTerm, setSearchTerm] = useState('')
+
+    const filterStudents = Students.filter(student =>
+        student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        student.email.toLowerCase().includes(searchTerm.toLowerCase())
+    )
 
     useEffect(() => {
-        dispatch(fetchStudnets())
-    }, [])
+        dispatch(fetchStudents())
+    }, [dispatch])
 
     return (
         <div className="flex flex-col">
@@ -25,7 +31,7 @@ const StudentsPage = () => {
                                 <path d="M17.5 17.5L15.4167 15.4167M15.8333 9.16667C15.8333 5.48477 12.8486 2.5 9.16667 2.5C5.48477 2.5 2.5 5.48477 2.5 9.16667C2.5 12.8486 5.48477 15.8333 9.16667 15.8333C11.0005 15.8333 12.6614 15.0929 13.8667 13.8947C15.0814 12.6872 15.8333 11.0147 15.8333 9.16667Z" stroke="black" strokeOpacity="0.2" strokeWidth="1.6" strokeLinecap="round" />
                             </svg>
                         </div>
-                        <input type="text" id="default-search" className="block w-80 h-11 pr-5 pl-12 py-2.5 text-base font-normal shadow-xs text-gray-900 bg-transparent border border-gray-300 rounded-full placeholder-gray-400 focus:outline-none" placeholder="Search for company" />
+                        <input value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} type="text" id="default-search" className="block w-80 h-11 pr-5 pl-12 py-2.5 text-base font-normal shadow-xs text-gray-900 bg-transparent border border-gray-300 rounded-full placeholder-gray-400 focus:outline-none" placeholder="Search for company" />
                     </div>
                     <div className="overflow-hidden ">
                         <table className=" min-w-full rounded-xl">
@@ -41,12 +47,12 @@ const StudentsPage = () => {
                             <tbody className="divide-y divide-gray-300 ">
 
                                 {
-                                    Students.map((student) => (
+                                    filterStudents.map((student) => (
                                         <tr key={student._id} className="bg-white transition-all duration-500 hover:bg-gray-50">
-                                            <td className="p-5 whitespace-nowrap text-sm leading-6 font-medium text-gray-900 "> {student._id}</td>
+                                            <td className="p-5 whitespace-nowrap text-sm leading-6 font-medium text-gray-900 truncate max-w-[120px] "> {student._id}</td>
                                             <td className="p-5 whitespace-nowrap text-sm leading-6 font-medium text-gray-900"> {student.name} </td>
                                             <td className="p-5 whitespace-nowrap text-sm leading-6 font-medium text-gray-900"> {student.email}</td>
-                                            <td className="p-5 whitespace-nowrap text-sm leading-6 font-medium text-gray-900"> <Image src={student.image} alt={student.name}  width={40} height={40} /></td>
+                                            <td className="p-5 whitespace-nowrap text-sm leading-6 font-medium text-gray-900"> <Image src={student.image} alt={student.name} width={40} height={40} /></td>
                                             <td className=" p-5 ">
                                                 <div className="flex items-center gap-1">
                                                     <button className="p-2  rounded-full  group transition-all duration-500  flex item-center">
