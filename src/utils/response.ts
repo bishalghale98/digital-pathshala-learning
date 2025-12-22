@@ -16,6 +16,7 @@ export function successResponse(
 }
 
 export function errorResponse(message: string, status = 500) {
+  console.log(message)
   return NextResponse.json(
     {
       success: false,

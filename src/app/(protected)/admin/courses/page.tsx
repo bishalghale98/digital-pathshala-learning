@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import CourseModal from "@/components/course/modal";
 import { ICourse } from "@/store/course/types";
 import ConfirmationModal from "@/components/common/delete-modal";
+import { redirect } from "next/navigation";
 
 const Courses = () => {
     const { Courses } = useAppSelector((store) => store.courses);
@@ -111,7 +112,7 @@ const Courses = () => {
                                     ) : (
                                         Courses.map((course: ICourse) => (
                                             <tr key={course._id} className="hover:bg-gray-50 transition-colors">
-                                                <td className="px-6 py-4 font-medium">{course.title}</td>
+                                                <td onClick={() => redirect(`/admin/courses/${course._id}/lessons`)} className="px-6 py-4 font-medium">{course.title}</td>
                                                 <td className="px-6 py-4 text-gray-600 truncate line-clamp-2 max-w-[300px]">
                                                     {course.description}
                                                 </td>

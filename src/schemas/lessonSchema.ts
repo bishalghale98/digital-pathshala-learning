@@ -11,7 +11,7 @@ const lessonBaseSchema = {
     .trim()
     .min(5, "Description must be at least 5 characters long")
     .optional(),
-  videoUrl: z.string().trim().url("Invalid video URL").optional(),
+  videoUrl: z.string().trim().url("Invalid video URL"),
 };
 
 /**

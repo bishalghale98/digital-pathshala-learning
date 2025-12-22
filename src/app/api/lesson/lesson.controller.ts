@@ -30,7 +30,11 @@ export const createLesson = tryCatch(async (req: NextRequest) => {
 
   const lesson = await Lesson.create(parsed.data);
 
-  return successResponse("Lesson created successfully", lesson, 201);
+  const populatedLesson = await Lesson.findById(lesson._id).populate(
+    "courseId"
+  );
+
+  return successResponse("Lesson created successfully", populatedLesson, 201);
 });
 
 export const getLesson = tryCatch(async (req: NextRequest, id: string) => {
