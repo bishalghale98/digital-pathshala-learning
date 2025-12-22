@@ -10,9 +10,6 @@ export async function proxy(request: NextRequest) {
     headers: await headers(),
   });
 
-  if (pathname === "/sign-in" && session?.user) {
-    return NextResponse.redirect(new URL("/", request.url));
-  }
 
   if (pathname === "/sign-in") {
     return NextResponse.next();

@@ -4,7 +4,7 @@ import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { Roles, validateRole } from "./constants";
 
 const client = new MongoClient(process.env.MONGODB!);
-const db = client.db();
+export const db = client.db();
 
 export const auth = betterAuth({
   database: mongodbAdapter(db, { client }),
