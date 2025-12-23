@@ -25,9 +25,9 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/unauthorized", request.url));
   }
 
-  if (pathname.startsWith("/student") && role !== Roles.Student) {
-    return NextResponse.redirect(new URL("/unauthorized", request.url));
-  }
+  // if (pathname.startsWith("/student") && role !== Roles.Student) {
+  //   return NextResponse.redirect(new URL("/unauthorized", request.url));
+  // }
 
   return NextResponse.next();
 }

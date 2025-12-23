@@ -57,7 +57,7 @@ export default EnrollmentSlice.reducer;
 export function fetchEnrollements() {
   return async function fetchEnrollmentsThunk(dispatch: AppDispatch) {
     try {
-      const res = await api.get("Enrollement");
+      const res = await api.get("enrollment");
 
       if (res.data.success) {
         dispatch(setStatus(Status.Loading));

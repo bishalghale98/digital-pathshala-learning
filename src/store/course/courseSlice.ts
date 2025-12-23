@@ -51,11 +51,12 @@ export default courseSlice.reducer;
 
 export function fetchCourses() {
   return async function fetchCoursesThunk(dispatch: AppDispatch) {
+    
     try {
       const res = await api.get("course");
 
       if (res.data.success) {
-        dispatch(setStatus(Status.Loading));
+        dispatch(setStatus(Status.Success));
         dispatch(setCourses(res.data.data));
       } else {
         dispatch(setStatus(Status.Error));

@@ -1,4 +1,4 @@
-import Dashboard from "@/components/dashboard/dashboard";
+import Dashboard from "@/components/dashboard/admin-dashboard";
 
 function AdminLayout({
   children,
