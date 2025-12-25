@@ -1,5 +1,6 @@
 import { ILesson } from "@/types/models";
 import { model, models, Schema } from "mongoose";
+import './course.schema'
 
 const lessonSchema = new Schema<ILesson>(
   {

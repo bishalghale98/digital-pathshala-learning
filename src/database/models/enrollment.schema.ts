@@ -1,5 +1,6 @@
 import { EnrollmentStatus, IEnrollment } from "@/types/models";
 import { Schema, model, models } from "mongoose";
+import './course.schema'
 
 const enrollmentSchema = new Schema<IEnrollment>(
   {

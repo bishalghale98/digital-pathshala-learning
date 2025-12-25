@@ -1,5 +1,6 @@
 import { IPayment, Status } from "@/types/models";
 import { model, models, Schema } from "mongoose";
+import './course.schema'
 
 const paymentSchema = new Schema<IPayment>(
   {

@@ -1,7 +1,7 @@
 import { betterAuth } from "better-auth";
 import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
-import { Roles, validateRole } from "./constants";
+import { Roles } from "./constants";
 
 const client = new MongoClient(process.env.MONGODB!);
 export const db = client.db();
@@ -16,7 +16,6 @@ export const auth = betterAuth({
         required: true,
         input: false,
         default: Roles.Student,
-        validate: validateRole,
       },
     },
   },

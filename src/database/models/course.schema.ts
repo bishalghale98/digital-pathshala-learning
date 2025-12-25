@@ -1,5 +1,6 @@
 import { ICourse } from "@/types/models";
 import { model, models, Schema } from "mongoose";
+import '@/database/models/category.schema'
 
 const courseSchema = new Schema<ICourse>(
   {
