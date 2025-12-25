@@ -1,6 +1,6 @@
-import { EnrollmentStatus, IEnrollment } from "@/types/models";
+import { EnrollmentStatus, IEnrollment, PaymentMethod } from "@/types/models";
 import { Schema, model, models } from "mongoose";
-import './course.schema'
+import "./course.schema";
 
 const enrollmentSchema = new Schema<IEnrollment>(
   {
@@ -29,7 +29,12 @@ const enrollmentSchema = new Schema<IEnrollment>(
     },
     whatsapp: {
       type: String,
-    }
+    },
+    paymentMethod: {
+      type: String,
+      enum: [PaymentMethod.Esewa, PaymentMethod.Khalti],
+      default: PaymentMethod.Khalti,
+    },
   },
   {
     timestamps: true,

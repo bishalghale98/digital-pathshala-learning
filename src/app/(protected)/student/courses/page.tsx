@@ -1,17 +1,32 @@
 'use client'
 
-import CourseCard from '@/components/student/course-card'
+import CourseCard from '@/components/student/course/course-card'
+import EnrollModal from '@/components/student/course/enroll-modal';
 import { CourseCardSkeleton } from '@/components/student/loading/course-card';
 import { fetchCourses } from '@/store/course/courseSlice';
 import { ICourse } from '@/store/course/types';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { Status } from '@/store/types';
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
 const CoursesPage = () => {
 
     const { Courses, status }: { Courses: ICourse[], status: Status } = useAppSelector((store) => store.courses)
     const dispatch = useAppDispatch()
+
+    const [isOpen, setIsOpen] = useState<boolean>(false)
+    const [courseId, setCourseId] = useState<string>('')
+
+    console.log(courseId, "ID ho hai")
+
+    const openModal = useCallback((id: string) => {
+        setIsOpen(true)
+        setCourseId(id)
+    }, [])
+
+    const closeModal = useCallback(() => {
+        setIsOpen(false)
+    }, [])
 
 
 
@@ -50,6 +65,7 @@ const CoursesPage = () => {
                             price={course.price}
                             duration={course.duration}
                             category={course.categoryId.name}
+                            openModal={openModal}
                         />
                     ))}
                 </div>
@@ -76,6 +92,10 @@ const CoursesPage = () => {
                     </div>
                 </div>
             </div>
+            {
+                isOpen && <EnrollModal closeModal={closeModal} courseId={courseId} />
+
+            }
         </div>
     )
 }

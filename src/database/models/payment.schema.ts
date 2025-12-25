@@ -1,17 +1,12 @@
 import { IPayment, Status } from "@/types/models";
 import { model, models, Schema } from "mongoose";
-import './course.schema'
+import "./course.schema";
 
 const paymentSchema = new Schema<IPayment>(
   {
-    student: {
+    enrollment: {
       type: Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-    course: {
-      type: Schema.Types.ObjectId,
-      ref: "Course",
+      ref: "Enrollment",
       required: true,
     },
     amount: {

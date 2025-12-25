@@ -52,12 +52,17 @@ export interface IEnrollment extends Document {
   enrollmentStatus: EnrollmentStatus;
   enrolledAt: Date;
   whatsapp: string;
+  paymentMethod: PaymentMethod;
+}
+
+export enum PaymentMethod {
+  Khalti = "khalti",
+  Esewa = "esewa",
 }
 
 // ====== Payment Interface ======
 export interface IPayment extends Document {
-  student: Types.ObjectId;
-  course: Types.ObjectId;
+  enrollment: Types.ObjectId;
   amount: number;
   status: Status;
   createdAt?: Date;

@@ -1,5 +1,6 @@
 import dbConnect from "@/database/dbConnection";
 import Enrollment from "@/database/models/enrollment.schema";
+import { auth } from "@/lib/auth";
 import { isValidObjectId } from "@/lib/helper/isValidObjectId";
 import {
   enrollmentCreateSchema,
@@ -7,6 +8,7 @@ import {
 } from "@/schemas/enrollmentSchema";
 import { errorResponse, successResponse } from "@/utils/response";
 import { tryCatch } from "@/utils/tryCatch";
+import { headers } from "next/headers";
 import { NextRequest } from "next/server";
 
 export const getEnrollments = tryCatch(async (req: NextRequest) => {
@@ -22,6 +24,10 @@ export const getEnrollments = tryCatch(async (req: NextRequest) => {
 });
 
 export const createEnrollment = tryCatch(async (req: NextRequest) => {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
   await dbConnect();
 
   const body = await req.json();
@@ -32,9 +38,9 @@ export const createEnrollment = tryCatch(async (req: NextRequest) => {
     return errorResponse("Invalid enrollment data", 400);
   }
 
-  const { courseId, whatsapp } = parsed.data;
+  const { courseId, whatsApp, paymentMethod } = parsed.data;
 
-  const studentId = "123";
+  const studentId = session?.user.id;
 
   const existing = await Enrollment.findOne({ studentId, courseId });
   if (existing) {
@@ -42,9 +48,10 @@ export const createEnrollment = tryCatch(async (req: NextRequest) => {
   }
 
   const enrollment = await Enrollment.create({
-    studentId: "123",
+    studentId,
     courseId,
-    whatsapp,
+    whatsapp: whatsApp,
+    paymentMethod,
     enrolledAt: new Date(),
   });
 
