@@ -12,12 +12,12 @@ import React, { useCallback, useEffect, useState } from 'react'
 const CoursesPage = () => {
 
     const { Courses, status }: { Courses: ICourse[], status: Status } = useAppSelector((store) => store.courses)
+    const { PaymentUrl } = useAppSelector((store) => store.enrollments)
     const dispatch = useAppDispatch()
 
     const [isOpen, setIsOpen] = useState<boolean>(false)
     const [courseId, setCourseId] = useState<string>('')
 
-    console.log(courseId, "ID ho hai")
 
     const openModal = useCallback((id: string) => {
         setIsOpen(true)
@@ -28,6 +28,13 @@ const CoursesPage = () => {
         setIsOpen(false)
     }, [])
 
+
+    useEffect(() => {
+        if (PaymentUrl) {
+            window.open(PaymentUrl, "_blank", "noopener,noreferrer");
+
+        }
+    }, [PaymentUrl])
 
 
     useEffect(() => {

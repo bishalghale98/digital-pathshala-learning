@@ -1,4 +1,4 @@
-import { IPayment, Status } from "@/types/models";
+import { IPayment, PaymentMethod, Status } from "@/types/models";
 import { model, models, Schema } from "mongoose";
 import "./course.schema";
 
@@ -17,6 +17,11 @@ const paymentSchema = new Schema<IPayment>(
       type: String,
       enum: [Status.Pending, Status.Completed, Status.Failed],
       default: Status.Pending,
+    },
+    paymentMethod: {
+      type: String,
+      enum: [PaymentMethod.Esewa, PaymentMethod.Khalti],
+      default: PaymentMethod.Khalti,
     },
   },
   {

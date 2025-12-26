@@ -4,11 +4,15 @@ import { AppDispatch } from "../store";
 import api from "@/config/api";
 import z from "zod";
 import { IInitialState } from "./types";
-import { enrollmentCreateSchema, enrollmentUpdateSchema } from "@/schemas/enrollmentSchema";
+import {
+  enrollmentCreateSchema,
+  enrollmentUpdateSchema,
+} from "@/schemas/enrollmentSchema";
 
 const datas: IInitialState = {
   Enrollments: [],
   status: Status.Loading,
+  PaymentUrl: "",
 };
 
 const EnrollmentSlice = createSlice({
@@ -42,6 +46,9 @@ const EnrollmentSlice = createSlice({
         state.Enrollments[index] = updatedEnrollment;
       }
     },
+    setPaymentUrl(state, action) {
+      state.PaymentUrl = action.payload;
+    },
   },
 });
 
@@ -51,6 +58,7 @@ export const {
   addEnrollment,
   editEnrollment,
   removeEnrollment,
+  setPaymentUrl,
 } = EnrollmentSlice.actions;
 export default EnrollmentSlice.reducer;
 
@@ -78,7 +86,8 @@ export function createEnrollment(data: z.infer<typeof enrollmentCreateSchema>) {
       const res = await api.post("enrollment", data);
 
       if (res.data.success) {
-        dispatch(addEnrollment(res.data.data));
+        dispatch(addEnrollment(res.data.data.enrollment));
+        dispatch(setPaymentUrl(res.data.data.payment_url));
       }
     } catch (error) {
       console.error(error);

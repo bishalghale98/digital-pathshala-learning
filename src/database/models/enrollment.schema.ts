@@ -30,11 +30,6 @@ const enrollmentSchema = new Schema<IEnrollment>(
     whatsapp: {
       type: String,
     },
-    paymentMethod: {
-      type: String,
-      enum: [PaymentMethod.Esewa, PaymentMethod.Khalti],
-      default: PaymentMethod.Khalti,
-    },
   },
   {
     timestamps: true,

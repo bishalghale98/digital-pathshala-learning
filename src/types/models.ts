@@ -65,6 +65,7 @@ export interface IPayment extends Document {
   enrollment: Types.ObjectId;
   amount: number;
   status: Status;
+  paymentMethod: PaymentMethod;
   createdAt?: Date;
   updatedAt?: Date;
 }

@@ -1,13 +1,17 @@
 import dbConnect from "@/database/dbConnection";
+import Course from "@/database/models/course.schema";
 import Enrollment from "@/database/models/enrollment.schema";
+import Payment from "@/database/models/payment.schema";
 import { auth } from "@/lib/auth";
 import { isValidObjectId } from "@/lib/helper/isValidObjectId";
 import {
   enrollmentCreateSchema,
   enrollmentStatusSchema,
 } from "@/schemas/enrollmentSchema";
+import { PaymentMethod } from "@/types/models";
 import { errorResponse, successResponse } from "@/utils/response";
 import { tryCatch } from "@/utils/tryCatch";
+import axios from "axios";
 import { headers } from "next/headers";
 import { NextRequest } from "next/server";
 
@@ -51,11 +55,48 @@ export const createEnrollment = tryCatch(async (req: NextRequest) => {
     studentId,
     courseId,
     whatsapp: whatsApp,
-    paymentMethod,
     enrolledAt: new Date(),
   });
 
-  return successResponse("Enrollment created successfully", enrollment, 201);
+  const courseData = await Course.findById(courseId);
+
+  let payment_url;
+
+  if (paymentMethod === PaymentMethod.Khalti) {
+    const data = {
+      return_url: "http://localhost:3000/",
+      website_url: "http://localhost:3000/",
+      amount: courseData.price * 100,
+      purchase_order_id: enrollment._id,
+      purchase_order_name: courseData.title,
+    };
+
+    const res = await axios.post(
+      "https://dev.khalti.com/api/v2/epayment/initiate/",
+      data,
+      {
+        headers: {
+          Authorization: "key b540a86f2796459683b81cdaf2cf30c9",
+        },
+      }
+    );
+
+    payment_url = res.data.payment_url;
+
+    await Payment.create({
+      enrollment: enrollment._id,
+      amount: courseData.price,
+      paymentMethod,
+    });
+  } else {
+    // TODO ....
+  }
+
+  return successResponse(
+    "Enrollment created successfully",
+    { enrollment, payment_url },
+    201
+  );
 });
 
 export const getEnrollment = tryCatch(async (_req: NextRequest, id: string) => {
