@@ -1,10 +1,11 @@
 'use client'
 
-import { fetchEnrollements } from '@/store/enrollment/enrollmentSlice'
+import { EnrollmentStatus } from '@/schemas/enrollmentSchema'
+import { fetchEnrollements, updateEnrollment } from '@/store/enrollment/enrollmentSlice'
 import { IEnrollment } from '@/store/enrollment/types'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
-import { EnrollmentStatus } from '@/types/models'
 import React, { useEffect, useState } from 'react'
+import { id } from 'zod/locales'
 
 const EnrollmentPage = () => {
     const { Enrollments } = useAppSelector((store) => store.enrollments)
@@ -20,6 +21,15 @@ const EnrollmentPage = () => {
         enrollment.studentId.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         enrollment.courseId.title.toLowerCase().includes(searchTerm.toLowerCase())
     )
+
+    const handleApprove = (id: string) => {
+        dispatch(updateEnrollment(id, { enrollmentStatus: EnrollmentStatus.Approved }));
+    };
+
+    const handleReject = (id: string) => {
+        dispatch(updateEnrollment(id, { enrollmentStatus: EnrollmentStatus.Rejected }));
+    };
+
 
 
 
@@ -213,29 +223,34 @@ const EnrollmentPage = () => {
                                             <div className="text-sm text-gray-900">{enrollment.whatsapp}</div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <div className="flex items-center gap-2">
+                                            <div className="flex items-center space-x-2">
                                                 <button
-                                                    className="p-2 text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 rounded-full transition-colors"
-                                                    title="Edit enrollment"
+                                                    onClick={() => handleReject(enrollment._id)}
+                                                    className="p-2 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-lg transition-colors"
+                                                    title="Reject"
                                                 >
-                                                    <svg width={20} height={20} viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                                        <path d="M9.534 8.157l-.57-.562 8.926-8.737.57.562-8.926 8.737zM16.315 3.759l.665.628-3.259 3.448-.664-.628 3.258-3.448zM11.919 10.466l-3.461-3.658 1.248-1.222 3.46 3.658-1.247 1.222zM9.073 10.995l1.391-1.367-.784-.167-.607 1.534zM9.057 10.98l.043.393-.34-.323.297-.07zM17.168 4.995l.832.008-8.058 8.218-.832-.008 8.058-8.218z" />
+                                                    <svg width="24" height="24" viewBox="0 0 24 24">
+                                                        <path fill="currentColor" d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z" />
                                                     </svg>
                                                 </button>
+
                                                 <button
-                                                    className="p-2 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-full transition-colors"
-                                                    title="Delete enrollment"
+                                                    onClick={() => handleApprove(enrollment._id)}
+                                                    className="p-2 text-green-600 hover:text-green-900 hover:bg-green-50 rounded-lg transition-colors"
+                                                    title="Approve"
                                                 >
-                                                    <svg width={20} height={20} viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                                        <path d="M4 5.5h12v7.5h-1.2v1.2h-1.2v1.8h-4v-1.8H8.8v-1.2H7.6V13H4V5.5zM7.05 5.5v-1.334h5.9V5.5h-5.9z" />
+                                                    <svg width="24" height="24" viewBox="0 0 24 24">
+                                                        <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
                                                     </svg>
                                                 </button>
+
+
                                                 <button
-                                                    className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-full transition-colors"
+                                                    className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
                                                     title="More options"
                                                 >
-                                                    <svg width={20} height={20} viewBox="0 0 20 20" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                                        <path d="M10.016 14.99v.05M10.016 9.976v.05M10.016 4.962v.05" strokeWidth="2.5" strokeLinecap="round" />
+                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
                                                     </svg>
                                                 </button>
                                             </div>

@@ -1,8 +1,9 @@
+import { ObjectId } from "mongodb";
 import dbConnect from "@/database/dbConnection";
 import Course from "@/database/models/course.schema";
 import Enrollment from "@/database/models/enrollment.schema";
 import Payment from "@/database/models/payment.schema";
-import { auth } from "@/lib/auth";
+import { auth, db } from "@/lib/auth";
 import { isValidObjectId } from "@/lib/helper/isValidObjectId";
 import {
   enrollmentCreateSchema,
@@ -14,17 +15,24 @@ import { tryCatch } from "@/utils/tryCatch";
 import axios from "axios";
 import { headers } from "next/headers";
 import { NextRequest } from "next/server";
+import { populateStudentObj, populateStudents } from "./helper.controller";
 
 export const getEnrollments = tryCatch(async (req: NextRequest) => {
   await dbConnect();
 
   const enrollments = await Enrollment.find()
-    .populate("studentId")
     .populate("courseId")
-    .lean()
-    .sort({ createdAt: -1 });
+    .sort({ createdAt: -1 })
+    .lean();
 
-  return successResponse("Successfully fetched enrollments", enrollments, 200);
+  // Populate studentId from Better Auth
+  const populatedEnrollments = await populateStudents(enrollments);
+
+  return successResponse(
+    "Successfully fetched enrollments",
+    populatedEnrollments,
+    200
+  );
 });
 
 export const createEnrollment = tryCatch(async (req: NextRequest) => {
@@ -64,7 +72,7 @@ export const createEnrollment = tryCatch(async (req: NextRequest) => {
 
   if (paymentMethod === PaymentMethod.Khalti) {
     const data = {
-      return_url: "http://localhost:3000/",
+      return_url: "http://localhost:3000/student/courses",
       website_url: "http://localhost:3000/",
       amount: courseData.price * 100,
       purchase_order_id: enrollment._id,
@@ -83,11 +91,18 @@ export const createEnrollment = tryCatch(async (req: NextRequest) => {
 
     payment_url = res.data.payment_url;
 
-    await Payment.create({
+    const pidx = res.data.pidx;
+
+    console.log(pidx, "pidx enroll ma");
+
+    const createdPayment = await Payment.create({
       enrollment: enrollment._id,
       amount: courseData.price,
       paymentMethod,
+      pidx:pidx,
     });
+
+    console.log(createdPayment, "payment create vayo");
   } else {
     // TODO ....
   }
@@ -108,14 +123,19 @@ export const getEnrollment = tryCatch(async (_req: NextRequest, id: string) => {
 
   const enrollment = await Enrollment.findById(id)
     .populate("courseId", "title description")
-    .populate("studentId", "name email")
     .lean();
 
-  if (!enrollment) {
+  const populatedEnrollments = await populateStudents(enrollment);
+
+  if (!populatedEnrollments) {
     return errorResponse("Enrollment not found", 404);
   }
 
-  return successResponse("Successfully fetched enrollment", enrollment, 200);
+  return successResponse(
+    "Successfully fetched enrollment",
+    populatedEnrollments,
+    200
+  );
 });
 
 export const deleteEnrollment = tryCatch(
@@ -156,20 +176,22 @@ export const changeEnrollmentStatus = tryCatch(
       { enrollmentStatus: parsed.data.enrollmentStatus },
       {
         new: true,
-        runValidators: true,
       }
     )
       .populate("courseId")
-      .populate("studentId")
       .lean();
 
-    if (!updatedEnrollment) {
+    const populatedEnrollments = await populateStudentObj(updatedEnrollment);
+
+    console.log(populatedEnrollments);
+
+    if (!populatedEnrollments) {
       return errorResponse("Enrollment not found", 404);
     }
 
     return successResponse(
       "Enrollment status updated successfully",
-      updatedEnrollment,
+      populatedEnrollments,
       200
     );
   }

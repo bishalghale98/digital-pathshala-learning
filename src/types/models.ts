@@ -2,9 +2,9 @@ import { Document, Types } from "mongoose";
 
 // ====== Status Enum ======
 export enum Status {
-  Pending = "pending",
-  Completed = "completed",
-  Failed = "failed",
+  Pending = "Pending",
+  Completed = "Completed",
+  Failed = "Failed",
 }
 
 // ====== Category Interface ======
@@ -41,9 +41,9 @@ export interface ILesson extends Document {
 
 // Enrollment status
 export enum EnrollmentStatus {
-  Approved = "approved",
-  Pending = "pending",
-  rejected = "rejected",
+  Approved = "Approved",
+  Pending = "Pending",
+  Rejected = "Rejected",
 }
 
 export interface IEnrollment extends Document {
@@ -66,6 +66,8 @@ export interface IPayment extends Document {
   amount: number;
   status: Status;
   paymentMethod: PaymentMethod;
+  transactionId: string;
+  pidx: string;
   createdAt?: Date;
   updatedAt?: Date;
 }

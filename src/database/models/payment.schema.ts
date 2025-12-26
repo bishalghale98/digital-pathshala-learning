@@ -23,6 +23,13 @@ const paymentSchema = new Schema<IPayment>(
       enum: [PaymentMethod.Esewa, PaymentMethod.Khalti],
       default: PaymentMethod.Khalti,
     },
+    transactionId: {
+      type: String,
+    },
+    pidx: {
+      type: String,
+      required: true,
+    },
   },
   {
     timestamps: true,

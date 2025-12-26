@@ -6,6 +6,7 @@ import z from "zod";
 import { IInitialState } from "./types";
 import {
   enrollmentCreateSchema,
+  enrollmentStatusSchema,
   enrollmentUpdateSchema,
 } from "@/schemas/enrollmentSchema";
 
@@ -113,11 +114,11 @@ export function deleteEnrollment(id: string) {
 
 export function updateEnrollment(
   id: string,
-  data: z.infer<typeof enrollmentUpdateSchema>
+  data: z.infer<typeof enrollmentStatusSchema>
 ) {
-  return async function updateCategoryThunk(dispatch: AppDispatch) {
+  return async function updateEnrollmentThunk(dispatch: AppDispatch) {
     try {
-      const res = await api.put(`enrollment/${id}`, data);
+      const res = await api.patch(`enrollment/${id}`, data);
 
       if (res.data.success) {
         dispatch(editEnrollment(res.data.data));

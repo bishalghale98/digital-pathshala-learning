@@ -1,4 +1,4 @@
-import { EnrollmentStatus, IEnrollment, PaymentMethod } from "@/types/models";
+import { EnrollmentStatus, IEnrollment } from "@/types/models";
 import { Schema, model, models } from "mongoose";
 import "./course.schema";
 
@@ -6,7 +6,6 @@ const enrollmentSchema = new Schema<IEnrollment>(
   {
     studentId: {
       type: Schema.Types.ObjectId,
-      ref: "User",
       required: true,
     },
     courseId: {
@@ -23,7 +22,7 @@ const enrollmentSchema = new Schema<IEnrollment>(
       enum: [
         EnrollmentStatus.Approved,
         EnrollmentStatus.Pending,
-        EnrollmentStatus.rejected,
+        EnrollmentStatus.Rejected,
       ],
       default: EnrollmentStatus.Pending,
     },

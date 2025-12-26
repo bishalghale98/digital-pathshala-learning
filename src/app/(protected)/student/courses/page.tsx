@@ -7,6 +7,8 @@ import { fetchCourses } from '@/store/course/courseSlice';
 import { ICourse } from '@/store/course/types';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { Status } from '@/store/types';
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react'
 
 const CoursesPage = () => {
@@ -14,6 +16,7 @@ const CoursesPage = () => {
     const { Courses, status }: { Courses: ICourse[], status: Status } = useAppSelector((store) => store.courses)
     const { PaymentUrl } = useAppSelector((store) => store.enrollments)
     const dispatch = useAppDispatch()
+    const router = useRouter()
 
     const [isOpen, setIsOpen] = useState<boolean>(false)
     const [courseId, setCourseId] = useState<string>('')
@@ -35,6 +38,15 @@ const CoursesPage = () => {
 
         }
     }, [PaymentUrl])
+
+
+    useEffect(() => {
+        const pidx = new URLSearchParams(window.location.search).get("pidx");
+        if (!pidx) return;
+
+        axios.post("/api/payment/verify", { pidx }).then(() => router.replace('/student/courses'))
+
+    }, [router]);
 
 
     useEffect(() => {
