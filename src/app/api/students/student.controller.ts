@@ -11,7 +11,7 @@ import { NextRequest } from "next/server";
 export const getStudents = tryCatch(async (req: NextRequest) => {
   const students = await db
     .collection("user")
-    .find({ role: Roles.Student })
+    .find()
     .sort({ createdAt: -1 })
     .toArray();
 
@@ -21,7 +21,6 @@ export const getStudents = tryCatch(async (req: NextRequest) => {
 export const getMyCourse = tryCatch(async (req: NextRequest) => {
   await dbConnect();
 
-  
   const session = await auth.api.getSession({
     headers: await headers(),
   });

@@ -65,7 +65,7 @@ const CoursesPage = () => {
             {/* Header */}
             <div className="max-w-7xl mx-auto mb-10">
                 <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
-                    My Courses
+                    Available Courses
                 </h1>
                 <p className="text-gray-600">
                     Continue your learning journey with these courses
