@@ -3,7 +3,7 @@ import Enrollment from "@/database/models/enrollment.schema";
 import { auth, db } from "@/lib/auth";
 import { Roles } from "@/lib/constants";
 import { EnrollmentStatus } from "@/types/models";
-import { successResponse } from "@/utils/response";
+import { errorResponse, successResponse } from "@/utils/response";
 import { tryCatch } from "@/utils/tryCatch";
 import { headers } from "next/headers";
 import { NextRequest } from "next/server";
@@ -20,6 +20,8 @@ export const getStudents = tryCatch(async (req: NextRequest) => {
 
 export const getMyCourse = tryCatch(async (req: NextRequest) => {
   await dbConnect();
+
+  
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -32,6 +34,10 @@ export const getMyCourse = tryCatch(async (req: NextRequest) => {
   })
     .populate("courseId")
     .lean();
+
+  if (enrollments.length == 0) {
+    return errorResponse("You have not enrolled in any courses");
+  }
 
   return successResponse("My courses fetch successfully", enrollments);
 });

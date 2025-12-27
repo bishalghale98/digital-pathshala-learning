@@ -5,11 +5,9 @@ import { useAppSelector } from '@/store/hooks'
 import { useRouter } from 'next/navigation'
 import React from 'react'
 
-interface VideoPlaySectionProps {
-    lessonId: string
-}
 
-const VideoPlaySection: React.FC<VideoPlaySectionProps> = ({ lessonId }) => {
+
+const VideoPlaySection = () => {
     const router = useRouter()
     const { ActiveLesson, Lessons } = useAppSelector(store => store.students)
 

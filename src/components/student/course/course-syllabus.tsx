@@ -1,16 +1,13 @@
 'use client'
 
-import { useAppDispatch, useAppSelector } from '@/store/hooks'
-import { fetchMyLessons } from '@/store/student/studentSlice'
-import { ILesson } from '@/store/student/types'
+
+import { useAppSelector } from '@/store/hooks'
 import { useRouter } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 
-interface CourseSyallabusProps {
-    courseId: string
-}
 
-const CourseSyallabus: React.FC<CourseSyallabusProps> = ({ courseId }) => {
+
+const CourseSyallabus = () => {
     const { Lessons, status } = useAppSelector(store => store.students) // Use status from store
     const router = useRouter()
 
@@ -73,7 +70,7 @@ const CourseSyallabus: React.FC<CourseSyallabusProps> = ({ courseId }) => {
                             >
                                 <div className="flex items-start space-x-3 sm:space-x-4 flex-1 min-w-0">
                                     {/* Lesson Number */}
-                                    <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-gray-200 rounded-lg flex items-center justify-center shrink-0">
                                         <span className="text-gray-600 font-semibold text-xs sm:text-sm lg:text-base">
                                             {index + 1}
                                         </span>
@@ -94,7 +91,7 @@ const CourseSyallabus: React.FC<CourseSyallabusProps> = ({ courseId }) => {
 
                                 {/* Chevron Icon */}
                                 <svg
-                                    className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 flex-shrink-0 ml-2 sm:ml-4"
+                                    className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 shrink-0 ml-2 sm:ml-4"
                                     fill="none"
                                     stroke="currentColor"
                                     strokeWidth={2}

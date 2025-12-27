@@ -33,7 +33,7 @@ export const createCourse = tryCatch(async (req: NextRequest) => {
   return successResponse("Course created successfully", course, 201);
 });
 
-export const getCourses = tryCatch(async () => {
+export const getCourses = tryCatch(async (req) => {
   await dbConnect();
 
   const courses = await Course.find()

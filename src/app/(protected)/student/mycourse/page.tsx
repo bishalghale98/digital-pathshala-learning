@@ -47,13 +47,13 @@ const MyCoursePage = () => {
 
     if (section === 'course-syllabus' && courseId) {
         return (
-            <CourseSyallabus courseId={courseId} />
+            <CourseSyallabus />
         )
     }
 
     if (section === 'video_play' && courseId && lessonId) {
         return (
-            <VideoPlaySection lessonId={lessonId} />
+            <VideoPlaySection />
         )
     }
 

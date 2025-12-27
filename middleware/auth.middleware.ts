@@ -1,11 +1,18 @@
 import { auth } from "@/lib/auth";
-import { errorResponse } from "@/utils/response";
-import { NextRequest, NextResponse } from "next/server";
+import { errorResponse, successResponse } from "@/utils/response";
+import { NextRequest } from "next/server";
 
+/**
+ * Middleware to protect app routes by role
+ * @param req - NextRequest object
+ * @param allowedRoles - single role or array of roles allowed to access
+ * @returns null if authorized, or errorResponse if not
+ */
 export const authMiddleware = async (
   req: NextRequest,
   allowedRoles: string[] | string
 ) => {
+  // Get session from headers
   const session = await auth.api.getSession({
     headers: req.headers,
   });
@@ -23,5 +30,6 @@ export const authMiddleware = async (
     );
   }
 
-  return NextResponse.next();
+  // Authorized: return null so API route continues
+  return successResponse("Authorized", session);
 };

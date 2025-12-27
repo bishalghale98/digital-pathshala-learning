@@ -3,14 +3,10 @@ import Category from "@/database/models/category.schema";
 import { errorResponse, successResponse } from "@/utils/response";
 import { tryCatch } from "@/utils/tryCatch";
 import { NextRequest } from "next/server";
-import { authMiddleware } from "../../../../middleware/auth.middleware";
-import { Roles } from "@/lib/constants";
 import { categoryCreateSchema } from "@/schemas/categorySchema";
 
 export const createCategory = tryCatch(async (req: NextRequest) => {
-  // const checkAuth = authMiddleware(req, Roles.Admin);
-
-  // if (checkAuth) return checkAuth;
+ 
 
   await dbConnect();
   const body = await req.json();

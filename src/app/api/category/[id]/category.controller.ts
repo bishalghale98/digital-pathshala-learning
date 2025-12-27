@@ -25,7 +25,10 @@ export const getCategory = tryCatch(async (req: NextRequest, id: string) => {
 export const deleteCategroy = tryCatch(async (req: NextRequest, id: string) => {
   // const checkAuth = authMiddleware(req, Roles.Admin);
 
-  // if (checkAuth) return checkAuth;
+  // if (checkAuth.status !== 200) {
+    
+    return checkAuth;
+  }
 
   await dbConnect();
 
@@ -40,7 +43,10 @@ export const deleteCategroy = tryCatch(async (req: NextRequest, id: string) => {
 
 export const updateCategory = tryCatch(async (req: NextRequest, id: string) => {
   // const checkAuth = authMiddleware(req, Roles.Admin);
-  // if (checkAuth) return checkAuth;
+  // if (checkAuth.status !== 200) {
+    
+    return checkAuth;
+  }
 
   await dbConnect();
 

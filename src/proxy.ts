@@ -10,7 +10,6 @@ export async function proxy(request: NextRequest) {
     headers: await headers(),
   });
 
-
   if (pathname === "/sign-in") {
     return NextResponse.next();
   }
@@ -25,9 +24,13 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/unauthorized", request.url));
   }
 
-  // if (pathname.startsWith("/student") && role !== Roles.Student) {
-  //   return NextResponse.redirect(new URL("/unauthorized", request.url));
-  // }
+  if (
+    pathname.startsWith("/student") &&
+    role !== Roles.Student &&
+    role !== Roles.Admin
+  ) {
+    return NextResponse.redirect(new URL("/unauthorized", request.url));
+  }
 
   return NextResponse.next();
 }

@@ -10,6 +10,7 @@ export interface IEnrollment {
   enrolledAt: string;
   enrollmentStatus: EnrollmentStatus;
   whatsapp: string;
+  createdAt: string;
 }
 
 export interface IInitialState {
