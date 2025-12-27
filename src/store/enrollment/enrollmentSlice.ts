@@ -7,7 +7,6 @@ import { IInitialState } from "./types";
 import {
   enrollmentCreateSchema,
   enrollmentStatusSchema,
-  enrollmentUpdateSchema,
 } from "@/schemas/enrollmentSchema";
 
 const datas: IInitialState = {
@@ -16,7 +15,7 @@ const datas: IInitialState = {
   PaymentUrl: "",
 };
 
-const EnrollmentSlice = createSlice({
+const enrollmentSlice = createSlice({
   name: "category",
   initialState: datas,
   reducers: {
@@ -60,8 +59,8 @@ export const {
   editEnrollment,
   removeEnrollment,
   setPaymentUrl,
-} = EnrollmentSlice.actions;
-export default EnrollmentSlice.reducer;
+} = enrollmentSlice.actions;
+export default enrollmentSlice.reducer;
 
 export function fetchEnrollements() {
   return async function fetchEnrollmentsThunk(dispatch: AppDispatch) {

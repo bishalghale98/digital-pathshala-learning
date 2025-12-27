@@ -23,7 +23,7 @@ export const paymentVerification = tryCatch(async (req: NextRequest) => {
 
   await Payment.findOneAndUpdate(
     { pidx },
-    { status, transactionId: transaction_id, amount: total_amount }
+    { status, transactionId: transaction_id, amount: total_amount / 100 }
   );
 
   return NextResponse.json({ success: true, data: res.data });
@@ -39,7 +39,7 @@ export const getPaymentDetail = tryCatch(async (req: NextRequest) => {
   }).populate("enrollment");
 
   return Response.json({
-    res,
+    data: res,
     message: "running",
   });
 });

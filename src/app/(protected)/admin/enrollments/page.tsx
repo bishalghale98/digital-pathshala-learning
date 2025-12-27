@@ -1,15 +1,18 @@
 'use client'
 
+import PaymentModal from '@/components/enrollment/payment-modal'
 import { EnrollmentStatus } from '@/schemas/enrollmentSchema'
 import { fetchEnrollements, updateEnrollment } from '@/store/enrollment/enrollmentSlice'
 import { IEnrollment } from '@/store/enrollment/types'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
-import React, { useEffect, useState } from 'react'
-import { id } from 'zod/locales'
+import { fetchPayment } from '@/store/payment/paymentSlice'
+import { useEffect, useState } from 'react'
 
 const EnrollmentPage = () => {
     const { Enrollments } = useAppSelector((store) => store.enrollments)
     const [searchTerm, setSearchTerm] = useState('')
+    const [isOpenModal, setIsOpenModal] = useState(false)
+    const [selectedId, setSelectedId] = useState('')
 
     const dispatch = useAppDispatch()
 
@@ -29,6 +32,10 @@ const EnrollmentPage = () => {
     const handleReject = (id: string) => {
         dispatch(updateEnrollment(id, { enrollmentStatus: EnrollmentStatus.Rejected }));
     };
+
+
+
+
 
 
 
@@ -191,7 +198,12 @@ const EnrollmentPage = () => {
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {filterEnrollments.map((enrollment: IEnrollment) => (
                                     <tr key={enrollment._id} className="hover:bg-gray-50 transition-colors">
-                                        <td className="px-6 py-4 whitespace-nowrap">
+                                        <td
+                                            onClick={() => {
+                                                setSelectedId(enrollment._id)
+                                                setIsOpenModal(true)
+                                            }}
+                                            className="px-6 py-4 whitespace-nowrap">
                                             <div className="text-sm font-medium text-gray-900 truncate max-w-[120px]" title={enrollment._id}>
                                                 {enrollment._id}
                                             </div>
@@ -261,7 +273,13 @@ const EnrollmentPage = () => {
                         </table>
                     </div>
                 </div>
-            </div>
+            </div>{
+                isOpenModal && <PaymentModal
+                    isOpen={isOpenModal}
+                    onClose={() => setIsOpenModal(false)}
+                    selectedId={selectedId}
+                />
+            }
         </div>
     )
 }

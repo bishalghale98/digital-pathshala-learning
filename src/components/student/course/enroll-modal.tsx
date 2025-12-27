@@ -23,6 +23,7 @@ const EnrollModal: React.FC<EnrollModalProps> = ({ closeModal, courseId }) => {
     const {
         register,
         handleSubmit,
+        reset,
         formState: { errors, isSubmitting },
     } = useForm<EnrollFormValues>({
         resolver: zodResolver(enrollmentCreateSchema),
@@ -33,10 +34,21 @@ const EnrollModal: React.FC<EnrollModalProps> = ({ closeModal, courseId }) => {
         },
     });
 
+
     const onSubmit = async (data: EnrollFormValues) => {
-        console.log("Enroll Data:", data);
-        disptach(createEnrollment(data))
-    }
+        try {
+            await disptach(createEnrollment(data));
+
+            reset();
+
+            setIsConfirmed(false);
+
+            closeModal();
+        } catch (error) {
+            console.error("Enrollment failed:", error);
+        }
+    };
+
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center">

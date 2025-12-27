@@ -7,7 +7,7 @@ export interface IEnrollment {
   _id: string;
   courseId: ICourse;
   studentId: IStudent;
-  enrolledAt: Date;
+  enrolledAt: string;
   enrollmentStatus: EnrollmentStatus;
   whatsapp: string;
 }
