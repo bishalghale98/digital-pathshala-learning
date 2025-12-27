@@ -13,6 +13,7 @@ const datas: IInitialState = {
   Enrollments: [],
   status: Status.Loading,
   PaymentUrl: "",
+  message: "",
 };
 
 const enrollmentSlice = createSlice({
@@ -21,6 +22,9 @@ const enrollmentSlice = createSlice({
   reducers: {
     setStatus(state, action) {
       state.status = action.payload;
+    },
+    setMessage(state, action) {
+      state.message = action.payload;
     },
     setEnrollments(state, action) {
       state.Enrollments = action.payload;
@@ -59,6 +63,7 @@ export const {
   editEnrollment,
   removeEnrollment,
   setPaymentUrl,
+  setMessage,
 } = enrollmentSlice.actions;
 export default enrollmentSlice.reducer;
 
@@ -89,9 +94,10 @@ export function createEnrollment(data: z.infer<typeof enrollmentCreateSchema>) {
         dispatch(addEnrollment(res.data.data.enrollment));
         dispatch(setPaymentUrl(res.data.data.payment_url));
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
       dispatch(setStatus(Status.Error));
+      dispatch(setMessage(error.response.data.message));
     }
   };
 }

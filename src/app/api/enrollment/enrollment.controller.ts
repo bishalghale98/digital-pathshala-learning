@@ -9,7 +9,7 @@ import {
   enrollmentCreateSchema,
   enrollmentStatusSchema,
 } from "@/schemas/enrollmentSchema";
-import { PaymentMethod } from "@/types/models";
+import { EnrollmentStatus, PaymentMethod } from "@/types/models";
 import { errorResponse, successResponse } from "@/utils/response";
 import { tryCatch } from "@/utils/tryCatch";
 import axios from "axios";
@@ -54,7 +54,11 @@ export const createEnrollment = tryCatch(async (req: NextRequest) => {
 
   const studentId = session?.user.id;
 
-  const existing = await Enrollment.findOne({ studentId, courseId });
+  const existing = await Enrollment.findOne({
+    studentId,
+    courseId,
+    enrollmentStatus: EnrollmentStatus.Approved,
+  });
   if (existing) {
     return errorResponse("Student is already enrolled in this course", 409);
   }
@@ -99,7 +103,7 @@ export const createEnrollment = tryCatch(async (req: NextRequest) => {
       enrollment: enrollment._id,
       amount: courseData.price,
       paymentMethod,
-      pidx:pidx,
+      pidx: pidx,
     });
 
     console.log(createdPayment, "payment create vayo");

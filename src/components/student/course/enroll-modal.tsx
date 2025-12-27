@@ -7,7 +7,9 @@ import { enrollmentCreateSchema } from "@/schemas/enrollmentSchema";
 import { PaymentMethod } from "@/types/models";
 import { z } from "zod";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { createEnrollment } from "@/store/enrollment/enrollmentSlice";
+import { createEnrollment, setStatus } from "@/store/enrollment/enrollmentSlice";
+import { toast } from "sonner";
+import { Status } from "@/store/types";
 
 interface EnrollModalProps {
     closeModal: () => void;
@@ -19,6 +21,7 @@ type EnrollFormValues = z.infer<typeof enrollmentCreateSchema>;
 const EnrollModal: React.FC<EnrollModalProps> = ({ closeModal, courseId }) => {
     const [isConfirmed, setIsConfirmed] = useState(false);
     const disptach = useAppDispatch()
+    const { status, message } = useAppSelector((store) => store.enrollments)
 
     const {
         register,
@@ -36,18 +39,23 @@ const EnrollModal: React.FC<EnrollModalProps> = ({ closeModal, courseId }) => {
 
 
     const onSubmit = async (data: EnrollFormValues) => {
-        try {
-            await disptach(createEnrollment(data));
 
-            reset();
+        await disptach(createEnrollment(data));
 
-            setIsConfirmed(false);
+        reset();
 
-            closeModal();
-        } catch (error) {
-            console.error("Enrollment failed:", error);
-        }
+        setIsConfirmed(false);
+
+        closeModal();
+
+
+
     };
+
+    if (status == Status.Error) {
+        toast.error(message);
+        disptach(setStatus(Status.Loading))
+    }
 
 
     return (

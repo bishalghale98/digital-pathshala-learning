@@ -1,0 +1,112 @@
+'use client'
+
+import { useAppDispatch, useAppSelector } from '@/store/hooks'
+import { fetchMyLessons } from '@/store/student/studentSlice'
+import { ILesson } from '@/store/student/types'
+import { useRouter } from 'next/navigation'
+import React, { useEffect, useState } from 'react'
+
+interface CourseSyallabusProps {
+    courseId: string
+}
+
+const CourseSyallabus: React.FC<CourseSyallabusProps> = ({ courseId }) => {
+    const { Lessons, status } = useAppSelector(store => store.students) // Use status from store
+    const router = useRouter()
+
+
+
+    // Determine loading from store status instead of local state
+    const loading = status === 'loading'
+
+    return (
+        <div className="space-y-6 p-6">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+                {/* Title & Lesson Count */}
+                <div>
+                    <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Course Syllabus</h2>
+                    <p className="text-sm sm:text-base text-gray-500 mt-1">{Lessons.length} lessons</p>
+                </div>
+
+                {/* Back Button */}
+                <div className="mt-3 sm:mt-0">
+                    <button
+                        onClick={() => router.back()}
+                        className="flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm sm:text-base"
+                    >
+                        <svg
+                            className="w-4 h-4 mr-2"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                            viewBox="0 0 24 24"
+                        >
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                        </svg>
+                        Back
+                    </button>
+                </div>
+            </div>
+
+
+            {/* Lesson Cards */}
+            <div className="space-y-4">
+                {loading
+                    ? Array.from({ length: 5 }).map((_, index) => (
+                        <div
+                            key={index}
+                            className="bg-gray-100 animate-pulse rounded-lg sm:rounded-xl p-4 lg:p-6 h-20 sm:h-24"
+                        />
+                    ))
+                    : Lessons.length === 0
+                        ? <p className="text-gray-500 text-sm">No lessons available for this course.</p>
+                        : Lessons.map((lesson, index) => (
+                            <div
+                                key={lesson._id}
+                                onClick={() =>
+                                    router.push(
+                                        `/student/mycourse?section=video_play&courseId=${lesson.courseId._id}&lessonId=${lesson._id}`
+                                    )
+                                }
+                                className="bg-white rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 shadow-sm border border-gray-100 hover:shadow-lg transition-shadow cursor-pointer flex items-center justify-between"
+                            >
+                                <div className="flex items-start space-x-3 sm:space-x-4 flex-1 min-w-0">
+                                    {/* Lesson Number */}
+                                    <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <span className="text-gray-600 font-semibold text-xs sm:text-sm lg:text-base">
+                                            {index + 1}
+                                        </span>
+                                    </div>
+
+                                    {/* Lesson Title & Description */}
+                                    <div className="flex-1 min-w-0">
+                                        <h3 className="text-sm sm:text-base lg:text-lg font-semibold text-gray-800 truncate mb-1 sm:mb-2">
+                                            {lesson.title}
+                                        </h3>
+                                        {lesson.description && (
+                                            <p className="text-gray-500 text-xs sm:text-sm truncate hidden sm:block">
+                                                {lesson.description}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Chevron Icon */}
+                                <svg
+                                    className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 flex-shrink-0 ml-2 sm:ml-4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth={2}
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </div>
+                        ))}
+            </div>
+        </div>
+    )
+}
+
+export default CourseSyallabus

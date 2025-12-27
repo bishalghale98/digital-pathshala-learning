@@ -3,12 +3,14 @@ import { createSlice } from "@reduxjs/toolkit";
 import { Status } from "../types";
 import { AppDispatch } from "../store";
 import api from "@/config/api";
-import z from "zod";
 import { IInitialState } from "./types";
 
 const datas: IInitialState = {
   Students: [],
   status: Status.Loading,
+  MyCourses: [],
+  Lessons: [],
+  ActiveLesson: null,
 };
 
 const studentSlice = createSlice({
@@ -21,9 +23,20 @@ const studentSlice = createSlice({
     setStudents(state, action) {
       state.Students = action.payload;
     },
-    // addLesson(state, action) {
-    //   state.Students.push(action.payload);
-    // },
+    setMyCourses(state, action) {
+      state.MyCourses = action.payload;
+    },
+    setLessons(state, action) {
+      state.Lessons = action.payload;
+    },
+    setLesson(state, action) {
+      const lesson = state.Lessons.find(
+        (lesson) => lesson._id === action.payload
+      );
+
+      state.ActiveLesson = lesson || null;
+    },
+
     // removeLesson(state, action) {
     //   const index = state.Students.findIndex(
     //     (lesson) => lesson._id == action.payload
@@ -44,7 +57,8 @@ const studentSlice = createSlice({
   },
 });
 
-export const { setStudents, setStatus } = studentSlice.actions;
+export const { setStudents, setStatus, setMyCourses, setLessons, setLesson } =
+  studentSlice.actions;
 export default studentSlice.reducer;
 
 export function fetchStudents() {
@@ -60,6 +74,60 @@ export function fetchStudents() {
       } else {
         dispatch(setStatus(Status.Error));
       }
+    } catch (error) {
+      console.error(error);
+      dispatch(setStatus(Status.Error));
+    }
+  };
+}
+
+export function fetchMyCourses() {
+  return async function fetchMyCoursesThunk(dispatch: AppDispatch) {
+    dispatch(setStatus(Status.Loading));
+
+    try {
+      const res = await api.get(`students/my-course`);
+
+      if (res.data.success) {
+        dispatch(setMyCourses(res.data.data));
+        dispatch(setStatus(Status.Success));
+      } else {
+        dispatch(setStatus(Status.Error));
+      }
+    } catch (error) {
+      console.error(error);
+      dispatch(setStatus(Status.Error));
+    }
+  };
+}
+
+export function fetchMyLessons(id: string) {
+  return async function fetchMyLessonsThunk(dispatch: AppDispatch) {
+    dispatch(setStatus(Status.Loading));
+
+    try {
+      const res = await api.get(`students/lessons?courseId=${id}`);
+
+      if (res.data.success) {
+        dispatch(setLessons(res.data.data));
+        dispatch(setStatus(Status.Success));
+      } else {
+        dispatch(setStatus(Status.Error));
+      }
+    } catch (error) {
+      console.error(error);
+      dispatch(setStatus(Status.Error));
+    }
+  };
+}
+
+export function fetchMyLesson(id: string) {
+  return async function fetchMyLessonThunk(dispatch: AppDispatch) {
+    dispatch(setStatus(Status.Loading));
+
+    try {
+      dispatch(setLesson(id));
+      dispatch(setStatus(Status.Success));
     } catch (error) {
       console.error(error);
       dispatch(setStatus(Status.Error));

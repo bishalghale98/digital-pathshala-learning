@@ -16,4 +16,5 @@ export interface IInitialState {
   Enrollments: IEnrollment[];
   status: Status;
   PaymentUrl: string;
+  message: string;
 }
