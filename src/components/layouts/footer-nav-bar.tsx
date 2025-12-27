@@ -14,7 +14,11 @@ const FooterNavBar = () => {
     const navLinks = [
         { name: 'Home', href: '/', icon: <FaHome size={20} /> },
         { name: 'About Us', href: '/about-us', icon: <FaInfoCircle size={20} /> },
-        { name: 'Dashboard', href: `/${role || 'student'}`, icon: <FaTachometerAlt size={20} /> },
+        {
+            name: session?.user ? 'Dashboard' : 'Sign In',
+            href: session?.user ? `${role}` : 'sign-in',
+            icon: <FaTachometerAlt size={20} />
+        },
     ];
 
     return (

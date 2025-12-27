@@ -2,18 +2,23 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { authClient } from '@/lib/auth-client';
 
 const NavBar = () => {
     const pathname = usePathname();
+    const router = useRouter()
     const { data: session } = authClient.useSession();
 
     const role = session?.user.role
     const navLinks = [
         { name: 'Home', href: '/' },
         { name: 'About us', href: '/about-us' },
-        { name: 'Dashboard', href: `${role}` },
+        {
+            name: session?.user ? 'Dashboard' : 'Sign In',
+            href: session?.user ? `${role}` : 'sign-in'
+        }
+
     ];
 
     return (
@@ -50,7 +55,7 @@ const NavBar = () => {
                             </button>
                         ) : (
                             <button
-                                onClick={() => authClient.signIn.social({ provider: 'google' })}
+                                onClick={() => router.push('/sign-in')}
                                 className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
                             >
                                 Sign In
