@@ -77,16 +77,16 @@ const MyCoursePage = () => {
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 text-white">
                 {MyCourses?.map((enroll) => (
                     <div
-                        key={enroll._id}
+                        key={enroll?._id}
                         className="bg-white dark:bg-gray-900 border dark:border-gray-800 rounded-xl shadow-sm hover:shadow-md transition"
                     >
                         {/* Card Header */}
                         <div className="p-5 border-b dark:border-gray-800">
                             <h2 className="text-lg font-semibold line-clamp-1">
-                                {enroll.courseId.title}
+                                {enroll?.courseId?.title}
                             </h2>
                             <p className="text-sm text-gray-500 mt-1 line-clamp-2">
-                                {enroll.courseId.description}
+                                {enroll?.courseId?.description}
                             </p>
                         </div>
 
@@ -95,7 +95,7 @@ const MyCoursePage = () => {
                             <div className="flex justify-between">
                                 <span>Duration</span>
                                 <span className="font-medium">
-                                    {enroll.courseId.duration}
+                                    {enroll?.courseId?.duration}
                                 </span>
                             </div>
 

@@ -96,10 +96,10 @@ const CoursesPage = () => {
                             <div className="text-3xl font-bold text-blue-600">{coursesLength}</div>
                             <div className="text-gray-600 mt-1">Total Courses</div>
                         </div>
-                        <div className="text-center p-4">
+                        {/* <div className="text-center p-4">
                             <div className="text-3xl font-bold text-emerald-600">222</div>
                             <div className="text-gray-600 mt-1">Lessons</div>
-                        </div>
+                        </div> */}
                         {/* <div className="text-center p-4">
                             <div className="text-3xl font-bold text-purple-600">344h</div>
                             <div className="text-gray-600 mt-1">Total Duration</div>

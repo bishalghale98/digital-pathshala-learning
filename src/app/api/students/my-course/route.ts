@@ -8,7 +8,6 @@ export async function GET(req: NextRequest) {
 
   // If checkAuth is a Response, return it (unauthorized/forbidden)
   if (checkAuth.status !== 200) {
-    console.log(checkAuth);
     return checkAuth;
   }
 
