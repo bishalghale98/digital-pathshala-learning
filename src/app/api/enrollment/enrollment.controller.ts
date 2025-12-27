@@ -1,9 +1,8 @@
-import { ObjectId } from "mongodb";
 import dbConnect from "@/database/dbConnection";
 import Course from "@/database/models/course.schema";
 import Enrollment from "@/database/models/enrollment.schema";
 import Payment from "@/database/models/payment.schema";
-import { auth, db } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { isValidObjectId } from "@/lib/helper/isValidObjectId";
 import {
   enrollmentCreateSchema,
@@ -16,6 +15,9 @@ import axios from "axios";
 import { headers } from "next/headers";
 import { NextRequest } from "next/server";
 import { populateStudentObj, populateStudents } from "./helper.controller";
+
+const khalti_live_secret = process.env.KHALTI_SECRET_KEY;
+const base_url = process.env.NEXT_APP_URL;
 
 export const getEnrollments = tryCatch(async (req: NextRequest) => {
   await dbConnect();
@@ -76,8 +78,8 @@ export const createEnrollment = tryCatch(async (req: NextRequest) => {
 
   if (paymentMethod === PaymentMethod.Khalti) {
     const data = {
-      return_url: "http://localhost:3000/student/courses",
-      website_url: "http://localhost:3000/",
+      return_url: `${base_url}/student/courses`,
+      website_url: `${base_url}`,
       amount: courseData.price * 100,
       purchase_order_id: enrollment._id,
       purchase_order_name: courseData.title,
@@ -88,7 +90,7 @@ export const createEnrollment = tryCatch(async (req: NextRequest) => {
       data,
       {
         headers: {
-          Authorization: "key b540a86f2796459683b81cdaf2cf30c9",
+          Authorization: `key ${khalti_live_secret}`,
         },
       }
     );
