@@ -1,14 +1,11 @@
 import dbConnect from "@/database/dbConnection";
 import Course from "@/database/models/course.schema";
 import Lesson from "@/database/models/lesson.schema";
+import { isValidObjectId } from "@/lib/helper/isValidObjectId";
 import { createCourseSchema } from "@/schemas/courseSchema";
 import { errorResponse, successResponse } from "@/utils/response";
 import { tryCatch } from "@/utils/tryCatch";
-import { isValidObjectId } from "mongoose";
 import { NextRequest } from "next/server";
-// import { authMiddleware } from "../../../../../middleware/auth.middleware";
-// import { Roles } from "@/lib/constants";
-
 
 export const getCourse = tryCatch(async (req: NextRequest, id: string) => {
   await dbConnect();
@@ -27,9 +24,6 @@ export const getCourse = tryCatch(async (req: NextRequest, id: string) => {
 });
 
 export const deleteCourse = tryCatch(async (req: NextRequest, id: string) => {
-  // const authError = authMiddleware(req, Roles.Admin);
-  // if (authError) return authError;
-
   await dbConnect();
 
   if (!isValidObjectId(id)) {
@@ -50,9 +44,6 @@ export const deleteCourse = tryCatch(async (req: NextRequest, id: string) => {
 });
 
 export const updateCourse = tryCatch(async (req: NextRequest, id: string) => {
-  // const authError = authMiddleware(req, Roles.Admin);
-  // if (authError) return authError;
-
   await dbConnect();
 
   if (!isValidObjectId(id)) {
@@ -63,7 +54,6 @@ export const updateCourse = tryCatch(async (req: NextRequest, id: string) => {
 
   const parsed = createCourseSchema.safeParse(body);
   if (!parsed.success) {
-    console.error("Validation error:", parsed.error.issues);
     return errorResponse("Invalid course data", 400);
   }
 

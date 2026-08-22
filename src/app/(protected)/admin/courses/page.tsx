@@ -1,29 +1,31 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
-import { deleteCourse, fetchCourses, removeCourse } from "@/store/course/courseSlice";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import React, { useCallback, useState } from "react";
 import CourseModal from "@/components/course/modal";
-import { ICourse } from "@/store/course/types";
 import ConfirmationModal from "@/components/common/delete-modal";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
+import {
+    useDeleteCourseMutation,
+    useGetCoursesQuery,
+    type Course,
+} from "@/store/course/courseApi";
+import { getErrorMessage } from "@/store/api/base";
+import { toast } from "sonner";
 
 const Courses = () => {
-    const { Courses } = useAppSelector((store) => store.courses);
-    const dispatch = useAppDispatch();
+    const router = useRouter();
 
     const [openAddModal, setOpenAddModal] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [editingCourse, setEditingCourse] = useState<ICourse | null>(null);
-    const [courseToDelete, setCourseToDelete] = useState<ICourse | null>(null)
+    const [editingCourse, setEditingCourse] = useState<Course | null>(null);
+    const [courseToDelete, setCourseToDelete] = useState<Course | null>(null)
 
-    useEffect(() => {
-        dispatch(fetchCourses());
-    }, [dispatch]);
+    const { data: courses = [], isLoading } = useGetCoursesQuery();
+    const [deleteCourse] = useDeleteCourseMutation();
 
     const addModalOpen = useCallback(() => setOpenAddModal(true), []);
 
-    const editModalOpen = useCallback((course: ICourse) => {
+    const editModalOpen = useCallback((course: Course) => {
         setEditingCourse(course);
         setIsEditModalOpen(true);
     }, []);
@@ -36,16 +38,20 @@ const Courses = () => {
 
 
 
-    const openDeleteModal = useCallback((course: ICourse) => {
+    const openDeleteModal = useCallback((course: Course) => {
         setCourseToDelete(course)
     }, [])
 
-    const handleDelete = useCallback(() => {
-        if (courseToDelete) {
-            dispatch(deleteCourse(courseToDelete._id))
-            setCourseToDelete(null)
+    const handleDelete = useCallback(async () => {
+        if (!courseToDelete) return;
+        try {
+            await deleteCourse(courseToDelete._id).unwrap();
+            toast.success("Course deleted");
+        } catch (error) {
+            toast.error(getErrorMessage(error));
         }
-    }, [courseToDelete, dispatch])
+        setCourseToDelete(null)
+    }, [courseToDelete, deleteCourse])
 
     return (
         <div className="flex flex-col">
@@ -103,16 +109,26 @@ const Courses = () => {
                                 </thead>
 
                                 <tbody className="bg-white divide-y divide-gray-200">
-                                    {Courses.length === 0 ? (
+                                    {isLoading ? (
+                                        <tr>
+                                            <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
+                                                Loading courses...
+                                            </td>
+                                        </tr>
+                                    ) : courses.length === 0 ? (
                                         <tr>
                                             <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
                                                 No courses found
                                             </td>
                                         </tr>
                                     ) : (
-                                        Courses.map((course: ICourse) => (
-                                            <tr key={course._id} className="hover:bg-gray-50 transition-colors">
-                                                <td onClick={() => redirect(`/admin/courses/${course._id}/lessons`)} className="px-6 py-4 font-medium">{course.title}</td>
+                                        courses.map((course) => (
+                                            <tr
+                                                key={course._id}
+                                                className="hover:bg-gray-50 transition-colors cursor-pointer"
+                                                onClick={() => router.push(`/admin/courses/${course._id}/lessons`)}
+                                            >
+                                                <td className="px-6 py-4 font-medium">{course.title}</td>
                                                 <td className="px-6 py-4 text-gray-600 truncate line-clamp-2 max-w-[300px]">
                                                     {course.description}
                                                 </td>
@@ -122,14 +138,14 @@ const Courses = () => {
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                        {course.categoryId?.name}
+                                                        {typeof course.categoryId === "object" ? course.categoryId.name : ""}
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4 text-gray-600">
                                                     {new Date(course.createdAt).toLocaleDateString()}
                                                 </td>
 
-                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                <td className="px-6 py-4 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                                                     <div className="flex items-center space-x-2">
                                                         <button
                                                             onClick={() => editModalOpen(course)}
@@ -148,15 +164,6 @@ const Courses = () => {
                                                         >
                                                             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                                                                 <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                                                            </svg>
-                                                        </button>
-
-                                                        <button
-                                                            className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-                                                            title="More options"
-                                                        >
-                                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
                                                             </svg>
                                                         </button>
                                                     </div>

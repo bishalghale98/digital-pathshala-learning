@@ -1,1 +1,1 @@
-export const isValidObjectId = (id: string) => id?.length === 24;
+export { isValidObjectId } from "mongoose";

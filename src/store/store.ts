@@ -1,21 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
-import categorySlice from "./category/categorySlice";
-import courseSlice from "./course/courseSlice";
-import lessonSlice from "./lesson/lessonSlice";
-import studentSlice from "./student/studentSlice";
-import enrollmentSlice from "./enrollment/enrollmentSlice";
-import paymentSlice from "./payment/paymentSlice";
+import { baseApi } from "./api/base";
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
-      categories: categorySlice,
-      courses: courseSlice,
-      lessons: lessonSlice,
-      students: studentSlice,
-      enrollments: enrollmentSlice,
-      payments: paymentSlice,
+      [baseApi.reducerPath]: baseApi.reducer,
     },
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(baseApi.middleware),
   });
 };
 

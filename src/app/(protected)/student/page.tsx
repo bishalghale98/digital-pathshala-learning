@@ -1,25 +1,14 @@
 'use client'
 
-import React, { useEffect } from 'react'
-import { BookOpen, CheckCircle, Clock } from 'lucide-react'
+import React from 'react'
+import { BookOpen } from 'lucide-react'
 import StatCard from '@/components/dashboard/admin-stat-card'
-import { useAppDispatch, useAppSelector } from '@/store/hooks'
-import { IMyCourse } from '@/store/student/types'
-import { fetchMyCourses } from '@/store/student/studentSlice'
+import { useGetMyCoursesQuery } from '@/store/student/studentApi'
 
 const StudentDashboardPage = () => {
-  const dispatch = useAppDispatch()
+  const { data: myCourses = [] } = useGetMyCoursesQuery()
 
-  const { MyCourses }: { MyCourses: IMyCourse[] } = useAppSelector(
-    (store) => store.students
-  )
-
-  useEffect(() => {
-    dispatch(fetchMyCourses())
-  }, [dispatch])
-
-
-  const totalCourses = MyCourses.length
+  const totalCourses = myCourses.length
 
 
   return (

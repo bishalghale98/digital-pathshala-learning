@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { fetchPayment } from "@/store/payment/paymentSlice";
+import { useGetPaymentDetailQuery } from "@/store/payment/paymentApi";
 import { X, Loader2, CheckCircle, Clock, AlertCircle, CreditCard, Receipt, User } from "lucide-react";
 
 interface Props {
@@ -12,15 +11,10 @@ interface Props {
 }
 
 const PaymentModal = ({ isOpen, onClose, selectedId }: Props) => {
-    const dispatch = useAppDispatch();
-    const { payment, loading } = useAppSelector((state) => state.payments);
+    const { data: payment, isLoading: loading } = useGetPaymentDetailQuery(selectedId, {
+        skip: !isOpen || !selectedId,
+    });
     const [closing, setClosing] = useState(false);
-
-    useEffect(() => {
-        if (isOpen && selectedId) {
-            dispatch(fetchPayment(selectedId));
-        }
-    }, [isOpen, selectedId, dispatch]);
 
     // Handle smooth modal close with animation
     const handleClose = () => {

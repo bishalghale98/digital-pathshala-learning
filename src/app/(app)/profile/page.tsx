@@ -7,7 +7,7 @@ import { useEffect } from "react";
 
 
 export default function UserProfile() {
-  const { data: session, isPending } = authClient.useSession()!;
+  const { data: session, isPending } = authClient.useSession();
   const router = useRouter();
 
   useEffect(() => {

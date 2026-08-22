@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import {
-  deleteCategroy,
+  deleteCategory,
   getCategory,
   updateCategory,
 } from "./category.controller";
@@ -33,7 +33,7 @@ export async function DELETE(
   }
 
   const { id } = await params;
-  return deleteCategroy(req, id);
+  return deleteCategory(req, id);
 }
 
 export async function PUT(

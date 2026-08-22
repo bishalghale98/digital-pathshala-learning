@@ -7,7 +7,7 @@ interface CourseCardProps {
   title: string
   description: string
   price: number
-  duration: string
+  duration: number;
   category: string
   openModal: (id: string) => void
 }

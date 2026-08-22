@@ -1,38 +1,41 @@
 'use client'
 
-import { deleteCategory, fetchCategory } from '@/store/category/categorySlice'
-import { useAppDispatch, useAppSelector } from '@/store/hooks'
-import React, { useCallback, useEffect, useState, useMemo } from 'react'
+import React, { useCallback, useState, useMemo } from 'react'
 import Modal from '@/components/category/modal'
-import { Activity } from 'react'
 import EmptyState from '@/components/category/EmptyState'
 import ConfirmationModal from '@/components/common/delete-modal'
-import { ICategory } from '@/store/category/types'
+import {
+    useDeleteCategoryMutation,
+    useGetCategoriesQuery,
+    type Category,
+} from '@/store/category/categoryApi'
+import { getErrorMessage } from '@/store/api/base'
+import { toast } from 'sonner'
 
 
 
 
 const CategoriesPage = () => {
-    const { Categories } = useAppSelector((store) => store.categories)
-    const dispatch = useAppDispatch()
-
     const [isAddModalOpen, setIsAddModalOpen] = useState(false)
     const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-    const [editingCategory, setEditingCategory] = useState<ICategory | null>(null)
+    const [editingCategory, setEditingCategory] = useState<Category | null>(null)
     const [searchTerm, setSearchTerm] = useState('')
-    const [categoryToDelete, setCategoryToDelete] = useState<ICategory | null>(null)
+    const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null)
+
+    const { data: categories = [], isLoading } = useGetCategoriesQuery()
+    const [deleteCategory] = useDeleteCategoryMutation()
 
     // Memoize filtered categories to avoid recalculating on every render
     const filteredCategories = useMemo(() => {
-        if (!searchTerm.trim()) return Categories
+        if (!searchTerm.trim()) return categories
 
-        return Categories.filter(category =>
+        return categories.filter(category =>
             category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            category.description.toLowerCase().includes(searchTerm.toLowerCase())
+            category.description?.toLowerCase().includes(searchTerm.toLowerCase())
         )
-    }, [Categories, searchTerm])
+    }, [categories, searchTerm])
 
-    const openEditModal = useCallback((category: ICategory) => {
+    const openEditModal = useCallback((category: Category) => {
         setEditingCategory(category)
         setIsEditModalOpen(true)
     }, [])
@@ -48,20 +51,20 @@ const CategoriesPage = () => {
     }, [])
 
     // Handle opening delete modal
-    const openDeleteModal = useCallback((category: ICategory) => {
+    const openDeleteModal = useCallback((category: Category) => {
         setCategoryToDelete(category)
     }, [])
 
-    const handleDelete = useCallback(() => {
-        if (categoryToDelete) {
-            dispatch(deleteCategory(categoryToDelete._id))
-            setCategoryToDelete(null) 
+    const handleDelete = useCallback(async () => {
+        if (!categoryToDelete) return
+        try {
+            await deleteCategory(categoryToDelete._id).unwrap()
+            toast.success('Category deleted')
+        } catch (error) {
+            toast.error(getErrorMessage(error))
         }
-    }, [categoryToDelete, dispatch])
-
-    useEffect(() => {
-        dispatch(fetchCategory())
-    }, [dispatch])
+        setCategoryToDelete(null)
+    }, [categoryToDelete, deleteCategory])
 
     return (
         <div className="flex flex-col">
@@ -131,7 +134,13 @@ const CategoriesPage = () => {
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
-                                    {filteredCategories.length === 0 ? (
+                                    {isLoading ? (
+                                        <tr>
+                                            <td colSpan={5} className="px-6 py-8 text-center text-sm text-gray-500">
+                                                Loading categories...
+                                            </td>
+                                        </tr>
+                                    ) : filteredCategories.length === 0 ? (
                                         <EmptyState openAddModal={openAddModal} />
                                     ) : (
                                         filteredCategories.map((category) => (
@@ -185,14 +194,6 @@ const CategoriesPage = () => {
                                                             </svg>
                                                         </button>
 
-                                                        <button
-                                                            className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-                                                            title="More options"
-                                                        >
-                                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                                                            </svg>
-                                                        </button>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -206,7 +207,7 @@ const CategoriesPage = () => {
                             <div className="px-6 py-3 bg-gray-50 border-t border-gray-200">
                                 <div className="text-sm text-gray-600">
                                     Showing <span className="font-medium">{filteredCategories.length}</span> of{' '}
-                                    <span className="font-medium">{Categories.length}</span> categories
+                                    <span className="font-medium">{categories.length}</span> categories
                                 </div>
                             </div>
                         )}
@@ -214,13 +215,11 @@ const CategoriesPage = () => {
                 </div>
             </div>
 
-            <Activity mode={isAddModalOpen ? 'visible' : 'hidden'}>
-                <Modal closeModal={closeModal} />
-            </Activity>
+            {isAddModalOpen && <Modal closeModal={closeModal} />}
 
-            <Activity mode={isEditModalOpen ? 'visible' : 'hidden'}>
+            {isEditModalOpen && editingCategory && (
                 <Modal closeModal={closeModal} categoryData={editingCategory} />
-            </Activity>
+            )}
 
             <ConfirmationModal
                 isOpen={!!categoryToDelete}

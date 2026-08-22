@@ -1,28 +1,26 @@
 'use client'
 
-import { useAppDispatch, useAppSelector } from '@/store/hooks'
-import { fetchMyCourses, fetchMyLesson, fetchMyLessons } from '@/store/student/studentSlice'
-import { ILesson, IMyCourse } from '@/store/student/types'
-import React, { useEffect, useMemo } from 'react'
+import React, { Suspense, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import CourseSyallabus from '@/components/student/course/course-syllabus'
 import VideoPlaySection from '@/components/student/course/video-play-section';
+import {
+    useGetMyCoursesQuery,
+    useGetStudentLessonsQuery,
+} from '@/store/student/studentApi'
+import type { Lesson } from '@/store/lesson/lessonApi'
+import type { MyCourse } from '@/store/student/studentApi'
 
-const MyCoursePage = () => {
+const getCourse = (enroll: MyCourse) =>
+    typeof enroll.courseId === "object" ? enroll.courseId : null
+
+const getCourseId = (courseId: string | { _id: string }) =>
+    typeof courseId === "string" ? courseId : courseId._id
+
+function MyCourseContent() {
     const router = useRouter()
-    const dispatch = useAppDispatch()
-
-    const { MyCourses, Lessons }: { MyCourses: IMyCourse[], Lessons: ILesson[] } = useAppSelector(
-        (store) => store.students
-    )
-
-    useEffect(() => {
-        dispatch(fetchMyCourses())
-    }, [dispatch])
 
     const searchParams = useSearchParams()
-
-
 
     const { section, courseId, lessonId } = useMemo(() => ({
         section: searchParams.get('section'),
@@ -30,36 +28,32 @@ const MyCoursePage = () => {
         lessonId: searchParams.get('lessonId'),
     }), [searchParams])
 
-    useEffect(() => {
-        if (courseId) {
-            dispatch(fetchMyLessons(courseId))
-        }
-    }, [dispatch, courseId])
+    const { data: myCourses = [] } = useGetMyCoursesQuery()
+    const { data: lessons = [], isLoading: lessonsLoading } = useGetStudentLessonsQuery(
+        courseId ?? '',
+        { skip: !courseId }
+    )
 
-    useEffect(() => {
-        if (section === 'video_play' && courseId && lessonId && Lessons.length > 0) {
-            dispatch(fetchMyLesson(lessonId))
-        }
-    }, [dispatch, section, courseId, lessonId, Lessons])
-
-
-
+    const activeLesson: Lesson | undefined = useMemo(
+        () => lessons.find((lesson) => lesson._id === lessonId),
+        [lessons, lessonId]
+    )
 
     if (section === 'course-syllabus' && courseId) {
         return (
-            <CourseSyallabus />
+            <CourseSyallabus lessons={lessons} isLoading={lessonsLoading} />
         )
     }
 
     if (section === 'video_play' && courseId && lessonId) {
         return (
-            <VideoPlaySection />
+            <VideoPlaySection
+                lessons={lessons}
+                activeLesson={activeLesson ?? null}
+                isLoading={lessonsLoading}
+            />
         )
     }
-
-
-
-
 
     return (
         <div className="p-6 ">
@@ -67,7 +61,7 @@ const MyCoursePage = () => {
             <h1 className="text-2xl font-semibold mb-6">My Courses</h1>
 
             {/* Empty State */}
-            {MyCourses?.length === 0 && (
+            {myCourses.length === 0 && (
                 <div className="text-center text-gray-500 mt-20">
                     You are not enrolled in any course yet.
                 </div>
@@ -75,7 +69,9 @@ const MyCoursePage = () => {
 
             {/* Course Cards */}
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 text-white">
-                {MyCourses?.map((enroll) => (
+                {myCourses.map((enroll) => {
+                    const course = getCourse(enroll)
+                    return (
                     <div
                         key={enroll?._id}
                         className="bg-white dark:bg-gray-900 border dark:border-gray-800 rounded-xl shadow-sm hover:shadow-md transition"
@@ -83,10 +79,10 @@ const MyCoursePage = () => {
                         {/* Card Header */}
                         <div className="p-5 border-b dark:border-gray-800">
                             <h2 className="text-lg font-semibold line-clamp-1">
-                                {enroll?.courseId?.title}
+                                {course?.title}
                             </h2>
                             <p className="text-sm text-gray-500 mt-1 line-clamp-2">
-                                {enroll?.courseId?.description}
+                                {course?.description}
                             </p>
                         </div>
 
@@ -95,11 +91,9 @@ const MyCoursePage = () => {
                             <div className="flex justify-between">
                                 <span>Duration</span>
                                 <span className="font-medium">
-                                    {enroll?.courseId?.duration}
+                                    {course?.duration}
                                 </span>
                             </div>
-
-
 
                             <div className="flex justify-between">
                                 <span>Enrolled At</span>
@@ -127,7 +121,7 @@ const MyCoursePage = () => {
                                 disabled={enroll.enrollmentStatus !== 'Approved'}
                                 onClick={() =>
                                     router.push(
-                                        `/student/mycourse?section=course-syllabus&courseId=${enroll.courseId._id}`
+                                        `/student/mycourse?section=course-syllabus&courseId=${getCourseId(enroll.courseId)}`
                                     )
                                 }
                                 className="px-4 py-2 text-sm rounded-md bg-primary text-white
@@ -137,10 +131,17 @@ const MyCoursePage = () => {
                             </button>
                         </div>
                     </div>
-                ))}
+                    )
+                })}
             </div>
         </div>
     )
 }
+
+const MyCoursePage = () => (
+    <Suspense fallback={<div className="p-6 text-gray-500">Loading...</div>}>
+        <MyCourseContent />
+    </Suspense>
+)
 
 export default MyCoursePage

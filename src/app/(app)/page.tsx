@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { authClient } from '../../lib/auth-client';
 import React from 'react';
-import { Roles } from '@/lib/constants';
+import { getDashboardPath } from '@/lib/dashboard';
 
 export default function Home() {
   const { data: session, isPending } = authClient.useSession();
@@ -11,11 +11,7 @@ export default function Home() {
   const router = useRouter()
 
   const handleRoute = () => {
-    if (session?.user.role == Roles.Admin) {
-      router.push('/admin')
-    }else{
-      router.push('/student')
-    }
+    router.push(getDashboardPath(session?.user.role))
   }
 
   if (isPending) {

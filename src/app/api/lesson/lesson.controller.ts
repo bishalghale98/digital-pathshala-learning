@@ -11,8 +11,8 @@ export const getLessons = tryCatch(async (req: NextRequest) => {
 
   const lessons = await Lesson.find()
     .populate("courseId")
-    .lean()
-    .sort({ createdAt: -1 });
+    .sort({ createdAt: -1 })
+    .lean();
 
   return successResponse("Successfully fetched lessons", lessons, 200);
 });
@@ -24,7 +24,6 @@ export const createLesson = tryCatch(async (req: NextRequest) => {
   const parsed = lessonCreateSchema.safeParse(body);
 
   if (!parsed.success) {
-    console.error("Validation error:", parsed.error.issues);
     return errorResponse("Invalid lesson data", 400);
   }
 
@@ -81,7 +80,6 @@ export const updateLesson = tryCatch(async (req: NextRequest, id: string) => {
   const parsed = lessonUpdateSchema.safeParse(body);
 
   if (!parsed.success) {
-    console.error("Validation error:", parsed.error.issues);
     return errorResponse("Invalid lesson data", 400);
   }
 

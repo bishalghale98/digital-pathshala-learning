@@ -1,28 +1,19 @@
 'use client'
 
-import React, { useEffect, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { Users, BookOpen, CheckCircle, Clock } from 'lucide-react'
 import StatCard from '@/components/dashboard/admin-stat-card'
-import { useAppDispatch, useAppSelector } from '@/store/hooks'
-import { fetchStudents } from '@/store/student/studentSlice'
-import { fetchCourses } from '@/store/course/courseSlice'
-import { fetchEnrollements } from '@/store/enrollment/enrollmentSlice'
+import { useGetStudentsQuery } from '@/store/student/studentApi'
+import { useGetCoursesQuery } from '@/store/course/courseApi'
+import { useGetEnrollmentsQuery } from '@/store/enrollment/enrollmentApi'
 import { EnrollmentStatus } from '@/types/models'
 
 const AdminPage = () => {
-    const dispatch = useAppDispatch()
-
-    const { Students } = useAppSelector((store) => store.students)
-    const { Courses } = useAppSelector((store) => store.courses)
-    const { Enrollments } = useAppSelector((store) => store.enrollments)
+    const { data: students = [] } = useGetStudentsQuery()
+    const { data: courses = [] } = useGetCoursesQuery()
+    const { data: enrollments = [] } = useGetEnrollmentsQuery()
 
 
-
-    useEffect(() => {
-        dispatch(fetchStudents())
-        dispatch(fetchCourses());
-        dispatch(fetchEnrollements());
-    }, [dispatch])
 
     const stats = useMemo(() => {
         const sevenDaysAgo = new Date()
@@ -32,20 +23,20 @@ const AdminPage = () => {
         let pending = 0
         let last7Days = 0
 
-        for (const e of Enrollments) {
+        for (const e of enrollments) {
             if (e.enrollmentStatus === EnrollmentStatus.Approved) approved++
             if (e.enrollmentStatus === EnrollmentStatus.Pending) pending++
-            if (new Date(e.createdAt) >= sevenDaysAgo) last7Days++
+            if (e.createdAt && new Date(e.createdAt) >= sevenDaysAgo) last7Days++
         }
 
         return {
-            totalStudents: Students.length,
-            totalCourses: Courses.length,
+            totalStudents: students.length,
+            totalCourses: courses.length,
             approvedEnrollments: approved,
             pendingEnrollments: pending,
             newEnrollmentsLast7Days: last7Days,
         }
-    }, [Students.length, Courses.length, Enrollments])
+    }, [students.length, courses.length, enrollments])
 
 
 

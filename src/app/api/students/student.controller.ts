@@ -3,15 +3,28 @@ import Enrollment from "@/database/models/enrollment.schema";
 import { auth, db } from "@/lib/auth";
 import { Roles } from "@/lib/constants";
 import { EnrollmentStatus } from "@/types/models";
-import { errorResponse, successResponse } from "@/utils/response";
+import { successResponse } from "@/utils/response";
 import { tryCatch } from "@/utils/tryCatch";
 import { headers } from "next/headers";
 import { NextRequest } from "next/server";
 
 export const getStudents = tryCatch(async (req: NextRequest) => {
+  await dbConnect();
+
   const students = await db
     .collection("user")
-    .find()
+    .find(
+      { role: Roles.Student },
+      {
+        projection: {
+          name: 1,
+          email: 1,
+          image: 1,
+          role: 1,
+          createdAt: 1,
+        },
+      }
+    )
     .sort({ createdAt: -1 })
     .toArray();
 
@@ -33,10 +46,6 @@ export const getMyCourse = tryCatch(async (req: NextRequest) => {
   })
     .populate("courseId")
     .lean();
-
-  if (enrollments.length == 0) {
-    return errorResponse("You have not enrolled in any courses");
-  }
 
   return successResponse("My courses fetch successfully", enrollments);
 });

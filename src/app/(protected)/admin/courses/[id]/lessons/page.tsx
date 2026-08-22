@@ -1,45 +1,60 @@
 "use client";
 
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { deleteLesson, fetchLessons } from "@/store/lesson/lessonSlice";
 import { useParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
-import { ILesson } from "@/store/lesson/types";
+import { useCallback, useState } from "react";
 import LessonModal from "@/components/lesson/modal";
-import { Status } from "@/store/types";
 import ConfirmationModal from "@/components/common/delete-modal";
+import {
+    useDeleteLessonMutation,
+    useGetLessonsByCourseQuery,
+    type Lesson,
+} from "@/store/lesson/lessonApi";
+import { getErrorMessage } from "@/store/api/base";
+import { toast } from "sonner";
 
 const CourseLessonsPage = () => {
     const { id } = useParams();
-    const { Lessons, status } = useAppSelector((store) => store.lessons);
-    const dispatch = useAppDispatch();
+    const courseId = typeof id === "string" ? id : "";
 
     const [isOpenAddModal, setIsOpenAddModal] = useState(false);
-    const [lessonToDelete, setLessonToDelete] = useState<ILesson | null>(null);
+    const [lessonToDelete, setLessonToDelete] = useState<Lesson | null>(null);
+    const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
+
+    const { data: lessons = [], isLoading, isSuccess } = useGetLessonsByCourseQuery(courseId, {
+        skip: !courseId,
+    });
+    const [deleteLesson] = useDeleteLessonMutation();
 
     const openAddModal = useCallback(() => {
+        setEditingLesson(null);
         setIsOpenAddModal(true);
     }, []);
 
     const closeAddModal = useCallback(() => {
         setIsOpenAddModal(false);
+        setEditingLesson(null);
     }, []);
 
-    useEffect(() => {
-        if (!id) return;
-        dispatch(fetchLessons(id as string));
-    }, [dispatch, id]);
+    const openEditModal = useCallback((lesson: Lesson) => {
+        setEditingLesson(lesson);
+        setIsOpenAddModal(true);
+    }, []);
 
-    const openDeleteModal = useCallback((lesson: ILesson) => {
+    const openDeleteModal = useCallback((lesson: Lesson) => {
         setLessonToDelete(lesson);
     }, []);
 
-    const handleDelete = useCallback(() => {
+    const handleDelete = useCallback(async () => {
         if (!lessonToDelete) return;
 
-        dispatch(deleteLesson(lessonToDelete._id));
+        try {
+            await deleteLesson({ id: lessonToDelete._id, courseId }).unwrap();
+            toast.success("Lesson deleted");
+        } catch (error) {
+            toast.error(getErrorMessage(error));
+        }
         setLessonToDelete(null);
-    }, [lessonToDelete, dispatch]);
+    }, [lessonToDelete, deleteLesson, courseId]);
 
     return (
         <div className="flex flex-col">
@@ -100,7 +115,7 @@ const CourseLessonsPage = () => {
                                 <tbody className="bg-white divide-y divide-gray-200">
 
                                     {/* Loading State */}
-                                    {status === Status.Loading && (
+                                    {isLoading && (
                                         <tr>
                                             <td
                                                 colSpan={5}
@@ -112,7 +127,7 @@ const CourseLessonsPage = () => {
                                     )}
 
                                     {/* Empty State */}
-                                    {status === Status.Success && Lessons.length === 0 && (
+                                    {isSuccess && lessons.length === 0 && (
                                         <tr>
                                             <td
                                                 colSpan={5}
@@ -124,8 +139,8 @@ const CourseLessonsPage = () => {
                                     )}
 
                                     {/* Data State */}
-                                    {status === Status.Success &&
-                                        Lessons.map((lesson: ILesson) => (
+                                    {isSuccess &&
+                                        lessons.map((lesson) => (
                                             <tr key={lesson._id} className="hover:bg-gray-50">
                                                 <td className="px-6 py-4 font-medium">
                                                     {lesson.title}
@@ -137,11 +152,14 @@ const CourseLessonsPage = () => {
                                                     {lesson.videoUrl}
                                                 </td>
                                                 <td className="px-6 py-4 text-gray-600">
-                                                    {lesson.courseId?.title}
+                                                    {typeof lesson.courseId === "object" ? lesson.courseId.title : ""}
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <div className="flex gap-2">
-                                                        <button className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg">
+                                                        <button
+                                                            onClick={() => openEditModal(lesson)}
+                                                            className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg"
+                                                        >
                                                             Edit
                                                         </button>
                                                         <button onClick={() => openDeleteModal(lesson)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg">
@@ -158,7 +176,24 @@ const CourseLessonsPage = () => {
                     </div>
 
                     {
-                        isOpenAddModal && <LessonModal closeModal={closeAddModal} id={id as string} />
+                        isOpenAddModal && (
+                            <LessonModal
+                                closeModal={closeAddModal}
+                                id={courseId}
+                                lessonData={editingLesson
+                                    ? {
+                                        _id: editingLesson._id,
+                                        title: editingLesson.title,
+                                        description: editingLesson.description,
+                                        videoUrl: editingLesson.videoUrl,
+                                        courseId: typeof editingLesson.courseId === "object"
+                                            ? editingLesson.courseId._id
+                                            : editingLesson.courseId,
+                                    }
+                                    : null
+                                }
+                            />
+                        )
                     }
                 </div>
             </div>

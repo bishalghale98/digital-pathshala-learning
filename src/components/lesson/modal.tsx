@@ -2,24 +2,35 @@
 
 import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import { useAppDispatch } from '@/store/hooks'
 import { getInputClass } from '@/lib/utils/form'
 import { z } from 'zod'
 import { lessonCreateSchema } from '@/schemas/lessonSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { createLesson } from '@/store/lesson/lessonSlice'
+import {
+    useCreateLessonMutation,
+    useUpdateLessonMutation,
+} from '@/store/lesson/lessonApi'
+import { getErrorMessage } from '@/store/api/base'
+import { toast } from 'sonner'
 
 interface ModalProps {
-    id: string,
+    id: string
     closeModal: () => void
-    categoryData?: { _id: string; name: string; description?: string } | null
+    lessonData?: {
+        _id: string
+        title: string
+        description?: string
+        videoUrl: string
+        courseId: string
+    } | null
 }
 
 type formData = z.infer<typeof lessonCreateSchema>
 
-const LessonModal: React.FC<ModalProps> = ({ closeModal, categoryData, id }) => {
-    const dispatch = useAppDispatch()
-    const isEditMode = !!categoryData
+const LessonModal: React.FC<ModalProps> = ({ closeModal, lessonData, id }) => {
+    const [createLesson] = useCreateLessonMutation()
+    const [updateLesson] = useUpdateLessonMutation()
+    const isEditMode = !!lessonData
 
     const {
         register,
@@ -29,35 +40,41 @@ const LessonModal: React.FC<ModalProps> = ({ closeModal, categoryData, id }) => 
     } = useForm<formData>({
         resolver: zodResolver(lessonCreateSchema),
         defaultValues: {
-            title: categoryData?.name || '',
-            description: categoryData?.description || '',
-            videoUrl: '',
-            courseId: id
+            title: lessonData?.title || '',
+            description: lessonData?.description || '',
+            videoUrl: lessonData?.videoUrl || '',
+            courseId: id,
         },
     })
 
     useEffect(() => {
-        // Reset form when modal opens or categoryData changes
         reset({
-            title: categoryData?.name || '',
-            description: categoryData?.description || '',
+            title: lessonData?.title || '',
+            description: lessonData?.description || '',
+            videoUrl: lessonData?.videoUrl || '',
             courseId: id,
-            videoUrl: ''
         })
-    }, [categoryData, reset, id])
+    }, [lessonData, reset, id])
 
     const onSubmit = async (data: formData) => {
-        console.log(data)
         try {
-            if (isEditMode && categoryData?._id) {
-                // await dispatch(updateCategory(categoryData._id, data))
+            if (isEditMode && lessonData) {
+                await updateLesson({
+                    id: lessonData._id,
+                    courseId: id,
+                    title: data.title,
+                    description: data.description,
+                    videoUrl: data.videoUrl,
+                }).unwrap()
+                toast.success('Lesson updated')
             } else {
-                await dispatch(createLesson(data))
+                await createLesson(data).unwrap()
+                toast.success('Lesson created')
             }
             reset()
             closeModal()
         } catch (error) {
-            console.error('Error submitting category:', error)
+            toast.error(getErrorMessage(error))
         }
     }
 
@@ -165,7 +182,7 @@ const LessonModal: React.FC<ModalProps> = ({ closeModal, categoryData, id }) => 
                                         id="videoUrl"
                                         type="url"
                                         placeholder="Enter video url"
-                                        className={getInputClass(!!errors.title, "text-white")}
+                                        className={getInputClass(!!errors.videoUrl, "text-white")}
                                         {...register('videoUrl')}
                                     />
                                     {errors.videoUrl && (

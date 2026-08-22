@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export function successResponse(
   message: string,
-  data: any = null,
+  data: unknown = null,
   status = 200
 ) {
   return NextResponse.json(
@@ -16,7 +16,6 @@ export function successResponse(
 }
 
 export function errorResponse(message: string, status = 500) {
-  console.log(message)
   return NextResponse.json(
     {
       success: false,

@@ -5,8 +5,11 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { categoryCreateSchema } from '@/schemas/categorySchema'
-import { useAppDispatch } from '@/store/hooks'
-import { createCategory, updateCategory } from '@/store/category/categorySlice'
+import {
+    useCreateCategoryMutation,
+    useUpdateCategoryMutation,
+} from '@/store/category/categoryApi'
+import { getErrorMessage } from '@/store/api/base'
 import { getInputClass } from '@/lib/utils/form'
 
 interface ModalProps {
@@ -17,7 +20,8 @@ interface ModalProps {
 type FormData = z.infer<typeof categoryCreateSchema>
 
 const Modal: React.FC<ModalProps> = ({ closeModal, categoryData }) => {
-    const dispatch = useAppDispatch()
+    const [createCategory] = useCreateCategoryMutation()
+    const [updateCategory] = useUpdateCategoryMutation()
     const isEditMode = !!categoryData
 
     const {
@@ -44,14 +48,14 @@ const Modal: React.FC<ModalProps> = ({ closeModal, categoryData }) => {
     const onSubmit = async (data: FormData) => {
         try {
             if (isEditMode && categoryData?._id) {
-                await dispatch(updateCategory(categoryData._id, data))
+                await updateCategory({ id: categoryData._id, ...data }).unwrap()
             } else {
-                await dispatch(createCategory(data))
+                await createCategory(data).unwrap()
             }
             reset()
             closeModal()
         } catch (error) {
-            console.error('Error submitting category:', error)
+            console.error('Error submitting category:', getErrorMessage(error))
         }
     }
 

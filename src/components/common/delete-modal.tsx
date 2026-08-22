@@ -17,9 +17,16 @@ const ConfirmationModal: React.FC<ModalProps> = ({
     confirmText = "Yes, I'm sure",
     cancelText = "No, cancel",
 }) => {
+    useEffect(() => {
+        if (!isOpen) return;
 
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') onClose();
+        };
 
-
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [isOpen, onClose]);
 
     const handleConfirm = () => {
         onConfirm();
@@ -33,9 +40,13 @@ const ConfirmationModal: React.FC<ModalProps> = ({
             {/* Modal backdrop */}
             <div
                 className="fixed inset-0 z-50 bg-gray-900 bg-opacity-60 overflow-y-auto h-full w-full px-4"
+                onClick={onClose}
             >
                 {/* Modal container */}
-                <div className="relative top-40 mx-auto shadow-xl rounded-md bg-white max-w-md">
+                <div
+                    className="relative top-40 mx-auto shadow-xl rounded-md bg-white max-w-md"
+                    onClick={(e) => e.stopPropagation()}
+                >
                     {/* Close button */}
                     <div className="flex justify-end p-2">
                         <button

@@ -1,11 +1,8 @@
 import { z } from "zod";
-import { PaymentMethod } from "@/types/models";
+import { EnrollmentStatus, PaymentMethod } from "@/types/models";
 
-export enum EnrollmentStatus {
-  Approved = "Approved",
-  Pending = "Pending",
-  Rejected = "Rejected",
-}
+// Re-exported for convenience - types/models is the single source of truth
+export { EnrollmentStatus };
 
 export const enrollmentCreateSchema = z.object({
   courseId: z.string().length(24, "Invalid course ID"),

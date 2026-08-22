@@ -1,16 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
-import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { Roles } from "@/lib/constants";
+import { getDashboardPath } from "@/lib/dashboard";
 
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   const session = await auth.api.getSession({
-    headers: await headers(),
+    headers: request.headers,
   });
 
   if (pathname === "/sign-in") {
+    // Signed-in users should never see the sign-in page
+    if (session?.user) {
+      return NextResponse.redirect(
+        new URL(getDashboardPath(session.user.role), request.url)
+      );
+    }
     return NextResponse.next();
   }
 

@@ -1,19 +1,23 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { ICourse } from "@/store/course/types";
 import { createCourseSchema } from "@/schemas/courseSchema";
-import { fetchCategory } from "@/store/category/categorySlice";
+import { useGetCategoriesQuery } from "@/store/category/categoryApi";
+import {
+  useCreateCourseMutation,
+  useUpdateCourseMutation,
+  type Course,
+} from "@/store/course/courseApi";
+import { getErrorMessage } from "@/store/api/base";
 import { getInputClass } from "@/lib/utils/form";
-import { createCourse, updateCourse } from "@/store/course/courseSlice";
+import { toast } from "sonner";
 
 interface CourseModalProps {
     closeModal: () => void;
-    courseData?: ICourse | null;
+    courseData?: Course | null;
 }
 
 type CourseFormData = z.infer<typeof createCourseSchema>;
@@ -23,15 +27,16 @@ const CourseModal: React.FC<CourseModalProps> = ({
     courseData,
 }) => {
     const isEditMode = !!courseData;
-    const dispatch = useAppDispatch();
-    const { Categories } = useAppSelector((store) => store.categories)
 
+    const [createCourse, { isLoading: isCreating }] = useCreateCourseMutation();
+    const [updateCourse, { isLoading: isUpdating }] = useUpdateCourseMutation();
+    const { data: categories = [] } = useGetCategoriesQuery();
 
     const {
         register,
         handleSubmit,
         reset,
-        formState: { errors, isSubmitting, isValid },
+        formState: { errors, isValid },
     } = useForm<CourseFormData>({
         resolver: zodResolver(createCourseSchema),
         mode: "onChange",
@@ -45,17 +50,16 @@ const CourseModal: React.FC<CourseModalProps> = ({
     });
 
     useEffect(() => {
-        dispatch(fetchCategory())
-    }, [dispatch])
-
-    useEffect(() => {
         if (courseData) {
             reset({
                 title: courseData.title,
                 description: courseData.description || "",
-                duration: courseData.duration || "",
+                duration: (courseData.duration as unknown as string) || "",
                 price: courseData.price || 0,
-                categoryId: courseData.categoryId?._id,
+                categoryId:
+                    typeof courseData.categoryId === "object"
+                        ? courseData.categoryId._id
+                        : courseData.categoryId || "",
             });
         }
     }, [courseData, reset]);
@@ -63,22 +67,20 @@ const CourseModal: React.FC<CourseModalProps> = ({
 
     const onSubmit = async (data: CourseFormData) => {
         try {
-
             if (isEditMode && courseData?._id) {
-                await dispatch(updateCourse(courseData._id, data));
-
+                await updateCourse({ id: courseData._id, ...data }).unwrap();
             } else {
-                await dispatch(createCourse(data));
+                await createCourse(data).unwrap();
             }
-
+            toast.success(isEditMode ? "Course updated" : "Course created");
             reset();
             closeModal();
         } catch (error) {
-            console.error("Error submitting course:", error);
+            toast.error(getErrorMessage(error));
         }
     };
 
-
+    const isSubmitting = isCreating || isUpdating;
 
     return (
         <div className="fixed inset-0 z-50 overflow-y-auto">
@@ -194,7 +196,7 @@ const CourseModal: React.FC<CourseModalProps> = ({
                                     className={getInputClass(!!errors.categoryId)}
                                 >
                                     <option value="">Select category</option>
-                                    {Categories.map((category) => (
+                                    {categories.map((category) => (
                                         <option key={category._id} value={category._id}>
                                             {category.name}
                                         </option>

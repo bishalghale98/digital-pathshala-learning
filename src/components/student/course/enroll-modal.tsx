@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -6,10 +6,9 @@ import { getInputClass } from "@/lib/utils/form";
 import { enrollmentCreateSchema } from "@/schemas/enrollmentSchema";
 import { PaymentMethod } from "@/types/models";
 import { z } from "zod";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { createEnrollment, setStatus } from "@/store/enrollment/enrollmentSlice";
+import { useCreateEnrollmentMutation } from "@/store/enrollment/enrollmentApi";
+import { getErrorMessage } from "@/store/api/base";
 import { toast } from "sonner";
-import { Status } from "@/store/types";
 
 interface EnrollModalProps {
     closeModal: () => void;
@@ -20,14 +19,13 @@ type EnrollFormValues = z.infer<typeof enrollmentCreateSchema>;
 
 const EnrollModal: React.FC<EnrollModalProps> = ({ closeModal, courseId }) => {
     const [isConfirmed, setIsConfirmed] = useState(false);
-    const disptach = useAppDispatch()
-    const { status, message } = useAppSelector((store) => store.enrollments)
+    const [createEnrollment, { isLoading }] = useCreateEnrollmentMutation();
 
     const {
         register,
         handleSubmit,
         reset,
-        formState: { errors, isSubmitting },
+        formState: { errors },
     } = useForm<EnrollFormValues>({
         resolver: zodResolver(enrollmentCreateSchema),
         defaultValues: {
@@ -39,23 +37,20 @@ const EnrollModal: React.FC<EnrollModalProps> = ({ closeModal, courseId }) => {
 
 
     const onSubmit = async (data: EnrollFormValues) => {
+        try {
+            const res = await createEnrollment(data).unwrap();
 
-        await disptach(createEnrollment(data));
+            if (res?.payment_url) {
+                window.open(res.payment_url, "_blank", "noopener,noreferrer");
+            }
 
-        reset();
-
-        setIsConfirmed(false);
-
-        closeModal();
-
-
-
+            reset();
+            setIsConfirmed(false);
+            closeModal();
+        } catch (error) {
+            toast.error(getErrorMessage(error));
+        }
     };
-
-    if (status == Status.Error) {
-        toast.error(message);
-        disptach(setStatus(Status.Loading))
-    }
 
 
     return (
@@ -161,10 +156,10 @@ const EnrollModal: React.FC<EnrollModalProps> = ({ closeModal, courseId }) => {
 
                             <button
                                 type="submit"
-                                disabled={isSubmitting}
+                                disabled={isLoading}
                                 className="w-full py-3 rounded-xl bg-[#7127BA] hover:bg-[#8b3eea] text-white font-semibold text-sm disabled:opacity-50"
                             >
-                                {isSubmitting ? "Processing..." : "Enroll & Pay"}
+                                {isLoading ? "Processing..." : "Enroll & Pay"}
                             </button>
                         </div>
                     </form>

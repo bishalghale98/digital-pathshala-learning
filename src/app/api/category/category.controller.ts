@@ -1,28 +1,22 @@
 import dbConnect from "@/database/dbConnection";
 import Category from "@/database/models/category.schema";
+import { categoryCreateSchema } from "@/schemas/categorySchema";
 import { errorResponse, successResponse } from "@/utils/response";
 import { tryCatch } from "@/utils/tryCatch";
 import { NextRequest } from "next/server";
-import { categoryCreateSchema } from "@/schemas/categorySchema";
 
 export const createCategory = tryCatch(async (req: NextRequest) => {
- 
-
   await dbConnect();
+
   const body = await req.json();
 
-  const parshed = categoryCreateSchema.safeParse(body);
+  const parsed = categoryCreateSchema.safeParse(body);
 
-  if (!parshed.success) {
-    console.error("Invalid API data:", parshed.error.issues);
-    throw new Error("Invalid data received from API");
+  if (!parsed.success) {
+    return errorResponse("Invalid category data", 400);
   }
 
-  const { name, description } = parshed.data;
-
-  if (!name || !name.trim()) {
-    return errorResponse("Name is required", 400);
-  }
+  const { name, description } = parsed.data;
 
   const trimmedName = name.trim();
 
@@ -44,10 +38,6 @@ export const getCategories = tryCatch(async (req: NextRequest) => {
   await dbConnect();
 
   const categories = await Category.find().sort({ createdAt: -1 }).lean();
-
-  if (!categories || categories.length === 0) {
-    return errorResponse("No categories found", 404);
-  }
 
   return successResponse("List of all categories", categories, 200);
 });

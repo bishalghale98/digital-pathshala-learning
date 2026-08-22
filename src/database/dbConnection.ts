@@ -3,20 +3,16 @@ import mongoose from "mongoose";
 const MONGODB = process.env.MONGODB;
 
 if (!MONGODB) {
-  throw new Error("Mongo Db string should must provide");
+  throw new Error("MONGODB environment variable is required");
 }
 
+let connectionPromise: Promise<typeof mongoose> | null = null;
+
 const dbConnect = () => {
-  if (mongoose.connection.readyState === 1) {
-    console.log("Database is already connected 😘😘😘😘");
-    return;
+  if (!connectionPromise) {
+    connectionPromise = mongoose.connect(MONGODB);
   }
-  try {
-    mongoose.connect(MONGODB);
-    console.log("Database is connected successfully ❤️❤️");
-  } catch (error) {
-    console.error("Database connection error 😢😢😢", error);
-  }
+  return connectionPromise;
 };
 
 export default dbConnect;

@@ -5,7 +5,7 @@ export async function GET() {
     await dbConnect();
     return Response.json(
       {
-        message: "Api is working ",
+        message: "API is working",
       },
       { status: 200 }
     );
@@ -13,7 +13,7 @@ export async function GET() {
     console.error(error);
     return Response.json(
       {
-        message: "Api isn't working ",
+        message: "API isn't working",
       },
       { status: 500 }
     );

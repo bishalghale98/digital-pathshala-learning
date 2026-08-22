@@ -3,19 +3,15 @@
 import CourseCard from '@/components/student/course/course-card'
 import EnrollModal from '@/components/student/course/enroll-modal';
 import { CourseCardSkeleton } from '@/components/student/loading/course-card';
-import { fetchCourses } from '@/store/course/courseSlice';
-import { ICourse } from '@/store/course/types';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { Status } from '@/store/types';
-import axios from 'axios';
+import { useGetCoursesQuery, type Course } from '@/store/course/courseApi';
+import { useVerifyPaymentMutation } from '@/store/payment/paymentApi';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react'
 
 const CoursesPage = () => {
 
-    const { Courses, status }: { Courses: ICourse[], status: Status } = useAppSelector((store) => store.courses)
-    const { PaymentUrl } = useAppSelector((store) => store.enrollments)
-    const dispatch = useAppDispatch()
+    const { data: courses = [], isLoading } = useGetCoursesQuery();
+    const [verifyPayment] = useVerifyPaymentMutation();
     const router = useRouter()
 
     const [isOpen, setIsOpen] = useState<boolean>(false)
@@ -33,31 +29,22 @@ const CoursesPage = () => {
 
 
     useEffect(() => {
-        if (PaymentUrl) {
-            window.open(PaymentUrl, "_blank", "noopener,noreferrer");
-
-        }
-    }, [PaymentUrl])
-
-
-    useEffect(() => {
         const pidx = new URLSearchParams(window.location.search).get("pidx");
         if (!pidx) return;
 
-        axios.post("/api/payment/verify", { pidx }).then(() => router.replace('/student/courses'))
+        verifyPayment({ pidx })
+            .unwrap()
+            .then(() => router.replace('/student/courses'))
+            .catch((err) => console.error("Payment verification failed:", err))
 
-    }, [router]);
+    }, [router, verifyPayment]);
 
 
-    useEffect(() => {
-        dispatch(fetchCourses())
-    }, [dispatch])
-
-    if (status === Status.Loading && Courses.length === 0) {
+    if (isLoading && courses.length === 0) {
         return <CourseCardSkeleton />
     }
 
-    const coursesLength = Courses.length
+    const coursesLength = courses.length
 
 
     return (
@@ -75,7 +62,7 @@ const CoursesPage = () => {
             {/* Course cards grid */}
             <div className="max-w-7xl mx-auto">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {Courses.map((course) => (
+                    {courses.map((course: Course) => (
                         <CourseCard
                             key={course._id}
                             id={course._id}
@@ -83,7 +70,7 @@ const CoursesPage = () => {
                             description={course.description}
                             price={course.price}
                             duration={course.duration}
-                            category={course.categoryId.name}
+                            category={typeof course.categoryId === "object" ? course.categoryId.name : ""}
                             openModal={openModal}
                         />
                     ))}

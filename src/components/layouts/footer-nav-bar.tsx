@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { authClient } from '@/lib/auth-client';
+import { getDashboardPath } from '@/lib/dashboard';
 import { FaHome, FaInfoCircle, FaTachometerAlt } from 'react-icons/fa';
 
 const FooterNavBar = () => {
@@ -16,7 +17,7 @@ const FooterNavBar = () => {
         { name: 'About Us', href: '/about-us', icon: <FaInfoCircle size={20} /> },
         {
             name: session?.user ? 'Dashboard' : 'Sign In',
-            href: session?.user ? `${role}` : 'sign-in',
+            href: session?.user ? getDashboardPath(role) : '/sign-in',
             icon: <FaTachometerAlt size={20} />
         },
     ];

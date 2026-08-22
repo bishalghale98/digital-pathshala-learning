@@ -16,9 +16,6 @@ import { headers } from "next/headers";
 import { NextRequest } from "next/server";
 import { populateStudentObj, populateStudents } from "./helper.controller";
 
-const khalti_live_secret = process.env.KHALTI_SECRET_KEY;
-const base_url = process.env.NEXT_APP_URL;
-
 export const getEnrollments = tryCatch(async (req: NextRequest) => {
   await dbConnect();
 
@@ -38,23 +35,34 @@ export const getEnrollments = tryCatch(async (req: NextRequest) => {
 });
 
 export const createEnrollment = tryCatch(async (req: NextRequest) => {
+  await dbConnect();
+
   const session = await auth.api.getSession({
     headers: await headers(),
   });
 
-  await dbConnect();
+  if (!session?.user) {
+    return errorResponse("Unauthorized: Please login", 401);
+  }
 
   const body = await req.json();
   const parsed = enrollmentCreateSchema.safeParse(body);
 
   if (!parsed.success) {
-    console.error("Validation error:", parsed.error.issues);
     return errorResponse("Invalid enrollment data", 400);
   }
 
   const { courseId, whatsApp, paymentMethod } = parsed.data;
 
-  const studentId = session?.user.id;
+  // eSewa is not implemented yet - reject before creating anything
+  if (paymentMethod !== PaymentMethod.Khalti) {
+    return errorResponse(
+      "This payment method is not supported yet. Please use Khalti.",
+      400
+    );
+  }
+
+  const studentId = session.user.id;
 
   const existing = await Enrollment.findOne({
     studentId,
@@ -65,6 +73,19 @@ export const createEnrollment = tryCatch(async (req: NextRequest) => {
     return errorResponse("Student is already enrolled in this course", 409);
   }
 
+  const courseData = await Course.findById(courseId);
+
+  if (!courseData) {
+    return errorResponse("Course not found", 404);
+  }
+
+  const khaltiSecretKey = process.env.KHALTI_SECRET_KEY;
+  const base_url = process.env.NEXT_APP_URL;
+
+  if (!khaltiSecretKey || !base_url) {
+    return errorResponse("Payment gateway is not configured", 500);
+  }
+
   const enrollment = await Enrollment.create({
     studentId,
     courseId,
@@ -72,45 +93,40 @@ export const createEnrollment = tryCatch(async (req: NextRequest) => {
     enrolledAt: new Date(),
   });
 
-  const courseData = await Course.findById(courseId);
-
-  let payment_url;
+  let payment_url: string | undefined;
 
   if (paymentMethod === PaymentMethod.Khalti) {
     const data = {
       return_url: `${base_url}/student/courses`,
       website_url: `${base_url}`,
-      amount: courseData.price * 100,
+      amount: Math.round(courseData.price * 100),
       purchase_order_id: enrollment._id,
       purchase_order_name: courseData.title,
     };
 
-    const res = await axios.post(
-      "https://dev.khalti.com/api/v2/epayment/initiate/",
-      data,
-      {
-        headers: {
-          Authorization: `key ${khalti_live_secret}`,
-        },
-      }
-    );
+    try {
+      const res = await axios.post(
+        "https://dev.khalti.com/api/v2/epayment/initiate/",
+        data,
+        {
+          headers: {
+            Authorization: `key ${khaltiSecretKey}`,
+          },
+        }
+      );
 
-    payment_url = res.data.payment_url;
+      payment_url = res.data.payment_url;
 
-    const pidx = res.data.pidx;
-
-    console.log(pidx, "pidx enroll ma");
-
-    const createdPayment = await Payment.create({
-      enrollment: enrollment._id,
-      amount: courseData.price,
-      paymentMethod,
-      pidx: pidx,
-    });
-
-    console.log(createdPayment, "payment create vayo");
-  } else {
-    // TODO ....
+      await Payment.create({
+        enrollment: enrollment._id,
+        amount: courseData.price,
+        paymentMethod,
+        pidx: res.data.pidx as string,
+      });
+    } catch {
+      await Enrollment.findByIdAndDelete(enrollment._id);
+      return errorResponse("Failed to initiate payment. Please try again.", 502);
+    }
   }
 
   return successResponse(
@@ -188,8 +204,6 @@ export const changeEnrollmentStatus = tryCatch(
       .lean();
 
     const populatedEnrollments = await populateStudentObj(updatedEnrollment);
-
-    console.log(populatedEnrollments);
 
     if (!populatedEnrollments) {
       return errorResponse("Enrollment not found", 404);

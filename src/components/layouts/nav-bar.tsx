@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { authClient } from '@/lib/auth-client';
+import { getDashboardPath } from '@/lib/dashboard';
 
 const NavBar = () => {
     const pathname = usePathname();
@@ -16,7 +17,7 @@ const NavBar = () => {
         { name: 'About us', href: '/about-us' },
         {
             name: session?.user ? 'Dashboard' : 'Sign In',
-            href: session?.user ? `${role}` : 'sign-in'
+            href: session?.user ? getDashboardPath(role) : '/sign-in'
         }
 
     ];

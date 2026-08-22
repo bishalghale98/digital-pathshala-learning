@@ -38,7 +38,8 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const checkAuth = await authMiddleware(req, [Roles.Admin, Roles.Student]);
+  // Admin-only: students must never be able to change enrollment status
+  const checkAuth = await authMiddleware(req, [Roles.Admin]);
 
   if (checkAuth.status !== 200) {
     return checkAuth;
