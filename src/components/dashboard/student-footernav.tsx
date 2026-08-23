@@ -3,13 +3,14 @@
 import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { ROUTES } from '@/lib/constants'
 import { Home, BookOpen, GraduationCap, Settings } from 'lucide-react'
 
 const navItems = [
-  { href: '/student', label: 'Home', icon: Home },
-  { href: '/student/mycourse', label: 'My Courses', icon: GraduationCap },
-  { href: '/student/courses', label: 'Courses', icon: BookOpen },
-  { href: '/student/settings', label: 'Settings', icon: Settings },
+  { href: ROUTES.STUDENT_DASHBOARD, label: 'Home', icon: Home },
+  { href: ROUTES.STUDENT_MY_COURSES, label: 'My Courses', icon: GraduationCap },
+  { href: ROUTES.STUDENT_COURSES, label: 'Courses', icon: BookOpen },
+  { href: ROUTES.STUDENT_SETTINGS, label: 'Settings', icon: Settings },
 ]
 
 const StudentFooterNav = () => {
@@ -20,8 +21,8 @@ const StudentFooterNav = () => {
       <div className="flex items-center justify-around py-2">
         {navItems.map((item) => {
           const isActive =
-            item.href === '/student'
-              ? pathname === '/student'
+            item.href === ROUTES.STUDENT_DASHBOARD
+              ? pathname === ROUTES.STUDENT_DASHBOARD
               : pathname.startsWith(item.href)
           const Icon = item.icon
 

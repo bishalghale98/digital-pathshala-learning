@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { Roles } from "@/lib/constants";
+import { Roles, ROUTES } from "@/lib/constants";
 import { getDashboardPath } from "@/lib/dashboard";
 
 export async function proxy(request: NextRequest) {
@@ -10,7 +10,7 @@ export async function proxy(request: NextRequest) {
     headers: request.headers,
   });
 
-  if (pathname === "/sign-in") {
+  if (pathname === ROUTES.SIGN_IN) {
     // Signed-in users should never see the sign-in page
     if (session?.user) {
       return NextResponse.redirect(
@@ -21,21 +21,21 @@ export async function proxy(request: NextRequest) {
   }
 
   if (!session?.user) {
-    return NextResponse.redirect(new URL("/sign-in", request.url));
+    return NextResponse.redirect(new URL(ROUTES.SIGN_IN, request.url));
   }
 
   const role = session.user.role;
 
-  if (pathname.startsWith("/admin") && role !== Roles.Admin) {
-    return NextResponse.redirect(new URL("/unauthorized", request.url));
+  if (pathname.startsWith(ROUTES.ADMIN_DASHBOARD) && role !== Roles.Admin) {
+    return NextResponse.redirect(new URL(ROUTES.UNAUTHORIZED, request.url));
   }
 
   if (
-    pathname.startsWith("/student") &&
+    pathname.startsWith(ROUTES.STUDENT_DASHBOARD) &&
     role !== Roles.Student &&
     role !== Roles.Admin
   ) {
-    return NextResponse.redirect(new URL("/unauthorized", request.url));
+    return NextResponse.redirect(new URL(ROUTES.UNAUTHORIZED, request.url));
   }
 
   return NextResponse.next();

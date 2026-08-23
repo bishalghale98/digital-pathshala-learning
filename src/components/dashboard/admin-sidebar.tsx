@@ -4,6 +4,7 @@ import React from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { authClient } from '@/lib/auth-client'
+import { ROUTES } from '@/lib/constants'
 import {
   LayoutDashboard,
   Users,
@@ -20,23 +21,23 @@ const navGroups = [
   {
     label: 'Overview',
     items: [
-      { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+      { href: ROUTES.ADMIN_DASHBOARD, label: 'Dashboard', icon: LayoutDashboard },
     ],
   },
   {
     label: 'Management',
     items: [
-      { href: '/admin/students', label: 'Students', icon: Users },
-      { href: '/admin/courses', label: 'Courses', icon: BookOpen },
-      { href: '/admin/categories', label: 'Categories', icon: Tag },
-      { href: '/admin/enrollments', label: 'Enrollments', icon: ClipboardList },
+      { href: ROUTES.ADMIN_STUDENTS, label: 'Students', icon: Users },
+      { href: ROUTES.ADMIN_COURSES, label: 'Courses', icon: BookOpen },
+      { href: ROUTES.ADMIN_CATEGORIES, label: 'Categories', icon: Tag },
+      { href: ROUTES.ADMIN_ENROLLMENTS, label: 'Enrollments', icon: ClipboardList },
     ],
   },
   {
     label: 'Insights',
     items: [
-      { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
-      { href: '/admin/settings', label: 'Settings', icon: Settings },
+      { href: ROUTES.ADMIN_ANALYTICS, label: 'Analytics', icon: BarChart3 },
+      { href: ROUTES.ADMIN_SETTINGS, label: 'Settings', icon: Settings },
     ],
   },
 ]
@@ -52,7 +53,7 @@ export const SidebarContent = ({ onNavigate }: SidebarContentProps) => {
 
   const handleLogout = async () => {
     await authClient.signOut()
-    router.push('/sign-in')
+    router.push(ROUTES.SIGN_IN)
   }
 
   const handleNav = () => {
@@ -63,7 +64,7 @@ export const SidebarContent = ({ onNavigate }: SidebarContentProps) => {
     <>
       {/* Brand */}
       <div className="flex items-center h-16 px-6 border-b border-gray-100">
-        <Link href="/admin" className="text-lg font-bold text-gray-900 tracking-tight" onClick={handleNav}>
+        <Link href={ROUTES.ADMIN_DASHBOARD} className="text-lg font-bold text-gray-900 tracking-tight" onClick={handleNav}>
           BISAN LMS
         </Link>
         <span className="ml-2 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider bg-gray-900 text-white rounded">
@@ -81,8 +82,8 @@ export const SidebarContent = ({ onNavigate }: SidebarContentProps) => {
             <div className="space-y-0.5">
               {group.items.map((item) => {
                 const isActive =
-                  item.href === '/admin'
-                    ? pathname === '/admin'
+                  item.href === ROUTES.ADMIN_DASHBOARD
+                    ? pathname === ROUTES.ADMIN_DASHBOARD
                     : pathname.startsWith(item.href)
                 const Icon = item.icon
 

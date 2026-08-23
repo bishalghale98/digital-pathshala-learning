@@ -4,6 +4,7 @@ import React from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { authClient } from '@/lib/auth-client'
+import { ROUTES } from '@/lib/constants'
 import {
   LayoutDashboard,
   BookOpen,
@@ -13,10 +14,10 @@ import {
 } from 'lucide-react'
 
 const navItems = [
-  { href: '/student', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/student/mycourse', label: 'My Courses', icon: GraduationCap },
-  { href: '/student/courses', label: 'Courses', icon: BookOpen },
-  { href: '/student/settings', label: 'Settings', icon: Settings },
+  { href: ROUTES.STUDENT_DASHBOARD, label: 'Dashboard', icon: LayoutDashboard },
+  { href: ROUTES.STUDENT_MY_COURSES, label: 'My Courses', icon: GraduationCap },
+  { href: ROUTES.STUDENT_COURSES, label: 'Courses', icon: BookOpen },
+  { href: ROUTES.STUDENT_SETTINGS, label: 'Settings', icon: Settings },
 ]
 
 const SidebarContent = ({ onNavigate }: { onNavigate?: () => void }) => {
@@ -26,7 +27,7 @@ const SidebarContent = ({ onNavigate }: { onNavigate?: () => void }) => {
 
   const handleLogout = async () => {
     await authClient.signOut()
-    router.push('/sign-in')
+    router.push(ROUTES.SIGN_IN)
   }
 
   const handleNav = () => {
@@ -37,7 +38,7 @@ const SidebarContent = ({ onNavigate }: { onNavigate?: () => void }) => {
     <>
       {/* Logo */}
       <div className="flex items-center h-16 px-6 border-b border-gray-100">
-        <Link href="/student" className="text-xl font-bold text-gray-900" onClick={handleNav}>
+        <Link href={ROUTES.STUDENT_DASHBOARD} className="text-xl font-bold text-gray-900" onClick={handleNav}>
           BISAN LMS
         </Link>
       </div>
@@ -46,8 +47,8 @@ const SidebarContent = ({ onNavigate }: { onNavigate?: () => void }) => {
       <nav className="flex-1 px-3 py-4 space-y-1">
         {navItems.map((item) => {
           const isActive =
-            item.href === '/student'
-              ? pathname === '/student'
+            item.href === ROUTES.STUDENT_DASHBOARD
+              ? pathname === ROUTES.STUDENT_DASHBOARD
               : pathname.startsWith(item.href)
           const Icon = item.icon
 

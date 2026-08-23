@@ -3,6 +3,7 @@
 
 import { useRouter } from 'next/navigation'
 import React from 'react'
+import { ROUTES } from '@/lib/constants'
 import type { Lesson } from '@/store/lesson/lessonApi'
 
 interface CourseSyallabusProps {
@@ -31,7 +32,7 @@ const CourseSyallabus: React.FC<CourseSyallabusProps> = ({ lessons, isLoading = 
                 {/* Back Button */}
                 <div className="mt-3 sm:mt-0">
                     <button
-                        onClick={() => router.push("/student/mycourse")}
+                        onClick={() => router.push(ROUTES.STUDENT_MY_COURSES)}
                         className="flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm sm:text-base"
                     >
                         <svg
@@ -65,7 +66,7 @@ const CourseSyallabus: React.FC<CourseSyallabusProps> = ({ lessons, isLoading = 
                                 key={lesson._id}
                                 onClick={() =>
                                     router.push(
-                                        `/student/mycourse?section=video_play&courseId=${getCourseId(lesson.courseId)}&lessonId=${lesson._id}`
+                                        ROUTES.studentVideoPlay(getCourseId(lesson.courseId), lesson._id)
                                     )
                                 }
                                 role="button"
@@ -74,7 +75,7 @@ const CourseSyallabus: React.FC<CourseSyallabusProps> = ({ lessons, isLoading = 
                                     if (e.key === 'Enter' || e.key === ' ') {
                                         e.preventDefault()
                                         router.push(
-                                            `/student/mycourse?section=video_play&courseId=${getCourseId(lesson.courseId)}&lessonId=${lesson._id}`
+                                            ROUTES.studentVideoPlay(getCourseId(lesson.courseId), lesson._id)
                                         )
                                     }
                                 }}

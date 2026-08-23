@@ -16,11 +16,19 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "BISAN LMS",
+    default: "BISAN LMS - Online Learning Platform",
     template: "%s | BISAN LMS",
   },
   description:
-    "Learn courses, track progress, and join the community with BISAN LMS.",
+    "Learn practical skills through structured online courses. BISAN LMS helps you track progress, explore categories, and grow your knowledge at your own pace.",
+  keywords: ["online learning", "courses", "education", "LMS", "e-learning", "BISAN"],
+  openGraph: {
+    title: "BISAN LMS - Online Learning Platform",
+    description:
+      "Learn practical skills through structured online courses. Track progress and grow your knowledge.",
+    type: "website",
+    siteName: "BISAN LMS",
+  },
 };
 
 export default function RootLayout({

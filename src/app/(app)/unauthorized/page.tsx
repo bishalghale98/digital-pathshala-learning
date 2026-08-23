@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ROUTES } from "@/lib/constants";
 
 export default function MinimalUnauthorized() {
     return (
@@ -33,7 +34,7 @@ export default function MinimalUnauthorized() {
                 </div>
 
                 <Link
-                    href="/"
+                    href={ROUTES.HOME}
                     className="inline-flex items-center text-gray-400 hover:text-white transition-colors group"
                 >
                     <svg

@@ -2,6 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
+import { ROUTES } from '@/lib/constants'
 import {
     Home,
     Users,
@@ -12,11 +13,11 @@ import {
 
 const AdminFooterNav = () => {
     const navItems = [
-        { href: '/admin', label: 'Dashboard', icon: <Home size={20} /> },
-        { href: '/admin/students', label: 'Students', icon: <Users size={20} /> },
-        { href: '/admin/categories', label: 'Categories', icon: <Tag size={20} /> },
-        { href: '/admin/courses', label: 'Courses', icon: <BookOpen size={20} /> },
-        { href: '/admin/enrollments', label: 'Enrollments', icon: <ClipboardList size={20} /> },
+        { href: ROUTES.ADMIN_DASHBOARD, label: 'Dashboard', icon: <Home size={20} /> },
+        { href: ROUTES.ADMIN_STUDENTS, label: 'Students', icon: <Users size={20} /> },
+        { href: ROUTES.ADMIN_CATEGORIES, label: 'Categories', icon: <Tag size={20} /> },
+        { href: ROUTES.ADMIN_COURSES, label: 'Courses', icon: <BookOpen size={20} /> },
+        { href: ROUTES.ADMIN_ENROLLMENTS, label: 'Enrollments', icon: <ClipboardList size={20} /> },
     ]
 
     return (

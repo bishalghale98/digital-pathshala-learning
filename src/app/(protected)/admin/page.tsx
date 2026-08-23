@@ -20,6 +20,7 @@ import {
 import { useGetCategoriesQuery } from '@/store/category/categoryApi'
 import { EnrollmentStatus } from '@/types/models'
 import { authClient } from '@/lib/auth-client'
+import { ROUTES } from '@/lib/constants'
 
 const getStudent = (e: Enrollment) =>
   typeof e.studentId === 'object' ? e.studentId : null
@@ -125,7 +126,7 @@ const AdminPage = () => {
               <p className="text-xs text-gray-500 mt-0.5">Latest student enrollments</p>
             </div>
             <button
-              onClick={() => router.push('/admin/enrollments')}
+              onClick={() => router.push(ROUTES.ADMIN_ENROLLMENTS)}
               className="inline-flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
             >
               View All
@@ -189,7 +190,7 @@ const AdminPage = () => {
               <p className="text-xs text-gray-500 mt-0.5">Newly registered</p>
             </div>
             <button
-              onClick={() => router.push('/admin/students')}
+              onClick={() => router.push(ROUTES.ADMIN_STUDENTS)}
               className="inline-flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
             >
               View All
@@ -253,7 +254,7 @@ const AdminPage = () => {
         <h2 className="text-base font-semibold text-gray-900 mb-4">Quick Actions</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <button
-            onClick={() => router.push('/admin/courses')}
+            onClick={() => router.push(ROUTES.ADMIN_COURSES)}
             className="flex items-center gap-3 p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors text-left"
           >
             <BookOpen className="w-5 h-5 text-gray-600" />
@@ -263,7 +264,7 @@ const AdminPage = () => {
             </div>
           </button>
           <button
-            onClick={() => router.push('/admin/enrollments')}
+            onClick={() => router.push(ROUTES.ADMIN_ENROLLMENTS)}
             className="flex items-center gap-3 p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors text-left"
           >
             <TrendingUp className="w-5 h-5 text-gray-600" />
@@ -273,7 +274,7 @@ const AdminPage = () => {
             </div>
           </button>
           <button
-            onClick={() => router.push('/admin/categories')}
+            onClick={() => router.push(ROUTES.ADMIN_CATEGORIES)}
             className="flex items-center gap-3 p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors text-left"
           >
             <Tag className="w-5 h-5 text-gray-600" />

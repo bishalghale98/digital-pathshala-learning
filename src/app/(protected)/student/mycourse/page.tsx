@@ -10,6 +10,7 @@ import {
 } from '@/store/student/studentApi'
 import { useGetLessonsByCourseQuery } from '@/store/lesson/lessonApi'
 import { BookOpen, Play, Clock, ArrowRight } from 'lucide-react'
+import { ROUTES } from '@/lib/constants'
 import type { Lesson } from '@/store/lesson/lessonApi'
 import type { MyCourse } from '@/store/student/studentApi'
 import type { Course } from '@/store/course/courseApi'
@@ -91,9 +92,7 @@ const MyCourseCard = ({
 
         <button
           onClick={() =>
-            router.push(
-              `/student/mycourse?section=course-syllabus&courseId=${courseId}`
-            )
+            router.push(ROUTES.studentCourseSyllabus(courseId))
           }
           className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
         >
@@ -225,7 +224,7 @@ function MyCourseContent() {
             and start learning today.
           </p>
           <button
-            onClick={() => router.push('/student/courses')}
+            onClick={() => router.push(ROUTES.STUDENT_COURSES)}
             className="inline-flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
           >
             Browse Courses

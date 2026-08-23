@@ -7,6 +7,7 @@ import { useGetCoursesQuery, type Course } from '@/store/course/courseApi'
 import { useGetCategoriesQuery } from '@/store/category/categoryApi'
 import { useVerifyPaymentMutation } from '@/store/payment/paymentApi'
 import { useRouter } from 'next/navigation'
+import { ROUTES } from '@/lib/constants'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Search, X } from 'lucide-react'
 
@@ -36,7 +37,7 @@ const CoursesPage = () => {
 
     verifyPayment({ pidx })
       .unwrap()
-      .then(() => router.replace('/student/courses'))
+      .then(() => router.replace(ROUTES.STUDENT_COURSES))
       .catch((err) => console.error('Payment verification failed:', err))
   }, [router, verifyPayment])
 

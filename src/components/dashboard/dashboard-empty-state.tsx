@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { useRouter } from 'next/navigation'
+import { ROUTES } from '@/lib/constants'
 import { BookOpen } from 'lucide-react'
 
 const DashboardEmptyState = () => {
@@ -19,7 +20,7 @@ const DashboardEmptyState = () => {
         You haven&apos;t enrolled in any courses yet. Explore our catalog and start learning today.
       </p>
       <button
-        onClick={() => router.push('/student/courses')}
+        onClick={() => router.push(ROUTES.STUDENT_COURSES)}
         className="inline-flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
       >
         Browse Courses

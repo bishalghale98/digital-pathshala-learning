@@ -10,6 +10,7 @@ import {
   ArrowRight,
 } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
+import { ROUTES } from '@/lib/constants'
 import { useGetMyCoursesQuery } from '@/store/student/studentApi'
 import { useGetLessonsByCourseQuery } from '@/store/lesson/lessonApi'
 import DashboardStatCard from '@/components/dashboard/dashboard-stat-card'
@@ -156,7 +157,7 @@ const StudentDashboardPage = () => {
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-lg font-semibold text-gray-900">My Courses</h2>
           <button
-            onClick={() => router.push('/student/mycourse')}
+            onClick={() => router.push(ROUTES.STUDENT_MY_COURSES)}
             className="inline-flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
           >
             View All

@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { authClient } from '@/lib/auth-client';
 import { getDashboardPath } from '@/lib/dashboard';
-import { FaHome, FaInfoCircle, FaTachometerAlt } from 'react-icons/fa';
+import { ROUTES } from '@/lib/constants';
+import { Home, BookOpen, LayoutDashboard } from 'lucide-react';
 
 const FooterNavBar = () => {
     const pathname = usePathname();
@@ -13,12 +14,12 @@ const FooterNavBar = () => {
     const role = session?.user.role;
 
     const navLinks = [
-        { name: 'Home', href: '/', icon: <FaHome size={20} /> },
-        { name: 'About Us', href: '/about-us', icon: <FaInfoCircle size={20} /> },
+        { name: 'Home', href: ROUTES.HOME, icon: <Home size={20} /> },
+        { name: 'Courses', href: ROUTES.COURSES, icon: <BookOpen size={20} /> },
         {
             name: session?.user ? 'Dashboard' : 'Sign In',
-            href: session?.user ? getDashboardPath(role) : '/sign-in',
-            icon: <FaTachometerAlt size={20} />
+            href: session?.user ? getDashboardPath(role) : ROUTES.SIGN_IN,
+            icon: <LayoutDashboard size={20} />
         },
     ];
 
@@ -32,8 +33,9 @@ const FooterNavBar = () => {
                         <Link
                             key={link.name}
                             href={link.href}
-                            className={`flex flex-col items-center justify-center py-2 px-2 rounded-lg transition-all duration-200 ${isActive ? 'text-blue-600' : 'text-gray-500 hover:text-blue-500'
-                                }`}
+                            className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-all duration-200 ${
+                                isActive ? 'text-blue-600' : 'text-gray-500 hover:text-blue-500'
+                            }`}
                         >
                             <div className="mb-1">{link.icon}</div>
                             <span className="text-xs font-medium">{link.name}</span>

@@ -3,6 +3,7 @@
 import { getYoutubeEmbedUrl } from '@/lib/helper/getYoutubeEmbedUrl'
 import { useRouter } from 'next/navigation'
 import React from 'react'
+import { ROUTES } from '@/lib/constants'
 import { ArrowLeft, ChevronLeft, ChevronRight, Play } from 'lucide-react'
 import type { Lesson } from '@/store/lesson/lessonApi'
 
@@ -22,7 +23,7 @@ const VideoPlaySection: React.FC<VideoPlaySectionProps> = ({
 }) => {
     const router = useRouter()
 
-    const backButton = () => { router.push(`/student/mycourse?section=course-syllabus&courseId=${getCourseId(activeLesson?.courseId ?? '')}`) }
+    const backButton = () => { router.push(ROUTES.studentCourseSyllabus(getCourseId(activeLesson?.courseId ?? ''))) }
 
     const currentIndex = activeLesson
         ? lessons.findIndex((l) => l._id === activeLesson._id)
@@ -36,7 +37,7 @@ const VideoPlaySection: React.FC<VideoPlaySectionProps> = ({
 
     const navigateToLesson = (lesson: Lesson) => {
         router.push(
-            `/student/mycourse?section=video_play&courseId=${getCourseId(lesson.courseId)}&lessonId=${lesson._id}`
+            ROUTES.studentVideoPlay(getCourseId(lesson.courseId), lesson._id)
         )
     }
 
@@ -121,7 +122,7 @@ const VideoPlaySection: React.FC<VideoPlaySectionProps> = ({
                                 <div
                                     onClick={() =>
                                         router.push(
-                                            `/student/mycourse?section=video_play&courseId=${getCourseId(lesson.courseId)}&lessonId=${lesson._id}`
+                                            ROUTES.studentVideoPlay(getCourseId(lesson.courseId), lesson._id)
                                         )}
                                     key={lesson._id}
                                     role="button"
@@ -130,7 +131,7 @@ const VideoPlaySection: React.FC<VideoPlaySectionProps> = ({
                                         if (e.key === 'Enter' || e.key === ' ') {
                                             e.preventDefault()
                                             router.push(
-                                                `/student/mycourse?section=video_play&courseId=${getCourseId(lesson.courseId)}&lessonId=${lesson._id}`
+                                                ROUTES.studentVideoPlay(getCourseId(lesson.courseId), lesson._id)
                                             )
                                         }
                                     }}

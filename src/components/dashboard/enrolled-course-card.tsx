@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { useRouter } from 'next/navigation'
+import { ROUTES } from '@/lib/constants'
 import { Play, BookOpen } from 'lucide-react'
 import type { MyCourse } from '@/store/student/studentApi'
 import type { Course } from '@/store/course/courseApi'
@@ -35,7 +36,7 @@ const EnrolledCourseCard: React.FC<EnrolledCourseCardProps> = ({
       : (enrollment.courseId as Course)._id
 
   const handleContinue = () => {
-    router.push(`/student/mycourse?section=course-syllabus&courseId=${courseId}`)
+    router.push(ROUTES.studentCourseSyllabus(courseId))
   }
 
   return (

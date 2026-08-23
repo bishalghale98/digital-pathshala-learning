@@ -2,3 +2,40 @@ export const Roles = {
   Admin: "admin",
   Student: "student",
 } as const;
+
+export const ROUTES = {
+  // Public
+  HOME: '/',
+  COURSES: '/courses',
+  ABOUT: '/about-us',
+  SIGN_IN: '/sign-in',
+  PROFILE: '/profile',
+  UNAUTHORIZED: '/unauthorized',
+
+  // Dynamic public
+  courseDetail: (id: string) => `/courses/${id}`,
+
+  // Student dashboard
+  STUDENT_DASHBOARD: '/student',
+  STUDENT_MY_COURSES: '/student/mycourse',
+  STUDENT_COURSES: '/student/courses',
+  STUDENT_SETTINGS: '/student/settings',
+
+  // Student dynamic
+  studentCourseSyllabus: (courseId: string) =>
+    `/student/mycourse?section=course-syllabus&courseId=${courseId}`,
+  studentVideoPlay: (courseId: string, lessonId: string) =>
+    `/student/mycourse?section=video_play&courseId=${courseId}&lessonId=${lessonId}`,
+
+  // Admin dashboard
+  ADMIN_DASHBOARD: '/admin',
+  ADMIN_STUDENTS: '/admin/students',
+  ADMIN_COURSES: '/admin/courses',
+  ADMIN_CATEGORIES: '/admin/categories',
+  ADMIN_ENROLLMENTS: '/admin/enrollments',
+  ADMIN_ANALYTICS: '/admin/analytics',
+  ADMIN_SETTINGS: '/admin/settings',
+
+  // Admin dynamic
+  adminCourseLessons: (courseId: string) => `/admin/courses/${courseId}/lessons`,
+} as const;

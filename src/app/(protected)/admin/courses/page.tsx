@@ -4,6 +4,7 @@ import React, { useCallback, useState, useMemo } from 'react'
 import CourseModal from '@/components/course/modal'
 import ConfirmationModal from '@/components/common/delete-modal'
 import { useRouter } from 'next/navigation'
+import { ROUTES } from '@/lib/constants'
 import {
   useDeleteCourseMutation,
   useGetCoursesQuery,
@@ -169,7 +170,7 @@ const Courses = () => {
                   <tr
                     key={course._id}
                     className="hover:bg-gray-50 transition-colors cursor-pointer"
-                    onClick={() => router.push(`/admin/courses/${course._id}/lessons`)}
+                    onClick={() => router.push(ROUTES.adminCourseLessons(course._id))}
                   >
                     <td className="px-6 py-4">
                       <p className="text-sm font-medium text-gray-900">{course.title}</p>

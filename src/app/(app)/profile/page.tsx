@@ -1,6 +1,7 @@
 "use client";
 
 import { authClient } from "@/lib/auth-client";
+import { ROUTES } from "@/lib/constants";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -12,7 +13,7 @@ export default function UserProfile() {
 
   useEffect(() => {
     if (!isPending && !session?.user) {
-      router.replace("/sign-in");
+      router.replace(ROUTES.SIGN_IN);
     }
   }, [session, isPending, router]);
 
@@ -32,7 +33,7 @@ export default function UserProfile() {
   const handleSignOut = async () => {
     try {
       await authClient.signOut();
-      router.replace("/sign-in");
+      router.replace(ROUTES.SIGN_IN);
     } catch (err) {
       console.error("Sign out failed:", err);
     }

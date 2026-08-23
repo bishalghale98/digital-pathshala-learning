@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { useRouter } from 'next/navigation'
+import { ROUTES } from '@/lib/constants'
 import { Play, Clock, BookOpen } from 'lucide-react'
 import type { MyCourse } from '@/store/student/studentApi'
 import type { Course } from '@/store/course/courseApi'
@@ -41,20 +42,15 @@ const ContinueLearningCard: React.FC<ContinueLearningCardProps> = ({
   if (!course) return null
 
   const handleContinue = () => {
+    const courseId =
+      typeof enrollment.courseId === 'string'
+        ? enrollment.courseId
+        : (enrollment.courseId as Course)._id
+
     if (lastLesson) {
-      const courseId =
-        typeof enrollment.courseId === 'string'
-          ? enrollment.courseId
-          : (enrollment.courseId as Course)._id
-      router.push(
-        `/student/mycourse?section=video_play&courseId=${courseId}&lessonId=${lastLesson._id}`
-      )
+      router.push(ROUTES.studentVideoPlay(courseId, lastLesson._id))
     } else {
-      const courseId =
-        typeof enrollment.courseId === 'string'
-          ? enrollment.courseId
-          : (enrollment.courseId as Course)._id
-      router.push(`/student/mycourse?section=course-syllabus&courseId=${courseId}`)
+      router.push(ROUTES.studentCourseSyllabus(courseId))
     }
   }
 
