@@ -22,6 +22,10 @@ const lessonSchema = new Schema<ILesson>(
       type: String,
       trim: true,
     },
+    lessonNumber: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,

@@ -15,6 +15,15 @@ export interface MyCourse {
   courseId: Course | string;
   enrolledAt: string;
   enrollmentStatus: EnrollmentStatus;
+  completedLessons: string[];
+  lastAccessedLesson?: Lesson | string;
+  lastAccessedAt?: string;
+}
+
+export interface ProgressResult {
+  completedLessons: string[];
+  lastAccessedLesson: string;
+  lastAccessedAt: string;
 }
 
 export const studentApi = baseApi.injectEndpoints({
@@ -34,7 +43,39 @@ export const studentApi = baseApi.injectEndpoints({
       transformResponse: (res: { data: Lesson[] }) => res.data,
       providesTags: (_r, _e, courseId) => [{ type: "Lesson", id: courseId }],
     }),
+    toggleLessonCompletion: builder.mutation<
+      ProgressResult,
+      { enrollmentId: string; lessonId: string }
+    >({
+      query: (body) => ({
+        url: "students/progress",
+        method: "POST",
+        body,
+      }),
+      transformResponse: (res: { data: ProgressResult }) => res.data,
+      invalidatesTags: [{ type: "MyCourse", id: "LIST" }],
+    }),
+    updateLastAccessed: builder.mutation<
+      { lastAccessedLesson: string; lastAccessedAt: string },
+      { enrollmentId: string; lessonId: string }
+    >({
+      query: (body) => ({
+        url: "students/progress",
+        method: "PATCH",
+        body,
+      }),
+      transformResponse: (res: {
+        data: { lastAccessedLesson: string; lastAccessedAt: string };
+      }) => res.data,
+      invalidatesTags: [{ type: "MyCourse", id: "LIST" }],
+    }),
   }),
 });
 
-export const { useGetStudentsQuery, useGetMyCoursesQuery, useGetStudentLessonsQuery } = studentApi;
+export const {
+  useGetStudentsQuery,
+  useGetMyCoursesQuery,
+  useGetStudentLessonsQuery,
+  useToggleLessonCompletionMutation,
+  useUpdateLastAccessedMutation,
+} = studentApi;

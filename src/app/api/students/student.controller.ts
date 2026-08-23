@@ -45,6 +45,7 @@ export const getMyCourse = tryCatch(async (req: NextRequest) => {
     enrollmentStatus: EnrollmentStatus.Approved,
   })
     .populate("courseId")
+    .populate({ path: "lastAccessedLesson", strictPopulate: false })
     .lean();
 
   return successResponse("My courses fetch successfully", enrollments);

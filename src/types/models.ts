@@ -33,6 +33,7 @@ export interface ILesson extends Document {
   title: string;
   description?: string;
   videoUrl?: string;
+  lessonNumber?: number;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -52,6 +53,9 @@ export interface IEnrollment extends Document {
   enrollmentStatus: EnrollmentStatus;
   enrolledAt: Date;
   whatsapp: string;
+  completedLessons: Types.ObjectId[];
+  lastAccessedLesson?: Types.ObjectId;
+  lastAccessedAt?: Date;
   paymentMethod: PaymentMethod;
 }
 

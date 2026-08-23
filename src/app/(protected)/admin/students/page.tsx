@@ -1,71 +1,135 @@
 'use client'
 
-import Image from 'next/image'
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { useGetStudentsQuery } from '@/store/student/studentApi'
+import { Search, X, Users } from 'lucide-react'
 
 const StudentsPage = () => {
-    const [searchTerm, setSearchTerm] = useState('')
-    const { data: students = [], isLoading } = useGetStudentsQuery()
+  const [searchTerm, setSearchTerm] = useState('')
+  const { data: students = [], isLoading } = useGetStudentsQuery()
 
-    const filterStudents = students.filter(student =>
+  const filteredStudents = useMemo(() => {
+    if (!searchTerm.trim()) return students
+    return students.filter(
+      (student) =>
         student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         student.email.toLowerCase().includes(searchTerm.toLowerCase())
     )
+  }, [students, searchTerm])
 
-    return (
-        <div className="flex flex-col">
-            <div className=" overflow-x-auto">
-                <div className="min-w-full inline-block align-middle">
-                    <div className="relative  text-gray-500 focus-within:text-gray-900 mb-4">
-                        <div className="absolute inset-y-0 left-1 flex items-center pl-3 pointer-events-none ">
-                            <svg className="w-5 h-5" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M17.5 17.5L15.4167 15.4167M15.8333 9.16667C15.8333 5.48477 12.8486 2.5 9.16667 2.5C5.48477 2.5 2.5 5.48477 2.5 9.16667C2.5 12.8486 5.48477 15.8333 9.16667 15.8333C11.0005 15.8333 12.6614 15.0929 13.8667 13.8947C15.0814 12.6872 15.8333 11.0147 15.8333 9.16667Z" stroke="#9CA3AF" strokeWidth="1.6" strokeLinecap="round" />
-                                <path d="M17.5 17.5L15.4167 15.4167M15.8333 9.16667C15.8333 5.48477 12.8486 2.5 9.16667 2.5C5.48477 2.5 2.5 5.48477 2.5 9.16667C2.5 12.8486 5.48477 15.8333 9.16667 15.8333C11.0005 15.8333 12.6614 15.0929 13.8667 13.8947C15.0814 12.6872 15.8333 11.0147 15.8333 9.16667Z" stroke="black" strokeOpacity="0.2" strokeWidth="1.6" strokeLinecap="round" />
-                                <path d="M17.5 17.5L15.4167 15.4167M15.8333 9.16667C15.8333 5.48477 12.8486 2.5 9.16667 2.5C5.48477 2.5 2.5 5.48477 2.5 9.16667C2.5 12.8486 5.48477 15.8333 9.16667 15.8333C11.0005 15.8333 12.6614 15.0929 13.8667 13.8947C15.0814 12.6872 15.8333 11.0147 15.8333 9.16667Z" stroke="black" strokeOpacity="0.2" strokeWidth="1.6" strokeLinecap="round" />
-                            </svg>
-                        </div>
-                        <input value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} type="text" id="default-search" className="block w-80 h-11 pr-5 pl-12 py-2.5 text-base font-normal shadow-xs text-gray-900 bg-transparent border border-gray-300 rounded-full placeholder-gray-400 focus:outline-none" placeholder="Search students..." />
+  return (
+    <div>
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Students</h1>
+          <p className="text-sm text-gray-500 mt-1">
+            Manage all registered students
+          </p>
+        </div>
+        <div className="relative w-full sm:w-72">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search by name or email..."
+            className="w-full pl-10 pr-10 py-2.5 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-300 transition-colors"
+          />
+          {searchTerm && (
+            <button
+              onClick={() => setSearchTerm('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Student</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Email</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Role</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">ID</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {isLoading ? (
+                <tr>
+                  <td colSpan={4} className="px-6 py-12 text-center text-sm text-gray-500">
+                    Loading students...
+                  </td>
+                </tr>
+              ) : filteredStudents.length === 0 ? (
+                <tr>
+                  <td colSpan={4}>
+                    <div className="flex flex-col items-center justify-center py-12">
+                      <Users className="w-12 h-12 text-gray-300 mb-3" />
+                      <p className="text-sm font-medium text-gray-900">
+                        {searchTerm ? 'No students found' : 'No students yet'}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {searchTerm
+                          ? 'Try adjusting your search'
+                          : 'Students will appear here once they register'}
+                      </p>
                     </div>
-                    <div className="overflow-hidden ">
-                        <table className=" min-w-full rounded-xl">
-                            <thead>
-                                <tr className="bg-gray-50">
-                                    <th scope="col" className="p-5 text-left text-sm leading-6 font-semibold text-gray-900 capitalize rounded-t-xl"> Students Id</th>
-                                    <th scope="col" className="p-5 text-left text-sm leading-6 font-semibold text-gray-900 capitalize"> Name </th>
-                                    <th scope="col" className="p-5 text-left text-sm leading-6 font-semibold text-gray-900 capitalize"> Email </th>
-                                    <th scope="col" className="p-5 text-left text-sm leading-6 font-semibold text-gray-900 capitalize rounded-t-xl"> Image </th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-300 ">
+                  </td>
+                </tr>
+              ) : (
+                filteredStudents.map((student) => (
+                  <tr key={student._id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        {student.image ? (
+                          <img src={student.image} alt={student.name} className="w-9 h-9 rounded-full object-cover" />
+                        ) : (
+                          <div className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center">
+                            <span className="text-sm font-medium text-gray-600">
+                              {student.name.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                        )}
+                        <span className="text-sm font-medium text-gray-900">{student.name}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-sm text-gray-600">{student.email}</span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
+                        Student
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-xs text-gray-400 font-mono truncate max-w-[120px] block" title={student._id}>
+                        {student._id}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
 
-                                {
-                                    isLoading && (
-                                        <tr className="bg-white">
-                                            <td colSpan={5} className="p-5 text-center text-sm text-gray-500">Loading students...</td>
-                                        </tr>
-                                    )
-                                }
-                                {
-                                    filterStudents.map((student) => (
-                                        <tr key={student._id} className="bg-white transition-all duration-500 hover:bg-gray-50">
-                                            <td className="p-5 whitespace-nowrap text-sm leading-6 font-medium text-gray-900 truncate max-w-[120px] "> {student._id}</td>
-                                            <td className="p-5 whitespace-nowrap text-sm leading-6 font-medium text-gray-900"> {student.name} </td>
-                                            <td className="p-5 whitespace-nowrap text-sm leading-6 font-medium text-gray-900"> {student.email}</td>
-                                            <td className="p-5 whitespace-nowrap text-sm leading-6 font-medium text-gray-900"> {student.image && <Image src={student.image} alt={student.name} width={40} height={40} />}</td>
-                                        </tr>
-                                    ))
-                                }
-
-
-
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div >
-        </div >
-    )
+        {!isLoading && filteredStudents.length > 0 && (
+          <div className="px-6 py-3 bg-gray-50 border-t border-gray-200">
+            <p className="text-xs text-gray-500">
+              Showing <span className="font-medium">{filteredStudents.length}</span> of{' '}
+              <span className="font-medium">{students.length}</span> students
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  )
 }
 
 export default StudentsPage

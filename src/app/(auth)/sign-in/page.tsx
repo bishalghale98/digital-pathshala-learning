@@ -17,7 +17,7 @@ const SignIn = () => {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 flex flex-col items-center justify-center p-4">
+    <div className="bg-linear-to-br from-gray-50 to-gray-100 flex flex-col items-center justify-center p-4 min-h-[calc(100vh-4rem)]">
       {/* Logo/Brand */}
       <div className="text-center mb-8">
         <div className="inline-flex items-center justify-center w-16 h-16 bg-linear-to-br from-blue-500 to-purple-600 rounded-2xl shadow-lg mb-4">

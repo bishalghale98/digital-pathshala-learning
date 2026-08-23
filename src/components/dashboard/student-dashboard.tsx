@@ -1,50 +1,74 @@
 'use client'
 
-import React, { Activity, useState } from 'react'
-import StudentSidebar from './student-sidebar';
-import StudentFooterNav from './student-footernav';
+import React, { useState } from 'react'
+import StudentSidebar, { SidebarContent } from './student-sidebar'
+import { authClient } from '@/lib/auth-client'
+import { Menu, X } from 'lucide-react'
 
 const StudentDashboard = ({
-    children,
+  children,
 }: {
-    children: React.ReactNode;
+  children: React.ReactNode
 }) => {
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const { data: session } = authClient.useSession()
 
+  return (
+    <div className="flex h-screen bg-gray-50">
+      {/* Desktop sidebar */}
+      <StudentSidebar />
 
-    const [open, setOpen] = useState(true)
-
-    return (
-        <div className="flex h-screen bg-gray-100">
-            {/* sidebar */}
-            <Activity mode={open ? 'visible' : 'hidden'}>
-                <StudentSidebar />
-            </Activity>
-            {/* Main content */}
-            <div className="flex flex-col flex-1 overflow-y-auto">
-                <div className="flex items-center justify-between h-16 bg-white border-b border-gray-200">
-                    <div className="flex items-center px-4">
-                        <button className="text-gray-500 focus:outline-none focus:text-gray-700 hidden md:block" onClick={() => setOpen(!open)} >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                            </svg>
-                        </button>
-                        <input className="mx-4 w-full border rounded-md px-4 py-2 text-gray-700" type="text" placeholder="Search" />
-                    </div>
-                    <div className="flex items-center pr-4">
-                        <button className="flex items-center text-gray-500 hover:text-gray-700 focus:outline-none focus:text-gray-700">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l-7-7 7-7m5 14l7-7-7-7" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-                <div className="p-4 text-gray-600 mb-20 md:mb-0">
-                    {children}
-                </div>
-            </div>
-            <StudentFooterNav />
+      {/* Mobile sidebar overlay */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 z-40 md:hidden">
+          <div
+            className="fixed inset-0 bg-black/40"
+            onClick={() => setSidebarOpen(false)}
+          />
+          <div className="fixed inset-y-0 left-0 w-64 bg-white z-50 shadow-xl flex flex-col">
+            <SidebarContent onNavigate={() => setSidebarOpen(false)} />
+          </div>
         </div>
-    )
+      )}
+
+      {/* Main content */}
+      <div className="flex flex-col flex-1 min-w-0 overflow-y-auto">
+        {/* Top bar */}
+        <div className="flex items-center justify-between h-16 bg-white border-b border-gray-200 px-4 md:px-6 shrink-0">
+          <div className="flex items-center gap-3">
+            <button
+              className="md:hidden p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              aria-label="Toggle menu"
+            >
+              {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
+
+          <div className="flex items-center gap-3">
+            {session?.user.image ? (
+              <img
+                src={session.user.image}
+                alt={session.user.name || 'Student'}
+                className="w-8 h-8 rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                <span className="text-sm font-medium text-gray-600">
+                  {(session?.user.name || 'S').charAt(0).toUpperCase()}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Page content */}
+        <main className="flex-1 p-4 md:p-6">
+          {children}
+        </main>
+      </div>
+    </div>
+  )
 }
 
 export default StudentDashboard

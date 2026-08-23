@@ -1,58 +1,177 @@
 'use client'
 
 import React from 'react'
-import { BookOpen } from 'lucide-react'
-import StatCard from '@/components/dashboard/admin-stat-card'
+import { useRouter } from 'next/navigation'
+import {
+  BookOpen,
+  GraduationCap,
+  Clock,
+  TrendingUp,
+  ArrowRight,
+} from 'lucide-react'
+import { authClient } from '@/lib/auth-client'
 import { useGetMyCoursesQuery } from '@/store/student/studentApi'
+import { useGetLessonsByCourseQuery } from '@/store/lesson/lessonApi'
+import DashboardStatCard from '@/components/dashboard/dashboard-stat-card'
+import ContinueLearningCard from '@/components/dashboard/continue-learning-card'
+import EnrolledCourseCard from '@/components/dashboard/enrolled-course-card'
+import DashboardSkeleton from '@/components/dashboard/dashboard-skeleton'
+import DashboardEmptyState from '@/components/dashboard/dashboard-empty-state'
+import type { MyCourse } from '@/store/student/studentApi'
+import type { Course } from '@/store/course/courseApi'
 
-const StudentDashboardPage = () => {
-  const { data: myCourses = [] } = useGetMyCoursesQuery()
+const getCourseId = (courseId: string | Course): string => {
+  if (typeof courseId === 'string') return courseId
+  return courseId._id
+}
 
-  const totalCourses = myCourses.length
-
+const CourseCardWithProgress = ({
+  enrollment,
+}: {
+  enrollment: MyCourse
+}) => {
+  const courseId = getCourseId(enrollment.courseId)
+  const { data: lessons = [] } = useGetLessonsByCourseQuery(courseId)
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100">
-      {/* Main Content */}
-      <div className="flex-1 p-6 overflow-y-auto">
-        {/* Header */}
+    <EnrolledCourseCard
+      enrollment={enrollment}
+      totalLessons={lessons.length}
+    />
+  )
+}
+
+const ContinueWithProgress = ({
+  enrollment,
+}: {
+  enrollment: MyCourse
+}) => {
+  const courseId = getCourseId(enrollment.courseId)
+  const { data: lessons = [] } = useGetLessonsByCourseQuery(courseId)
+
+  return (
+    <ContinueLearningCard
+      enrollment={enrollment}
+      totalLessons={lessons.length}
+    />
+  )
+}
+
+const StudentDashboardPage = () => {
+  const router = useRouter()
+  const { data: session } = authClient.useSession()
+  const { data: myCourses = [], isLoading } = useGetMyCoursesQuery()
+
+  if (isLoading) {
+    return <DashboardSkeleton />
+  }
+
+  if (myCourses.length === 0) {
+    return (
+      <div>
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Welcome, Student!</h1>
-          <p className="text-sm text-gray-500 mt-1">Your learning progress at a glance</p>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Welcome back, {session?.user.name || 'Student'} 👋
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">
+            Start your learning journey by exploring our courses.
+          </p>
         </div>
+        <DashboardEmptyState />
+      </div>
+    )
+  }
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-          <StatCard
-            title="My Courses"
-            value={totalCourses}
-            icon={<BookOpen size={22} />}
-            color="blue"
-          />
+  // Find the continue learning course (most recently accessed)
+  const continueCourse = [...myCourses].sort((a, b) => {
+    if (!a.lastAccessedAt) return 1
+    if (!b.lastAccessedAt) return -1
+    return (
+      new Date(b.lastAccessedAt).getTime() -
+      new Date(a.lastAccessedAt).getTime()
+    )
+  })[0]
 
-        </div>
+  // Stats
+  const totalCourses = myCourses.length
+  const coursesInProgress = myCourses.filter(
+    (c) => (c.completedLessons?.length || 0) > 0
+  ).length
 
-        {/* Recent Courses / Activity */}
-        {/* <div className="bg-white rounded-xl border p-6">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">Recent Courses</h2>
-          <ul className="space-y-3 text-gray-700">
-            <li className="flex justify-between border-b pb-2">
-              <span>React.js Basics</span>
-              <span className="text-gray-400">In Progress</span>
-            </li>
-            <li className="flex justify-between border-b pb-2">
-              <span>Node.js & Express</span>
-              <span className="text-gray-400">Completed</span>
-            </li>
-            <li className="flex justify-between border-b pb-2">
-              <span>Database Fundamentals</span>
-              <span className="text-gray-400">Pending</span>
-            </li>
-          </ul>
-        </div> */}
+  // Preview courses (first 4)
+  const previewCourses = myCourses.slice(0, 4)
+
+  return (
+    <div className="space-y-6">
+      {/* Welcome */}
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">
+          Welcome back, {session?.user.name || 'Student'} 👋
+        </h1>
+        <p className="text-sm text-gray-500 mt-1">
+          Continue your learning journey and pick up where you left off.
+        </p>
       </div>
 
+      {/* Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <DashboardStatCard
+          title="Enrolled Courses"
+          value={totalCourses}
+          icon={<BookOpen className="w-5 h-5" />}
+          color="blue"
+        />
+        <DashboardStatCard
+          title="In Progress"
+          value={coursesInProgress}
+          icon={<Clock className="w-5 h-5" />}
+          color="yellow"
+        />
+        <DashboardStatCard
+          title="Completed"
+          value={0}
+          icon={<GraduationCap className="w-5 h-5" />}
+          color="green"
+        />
+        <DashboardStatCard
+          title="Total Courses"
+          value={totalCourses}
+          icon={<TrendingUp className="w-5 h-5" />}
+          color="purple"
+        />
+      </div>
 
+      {/* Continue Learning */}
+      {continueCourse && (
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900 mb-3">
+            Continue Learning
+          </h2>
+          <ContinueWithProgress enrollment={continueCourse} />
+        </div>
+      )}
+
+      {/* My Courses Preview */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-lg font-semibold text-gray-900">My Courses</h2>
+          <button
+            onClick={() => router.push('/student/mycourse')}
+            className="inline-flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            View All
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {previewCourses.map((enrollment) => (
+            <CourseCardWithProgress
+              key={enrollment._id}
+              enrollment={enrollment}
+            />
+          ))}
+        </div>
+      </div>
     </div>
   )
 }

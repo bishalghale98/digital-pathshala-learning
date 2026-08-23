@@ -1,6 +1,7 @@
 import { EnrollmentStatus, IEnrollment } from "@/types/models";
 import { Schema, model, models } from "mongoose";
 import "./course.schema";
+import "./lesson.schema";
 
 const enrollmentSchema = new Schema<IEnrollment>(
   {
@@ -28,6 +29,19 @@ const enrollmentSchema = new Schema<IEnrollment>(
     },
     whatsapp: {
       type: String,
+    },
+    completedLessons: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Lesson",
+      },
+    ],
+    lastAccessedLesson: {
+      type: Schema.Types.ObjectId,
+      ref: "Lesson",
+    },
+    lastAccessedAt: {
+      type: Date,
     },
   },
   {

@@ -1,113 +1,311 @@
 'use client'
 
 import React, { useMemo } from 'react'
-import { Users, BookOpen, CheckCircle, Clock } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import {
+  Users,
+  BookOpen,
+  CheckCircle,
+  Clock,
+  ArrowRight,
+  TrendingUp,
+} from 'lucide-react'
 import StatCard from '@/components/dashboard/admin-stat-card'
 import { useGetStudentsQuery } from '@/store/student/studentApi'
 import { useGetCoursesQuery } from '@/store/course/courseApi'
-import { useGetEnrollmentsQuery } from '@/store/enrollment/enrollmentApi'
+import {
+  useGetEnrollmentsQuery,
+  type Enrollment,
+} from '@/store/enrollment/enrollmentApi'
+import { useGetCategoriesQuery } from '@/store/category/categoryApi'
 import { EnrollmentStatus } from '@/types/models'
+import { authClient } from '@/lib/auth-client'
+
+const getStudent = (e: Enrollment) =>
+  typeof e.studentId === 'object' ? e.studentId : null
+const getCourse = (e: Enrollment) =>
+  typeof e.courseId === 'object' ? e.courseId : null
 
 const AdminPage = () => {
-    const { data: students = [] } = useGetStudentsQuery()
-    const { data: courses = [] } = useGetCoursesQuery()
-    const { data: enrollments = [] } = useGetEnrollmentsQuery()
+  const router = useRouter()
+  const { data: session } = authClient.useSession()
+  const { data: students = [], isLoading: loadingStudents } = useGetStudentsQuery()
+  const { data: courses = [], isLoading: loadingCourses } = useGetCoursesQuery()
+  const { data: enrollments = [], isLoading: loadingEnrollments } = useGetEnrollmentsQuery()
+  const { data: categories = [] } = useGetCategoriesQuery()
 
+  const stats = useMemo(() => {
+    let approved = 0
+    let pending = 0
+    let rejected = 0
 
+    for (const e of enrollments) {
+      if (e.enrollmentStatus === EnrollmentStatus.Approved) approved++
+      if (e.enrollmentStatus === EnrollmentStatus.Pending) pending++
+      if (e.enrollmentStatus === EnrollmentStatus.Rejected) rejected++
+    }
 
-    const stats = useMemo(() => {
-        const sevenDaysAgo = new Date()
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+    return {
+      totalStudents: students.length,
+      totalCourses: courses.length,
+      totalCategories: categories.length,
+      approvedEnrollments: approved,
+      pendingEnrollments: pending,
+      rejectedEnrollments: rejected,
+      totalEnrollments: enrollments.length,
+    }
+  }, [students.length, courses.length, categories.length, enrollments])
 
-        let approved = 0
-        let pending = 0
-        let last7Days = 0
+  const recentEnrollments = useMemo(() => {
+    return [...enrollments]
+      .sort((a, b) => new Date(b.enrolledAt).getTime() - new Date(a.enrolledAt).getTime())
+      .slice(0, 5)
+  }, [enrollments])
 
-        for (const e of enrollments) {
-            if (e.enrollmentStatus === EnrollmentStatus.Approved) approved++
-            if (e.enrollmentStatus === EnrollmentStatus.Pending) pending++
-            if (e.createdAt && new Date(e.createdAt) >= sevenDaysAgo) last7Days++
-        }
+  const recentStudents = useMemo(() => {
+    return [...students].slice(0, 5)
+  }, [students])
 
-        return {
-            totalStudents: students.length,
-            totalCourses: courses.length,
-            approvedEnrollments: approved,
-            pendingEnrollments: pending,
-            newEnrollmentsLast7Days: last7Days,
-        }
-    }, [students.length, courses.length, enrollments])
+  const isLoading = loadingStudents || loadingCourses || loadingEnrollments
 
+  const getGreeting = () => {
+    const hour = new Date().getHours()
+    if (hour < 12) return 'Good morning'
+    if (hour < 18) return 'Good afternoon'
+    return 'Good evening'
+  }
 
+  return (
+    <div className="space-y-6">
+      {/* Welcome */}
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">
+          {getGreeting()}, {session?.user.name || 'Admin'} 👋
+        </h1>
+        <p className="text-sm text-gray-500 mt-1">
+          Here&apos;s what&apos;s happening with your LMS today.
+        </p>
+      </div>
 
-    return (
-        <div className="p-6 space-y-8">
-            {/* Header */}
+      {/* Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          title="Total Students"
+          value={stats.totalStudents}
+          icon={<Users size={20} />}
+          color="blue"
+        />
+        <StatCard
+          title="Total Courses"
+          value={stats.totalCourses}
+          icon={<BookOpen size={20} />}
+          color="purple"
+        />
+        <StatCard
+          title="Approved Enrollments"
+          value={stats.approvedEnrollments}
+          icon={<CheckCircle size={20} />}
+          color="green"
+        />
+        <StatCard
+          title="Pending Enrollments"
+          value={stats.pendingEnrollments}
+          icon={<Clock size={20} />}
+          color="yellow"
+        />
+      </div>
+
+      {/* Two-column layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Recent Enrollments - 2/3 width */}
+        <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
             <div>
-                <h1 className="text-2xl font-bold text-gray-900">
-                    Admin Dashboard
-                </h1>
-                <p className="text-sm text-gray-500 mt-1">
-                    Platform overview & statistics
-                </p>
+              <h2 className="text-base font-semibold text-gray-900">Recent Enrollments</h2>
+              <p className="text-xs text-gray-500 mt-0.5">Latest student enrollments</p>
             </div>
+            <button
+              onClick={() => router.push('/admin/enrollments')}
+              className="inline-flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              View All
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <StatCard
-                    title="Total Users"
-                    value={stats.totalStudents}
-                    icon={<Users size={22} />}
-                    color="blue"
-                />
-                <StatCard
-                    title="Total Courses"
-                    value={stats.totalCourses}
-                    icon={<BookOpen size={22} />}
-                    color="purple"
-                />
-                <StatCard
-                    title="Approved Enrollments"
-                    value={stats.approvedEnrollments}
-                    icon={<CheckCircle size={22} />}
-                    color="green"
-                />
-                <StatCard
-                    title="Pending Enrollments"
-                    value={stats.pendingEnrollments}
-                    icon={<Clock size={22} />}
-                    color="yellow"
-                />
+          {isLoading ? (
+            <div className="p-6 text-sm text-gray-500 text-center">Loading...</div>
+          ) : recentEnrollments.length === 0 ? (
+            <div className="p-6 text-sm text-gray-500 text-center">No enrollments yet</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full">
+                <thead>
+                  <tr className="border-b border-gray-100">
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Student</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Course</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {recentEnrollments.map((enrollment) => {
+                    const student = getStudent(enrollment)
+                    const course = getCourse(enrollment)
+                    return (
+                      <tr key={enrollment._id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-6 py-3">
+                          <p className="text-sm font-medium text-gray-900">{student?.name || '—'}</p>
+                          <p className="text-xs text-gray-500">{student?.email || ''}</p>
+                        </td>
+                        <td className="px-6 py-3">
+                          <p className="text-sm text-gray-900">{course?.title || '—'}</p>
+                        </td>
+                        <td className="px-6 py-3">
+                          <p className="text-sm text-gray-600">
+                            {new Date(enrollment.enrolledAt).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                            })}
+                          </p>
+                        </td>
+                        <td className="px-6 py-3">
+                          <StatusBadge status={enrollment.enrollmentStatus} />
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
             </div>
-
-            {/* Sections */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Left */}
-                <div className="lg:col-span-2 bg-white rounded-xl border p-6">
-                    <h2 className="text-lg font-semibold text-gray-800 mb-4">
-                        Enrollment Activity
-                    </h2>
-                    <div className="h-64 flex items-center justify-center text-gray-400 border rounded-lg">
-                        Chart / Graph Placeholder
-                    </div>
-                </div>
-
-                {/* Right */}
-                <div className="bg-white rounded-xl border p-6">
-                    <h2 className="text-lg font-semibold text-gray-800 mb-4">
-                        Recent Actions
-                    </h2>
-                    <ul className="space-y-3 text-sm ">
-                        <li className="flex justify-between text-gray-800">
-                            <span>Enrollments from the last 7 days</span>
-                            <span className="text-gray-600">{stats.newEnrollmentsLast7Days}</span>
-                        </li>
-
-                    </ul>
-                </div>
-            </div>
+          )}
         </div>
-    )
+
+        {/* Recent Users - 1/3 width */}
+        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+            <div>
+              <h2 className="text-base font-semibold text-gray-900">Recent Users</h2>
+              <p className="text-xs text-gray-500 mt-0.5">Newly registered</p>
+            </div>
+            <button
+              onClick={() => router.push('/admin/students')}
+              className="inline-flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              View All
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+
+          {isLoading ? (
+            <div className="p-6 text-sm text-gray-500 text-center">Loading...</div>
+          ) : recentStudents.length === 0 ? (
+            <div className="p-6 text-sm text-gray-500 text-center">No users yet</div>
+          ) : (
+            <div className="divide-y divide-gray-50">
+              {recentStudents.map((student) => (
+                <div key={student._id} className="flex items-center gap-3 px-6 py-3 hover:bg-gray-50 transition-colors">
+                  {student.image ? (
+                    <img src={student.image} alt={student.name} className="w-9 h-9 rounded-full object-cover" />
+                  ) : (
+                    <div className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center">
+                      <span className="text-sm font-medium text-gray-600">
+                        {student.name.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 truncate">{student.name}</p>
+                    <p className="text-xs text-gray-500 truncate">{student.email}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Course Overview */}
+      <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <h2 className="text-base font-semibold text-gray-900 mb-4">Course Overview</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="text-center p-4 bg-gray-50 rounded-lg">
+            <div className="text-2xl font-bold text-gray-900">{stats.totalCourses}</div>
+            <div className="text-xs text-gray-500 mt-1">Total Courses</div>
+          </div>
+          <div className="text-center p-4 bg-gray-50 rounded-lg">
+            <div className="text-2xl font-bold text-gray-900">{stats.totalCategories}</div>
+            <div className="text-xs text-gray-500 mt-1">Categories</div>
+          </div>
+          <div className="text-center p-4 bg-gray-50 rounded-lg">
+            <div className="text-2xl font-bold text-green-600">{stats.approvedEnrollments}</div>
+            <div className="text-xs text-gray-500 mt-1">Active Enrollments</div>
+          </div>
+          <div className="text-center p-4 bg-gray-50 rounded-lg">
+            <div className="text-2xl font-bold text-yellow-600">{stats.pendingEnrollments}</div>
+            <div className="text-xs text-gray-500 mt-1">Pending Review</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <h2 className="text-base font-semibold text-gray-900 mb-4">Quick Actions</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <button
+            onClick={() => router.push('/admin/courses')}
+            className="flex items-center gap-3 p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors text-left"
+          >
+            <BookOpen className="w-5 h-5 text-gray-600" />
+            <div>
+              <p className="text-sm font-medium text-gray-900">Manage Courses</p>
+              <p className="text-xs text-gray-500">Create, edit, or remove courses</p>
+            </div>
+          </button>
+          <button
+            onClick={() => router.push('/admin/enrollments')}
+            className="flex items-center gap-3 p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors text-left"
+          >
+            <TrendingUp className="w-5 h-5 text-gray-600" />
+            <div>
+              <p className="text-sm font-medium text-gray-900">Review Enrollments</p>
+              <p className="text-xs text-gray-500">Approve or reject pending</p>
+            </div>
+          </button>
+          <button
+            onClick={() => router.push('/admin/categories')}
+            className="flex items-center gap-3 p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors text-left"
+          >
+            <Tag className="w-5 h-5 text-gray-600" />
+            <div>
+              <p className="text-sm font-medium text-gray-900">Manage Categories</p>
+              <p className="text-xs text-gray-500">Organize your courses</p>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  )
 }
+
+const StatusBadge = ({ status }: { status: EnrollmentStatus }) => {
+  const styles: Record<string, string> = {
+    [EnrollmentStatus.Approved]: 'bg-green-50 text-green-700',
+    [EnrollmentStatus.Pending]: 'bg-yellow-50 text-yellow-700',
+    [EnrollmentStatus.Rejected]: 'bg-red-50 text-red-700',
+  }
+
+  return (
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${styles[status] || 'bg-gray-50 text-gray-700'}`}>
+      {status}
+    </span>
+  )
+}
+
+const Tag = ({ className }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+  </svg>
+)
 
 export default AdminPage
