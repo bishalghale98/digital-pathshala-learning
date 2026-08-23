@@ -1,15 +1,14 @@
-import dbConnect from "@/database/dbConnection";
-import Course from "@/database/models/course.schema";
+import prisma from "@/database/prisma";
 import { successResponse, errorResponse } from "@/utils/response";
-import "@/database/models/category.schema";
 
 export async function GET() {
   try {
-    await dbConnect();
-    const courses = await Course.find()
-      .populate("categoryId")
-      .sort({ createdAt: -1 })
-      .lean();
+    const courses = await prisma.course.findMany({
+      include: {
+        category: true,
+      },
+      orderBy: { createdAt: "desc" },
+    });
     return successResponse("Courses fetched successfully", courses, 200);
   } catch (error) {
     console.error(error);

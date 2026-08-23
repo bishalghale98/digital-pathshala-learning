@@ -1,8 +1,8 @@
-import dbConnect from "@/database/dbConnection";
+import prisma from "@/database/prisma";
 
 export async function GET() {
   try {
-    await dbConnect();
+    await prisma.$connect();
     return Response.json(
       {
         message: "API is working",

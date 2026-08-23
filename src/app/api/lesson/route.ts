@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createLesson, getLessons } from "./lesson.controller";
+import { createLesson, getLessons } from "@/server/modules/lesson/lesson.controller";
 import { Roles } from "@/lib/constants";
 import { authMiddleware } from "../../../../middleware/auth.middleware";
 

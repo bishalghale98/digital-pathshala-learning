@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { getPaymentDetail } from "./verify.controller";
+import { getPaymentDetail } from "@/server/modules/payment/verify.controller";
 import { Roles } from "@/lib/constants";
 import { authMiddleware } from "../../../../middleware/auth.middleware";
 

@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createCategory, getCategories } from "./category.controller";
+import { createCategory, getCategories } from "@/server/modules/categories/category.controller";
 import { authMiddleware } from "../../../../middleware/auth.middleware";
 import { Roles } from "@/lib/constants";
 

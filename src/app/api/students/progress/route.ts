@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import {
   toggleLessonCompletion,
   updateLastAccessed,
-} from "./progress.controller";
+} from "@/server/modules/user/progress.controller";
 import { Roles } from "@/lib/constants";
 import { authMiddleware } from "../../../../../middleware/auth.middleware";
 

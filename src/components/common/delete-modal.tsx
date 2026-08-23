@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
-import { X, AlertCircle } from 'lucide-react';
+import { X, AlertTriangle } from 'lucide-react';
 
 interface ModalProps {
     isOpen: boolean;
     onClose: () => void;
     onConfirm: () => void;
+    description?: string;
     title?: string;
     confirmText?: string;
     cancelText?: string;
@@ -15,8 +16,9 @@ const ConfirmationModal: React.FC<ModalProps> = ({
     onClose,
     onConfirm,
     title = "Are you sure you want to delete this user?",
-    confirmText = "Yes, I'm sure",
-    cancelText = "No, cancel",
+    confirmText = "Yes, delete",
+    description = "This action cannot be undone. This will permanently delete the user and remove their data from our servers.",
+    cancelText = "Cancel",
 }) => {
     useEffect(() => {
         if (!isOpen) return;
@@ -26,7 +28,13 @@ const ConfirmationModal: React.FC<ModalProps> = ({
         };
 
         document.addEventListener('keydown', handleKeyDown);
-        return () => document.removeEventListener('keydown', handleKeyDown);
+        // Prevent body scroll when modal is open
+        document.body.style.overflow = 'hidden';
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+            document.body.style.overflow = 'unset';
+        };
     }, [isOpen, onClose]);
 
     const handleConfirm = () => {
@@ -37,57 +45,67 @@ const ConfirmationModal: React.FC<ModalProps> = ({
     if (!isOpen) return null;
 
     return (
-        <>
-            {/* Modal backdrop */}
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Backdrop with smooth fade */}
             <div
-                className="fixed inset-0 z-50 bg-gray-900 bg-opacity-60 overflow-y-auto h-full w-full px-4"
+                className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
                 onClick={onClose}
+                aria-hidden="true"
+            />
+
+            {/* Modal Box */}
+            <div
+                className="relative w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-2xl transition-all"
+                onClick={(e) => e.stopPropagation()}
             >
-                {/* Modal container */}
-                <div
-                    className="relative top-40 mx-auto shadow-xl rounded-md bg-white max-w-md"
-                    onClick={(e) => e.stopPropagation()}
-                >
-                    {/* Close button */}
-                    <div className="flex justify-end p-2">
-                        <button
-                            onClick={onClose}
-                            type="button"
-                            className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
-                            aria-label="Close modal"
-                        >
-                            <X className="w-5 h-5" />
-                        </button>
+                {/* Close Button */}
+                <div className="absolute top-4 right-4">
+                    <button
+                        onClick={onClose}
+                        type="button"
+                        className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
+                        aria-label="Close modal"
+                    >
+                        <X className="w-5 h-5" />
+                    </button>
+                </div>
+
+                <div className="flex items-start gap-4">
+                    {/* Icon Container */}
+                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-50 text-red-600">
+                        <AlertTriangle className="w-6 h-6" />
                     </div>
 
-                    {/* Modal content */}
-                    <div className="p-6 pt-0 text-center">
-                        <AlertCircle className="w-20 h-20 text-red-600 mx-auto" />
-
-                        {/* Title */}
-                        <h3 className="text-xl font-normal text-gray-500 mt-5 mb-6">
+                    {/* Text Content */}
+                    <div className="flex-1 pr-6">
+                        <h3 className="text-lg font-semibold text-slate-900">
                             {title}
                         </h3>
-
-                        {/* Action buttons */}
-                        <div className="flex justify-center space-x-4">
-                            <button
-                                onClick={handleConfirm}
-                                className="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-base px-5 py-2.5 transition-colors"
-                            >
-                                {confirmText}
-                            </button>
-                            <button
-                                onClick={onClose}
-                                className="text-gray-900 bg-white hover:bg-gray-100 focus:ring-4 focus:ring-cyan-200 border border-gray-200 font-medium rounded-lg text-base px-5 py-2.5 transition-colors"
-                            >
-                                {cancelText}
-                            </button>
-                        </div>
+                        <p className="mt-2 text-sm text-slate-600 leading-relaxed">
+                            {description}
+                        </p>
                     </div>
                 </div>
+
+                {/* Action Buttons */}
+                <div className="mt-6 flex items-center justify-end gap-3 border-t border-slate-100 pt-4">
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 transition-all"
+                    >
+                        {cancelText}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={handleConfirm}
+                        className="rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all"
+                    >
+                        {confirmText}
+                    </button>
+                </div>
             </div>
-        </>
+        </div>
     );
 };
 

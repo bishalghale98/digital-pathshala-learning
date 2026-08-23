@@ -10,6 +10,8 @@ export const categoryCreateSchema = z.object({
     .min(2, "Slug must be at least 2 characters")
     .max(150, "Slug required")
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug must be lowercase and can contain hyphens"),
+
+  parent: z.string().optional()
 });
 
 export const categoryUpdateSchema = z

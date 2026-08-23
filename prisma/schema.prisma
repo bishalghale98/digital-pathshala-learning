@@ -1,0 +1,111 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ==================== ENUMS ====================
+
+enum EnrollmentStatus {
+  Approved
+  Pending
+  Rejected
+}
+
+enum PaymentStatus {
+  Pending
+  Completed
+  Failed
+}
+
+enum PaymentMethod {
+  khalti
+  esewa
+}
+
+// ==================== MODELS ====================
+
+model Category {
+  id        String     @id @default(cuid())
+  name      String     @unique
+  slug      String?
+  parentId  String?
+  parent    Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children  Category[] @relation("CategoryHierarchy")
+  courses   Course[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@index([parentId])
+}
+
+model Course {
+  id          String       @id @default(cuid())
+  title       String
+  description String
+  duration    String
+  price       Float
+  categoryId  String
+  category    Category     @relation(fields: [categoryId], references: [id])
+  lessons     Lesson[]
+  enrollments Enrollment[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([categoryId])
+}
+
+model Lesson {
+  id             String       @id @default(cuid())
+  courseId       String
+  course         Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title          String
+  description    String?
+  videoUrl       String?
+  lessonNumber   Int          @default(0)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  completedBy    Enrollment[] @relation("CompletedLessons")
+  lastAccessedBy Enrollment[] @relation("LastAccessedLesson")
+
+  @@index([courseId])
+}
+
+model Enrollment {
+  id                   String           @id @default(cuid())
+  studentId            String
+  courseId             String
+  course               Course           @relation(fields: [courseId], references: [id])
+  enrolledAt           DateTime         @default(now())
+  enrollmentStatus     EnrollmentStatus @default(Pending)
+  whatsapp             String?
+  completedLessons     Lesson[]         @relation("CompletedLessons")
+  lastAccessedLessonId String?
+  lastAccessedLesson   Lesson?          @relation("LastAccessedLesson", fields: [lastAccessedLessonId], references: [id])
+  lastAccessedAt       DateTime?
+  payment              Payment?
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+
+  @@index([studentId])
+  @@index([courseId])
+  @@index([enrollmentStatus])
+}
+
+model Payment {
+  id            String        @id @default(cuid())
+  enrollmentId  String        @unique
+  enrollment    Enrollment    @relation(fields: [enrollmentId], references: [id])
+  amount        Float
+  status        PaymentStatus @default(Pending)
+  paymentMethod PaymentMethod @default(khalti)
+  transactionId String?
+  pidx          String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([enrollmentId])
+  @@index([pidx])
+}

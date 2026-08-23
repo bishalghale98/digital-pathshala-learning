@@ -4,10 +4,12 @@ export interface Category {
   _id: string;
   name: string;
   slug?: string;
+  parent?: { _id: string; name: string; slug?: string } | null;
+  subcategories?: Category[];
   createdAt: string;
 }
 
-type CategoryPayload = { name: string; slug?: string };
+type CategoryPayload = { name: string; slug?: string; parent?: string | null };
 
 export const categoryApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({

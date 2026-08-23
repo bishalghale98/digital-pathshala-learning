@@ -1,13 +1,12 @@
 import { betterAuth } from "better-auth";
-import { MongoClient } from "mongodb";
-import { mongodbAdapter } from "better-auth/adapters/mongodb";
+import { prismaAdapter } from "better-auth/adapters/prisma";
+import prisma from "@/database/prisma";
 import { Roles } from "./constants";
 
-const client = new MongoClient(process.env.MONGODB!);
-export const db = client.db();
-
 export const auth = betterAuth({
-  database: mongodbAdapter(db, { client }),
+  database: prismaAdapter(prisma, {
+    provider: "postgresql",
+  }),
 
   user: {
     additionalFields: {

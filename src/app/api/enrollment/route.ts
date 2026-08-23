@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createEnrollment, getEnrollments } from "./enrollment.controller";
+import { createEnrollment, getEnrollments } from "@/server/modules/enrollment/enrollment.controller";
 import { Roles } from "@/lib/constants";
 import { authMiddleware } from "../../../../middleware/auth.middleware";
 

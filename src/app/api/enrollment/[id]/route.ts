@@ -3,7 +3,7 @@ import {
   deleteEnrollment,
   getEnrollment,
   changeEnrollmentStatus,
-} from "../enrollment.controller";
+} from "@/server/modules/enrollment/enrollment.controller";
 import { authMiddleware } from "../../../../../middleware/auth.middleware";
 import { Roles } from "@/lib/constants";
 
@@ -16,6 +16,7 @@ export async function GET(
   if (checkAuth.status !== 200) {
     return checkAuth;
   }
+
   const { id } = await params;
 
   return getEnrollment(req, id);
@@ -38,7 +39,6 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  // Admin-only: students must never be able to change enrollment status
   const checkAuth = await authMiddleware(req, [Roles.Admin]);
 
   if (checkAuth.status !== 200) {

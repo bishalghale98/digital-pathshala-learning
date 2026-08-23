@@ -1,24 +1,20 @@
-import dbConnect from "@/database/dbConnection";
-import Category from "@/database/models/category.schema";
+import prisma from "@/database/prisma";
 import { successResponse, errorResponse } from "@/utils/response";
 
 export async function GET() {
   try {
-    await dbConnect();
+    const categories = await prisma.category.findMany({
+      orderBy: { createdAt: "desc" },
+      include: {
+        children: true,
+      },
+    });
 
-    const categories = await Category.find({ isActive: true })
-      .sort({ sortOrder: 1, createdAt: -1 })
-      .lean();
-
-    const mainCategories = categories.filter(
-      (cat) => !cat.parent
-    );
+    const mainCategories = categories.filter((cat) => !cat.parentId);
 
     const tree = mainCategories.map((main) => ({
       ...main,
-      subcategories: categories.filter(
-        (sub) => sub.parent?.toString() === main._id.toString()
-      ),
+      subcategories: main.children,
     }));
 
     return successResponse("Categories fetched successfully", tree, 200);

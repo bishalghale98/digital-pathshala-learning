@@ -222,8 +222,8 @@ api/{domain}/
 +-- route.ts                    # GET (list) + POST (create)
 +-- {domain}.controller.ts      # Business logic for list/create
 +-- [id]/
-¦   +-- route.ts                # GET (single) + PUT/PATCH/DELETE
-¦   +-- {domain}.controller.ts  # Business logic for single item
+ï¿½   +-- route.ts                # GET (single) + PUT/PATCH/DELETE
+ï¿½   +-- {domain}.controller.ts  # Business logic for single item
 ```
 
 API routes use manual `authMiddleware()` - NOT Next.js edge middleware.
@@ -945,6 +945,10 @@ No Prettier config. Formatting depends on editor settings.
 2. Use `baseApi.injectEndpoints()`
 3. Define types in the same file
 4. Export typed hooks
+
+categories
+ â”ƒ 
+ â”— category.controller.ts
 
 ### New Zod Schema
 

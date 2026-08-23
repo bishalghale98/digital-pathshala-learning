@@ -1,6 +1,5 @@
-// /app/api/payment/verify/route.ts
 import { NextRequest } from "next/server";
-import { paymentVerification } from "../verify.controller";
+import { paymentVerification } from "@/server/modules/payment/verify.controller";
 import { authMiddleware } from "../../../../../middleware/auth.middleware";
 import { Roles } from "@/lib/constants";
 

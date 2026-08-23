@@ -1,7 +1,7 @@
 import { errorResponse } from "@/utils/response";
 import { tryCatch } from "@/utils/tryCatch";
 import { NextRequest } from "next/server";
-import { fetchLessonsByCourseId } from "../../lesson/course/lessonByCourse.controller";
+import { fetchLessonsByCourseId } from "../lesson/lessonByCourse.controller";
 
 export const getLessonsWithCourseId = tryCatch(async (req: NextRequest) => {
   const courseId = req.nextUrl.searchParams.get("courseId");

@@ -3,7 +3,7 @@ import {
   deleteCategory,
   getCategory,
   updateCategory,
-} from "./category.controller";
+} from "@/server/modules/categories/category.controller";
 import { Roles } from "@/lib/constants";
 import { authMiddleware } from "../../../../../middleware/auth.middleware";
 
