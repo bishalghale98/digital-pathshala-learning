@@ -1,22 +1,35 @@
 import { baseApi } from "../api/base";
 import type { Category } from "../category/categoryApi";
 
+export type CourseStatus = "draft" | "published" | "archived";
+
 export interface Course {
   _id: string;
   title: string;
+  slug: string;
   description: string;
-  duration: number;
+  shortDescription?: string | null;
+  thumbnail?: string | null;
+  duration: string;
   price: number;
+  isFree: boolean;
   categoryId: Category | string;
+  subcategoryId?: Category | string | null;
+  status: CourseStatus;
   createdAt: string;
+  updatedAt: string;
 }
 
 export type CoursePayload = {
   title: string;
   description: string;
-  duration: string | number;
+  shortDescription?: string | null;
+  duration: string;
   price: number;
+  isFree?: boolean;
   categoryId: string;
+  subcategoryId?: string | null;
+  status?: CourseStatus;
 };
 
 export const courseApi = baseApi.injectEndpoints({

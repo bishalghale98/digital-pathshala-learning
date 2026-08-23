@@ -9,11 +9,18 @@ import {
   useDeleteCourseMutation,
   useGetCoursesQuery,
   type Course,
+  type CourseStatus,
 } from '@/store/course/courseApi'
 import { useGetCategoriesQuery } from '@/store/category/categoryApi'
 import { getErrorMessage } from '@/store/api/base'
 import { toast } from 'sonner'
 import { Search, X, Plus, BookOpen } from 'lucide-react'
+
+const statusConfig: Record<CourseStatus, { label: string; bg: string; text: string }> = {
+  draft: { label: 'Draft', bg: 'bg-yellow-50', text: 'text-yellow-700' },
+  published: { label: 'Published', bg: 'bg-green-50', text: 'text-green-700' },
+  archived: { label: 'Archived', bg: 'bg-gray-100', text: 'text-gray-600' },
+}
 
 const Courses = () => {
   const router = useRouter()
@@ -24,6 +31,7 @@ const Courses = () => {
   const [courseToDelete, setCourseToDelete] = useState<Course | null>(null)
   const [search, setSearch] = useState('')
   const [categoryFilter, setCategoryFilter] = useState<string>('')
+  const [statusFilter, setStatusFilter] = useState<string>('')
 
   const { data: courses = [], isLoading } = useGetCoursesQuery()
   const { data: categories = [] } = useGetCategoriesQuery()
@@ -37,11 +45,14 @@ const Courses = () => {
         course.description?.toLowerCase().includes(search.toLowerCase())
       const matchesCategory =
         !categoryFilter ||
-        (typeof course.categoryId === 'object' &&
-          (course.categoryId as { _id: string })._id === categoryFilter)
-      return matchesSearch && matchesCategory
+        (typeof course.categoryId === 'object'
+          ? (course.categoryId as { _id: string })._id === categoryFilter
+          : course.categoryId === categoryFilter)
+      const matchesStatus =
+        !statusFilter || course.status === statusFilter
+      return matchesSearch && matchesCategory && matchesStatus
     })
-  }, [courses, search, categoryFilter])
+  }, [courses, search, categoryFilter, statusFilter])
 
   const addModalOpen = useCallback(() => setOpenAddModal(true), [])
   const editModalOpen = useCallback((course: Course) => {
@@ -117,6 +128,16 @@ const Courses = () => {
             </option>
           ))}
         </select>
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="px-4 py-2.5 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-300 transition-colors min-w-[140px]"
+        >
+          <option value="">All Status</option>
+          <option value="draft">Draft</option>
+          <option value="published">Published</option>
+          <option value="archived">Archived</option>
+        </select>
       </div>
 
       {/* Table */}
@@ -127,6 +148,7 @@ const Courses = () => {
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Course</th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Category</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Duration</th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Price</th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Created</th>
@@ -136,24 +158,24 @@ const Courses = () => {
             <tbody className="divide-y divide-gray-100">
               {isLoading ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-sm text-gray-500">
+                  <td colSpan={7} className="px-6 py-12 text-center text-sm text-gray-500">
                     Loading courses...
                   </td>
                 </tr>
               ) : filteredCourses.length === 0 ? (
                 <tr>
-                  <td colSpan={6}>
+                  <td colSpan={7}>
                     <div className="flex flex-col items-center justify-center py-12">
                       <BookOpen className="w-12 h-12 text-gray-300 mb-3" />
                       <p className="text-sm font-medium text-gray-900">
-                        {search || categoryFilter ? 'No courses found' : 'No courses yet'}
+                        {search || categoryFilter || statusFilter ? 'No courses found' : 'No courses yet'}
                       </p>
                       <p className="text-xs text-gray-500 mt-1">
-                        {search || categoryFilter
+                        {search || categoryFilter || statusFilter
                           ? 'Try adjusting your filters'
                           : 'Create your first course to get started'}
                       </p>
-                      {!search && !categoryFilter && (
+                      {!search && !categoryFilter && !statusFilter && (
                         <button
                           onClick={addModalOpen}
                           className="mt-3 inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-900 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
@@ -166,56 +188,66 @@ const Courses = () => {
                   </td>
                 </tr>
               ) : (
-                filteredCourses.map((course) => (
-                  <tr
-                    key={course._id}
-                    className="hover:bg-gray-50 transition-colors cursor-pointer"
-                    onClick={() => router.push(ROUTES.adminCourseLessons(course._id))}
-                  >
-                    <td className="px-6 py-4">
-                      <p className="text-sm font-medium text-gray-900">{course.title}</p>
-                      <p className="text-xs text-gray-500 line-clamp-1 max-w-[300px]">
-                        {course.description}
-                      </p>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
-                        {typeof course.categoryId === 'object' ? course.categoryId.name : '—'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm text-gray-600">{course.duration}</span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm font-medium text-gray-900">Rs. {course.price}</span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm text-gray-600">
-                        {new Date(course.createdAt).toLocaleDateString('en-US', {
-                          month: 'short',
-                          day: 'numeric',
-                          year: 'numeric',
-                        })}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
-                      <div className="flex items-center gap-1">
-                        <button
-                          onClick={() => editModalOpen(course)}
-                          className="px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => openDeleteModal(course)}
-                          className="px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                filteredCourses.map((course) => {
+                  const status = statusConfig[course.status] || statusConfig.draft
+                  return (
+                    <tr
+                      key={course._id}
+                      className="hover:bg-gray-50 transition-colors cursor-pointer"
+                      onClick={() => router.push(ROUTES.adminCourseLessons(course._id))}
+                    >
+                      <td className="px-6 py-4">
+                        <p className="text-sm font-medium text-gray-900">{course.title}</p>
+                        <p className="text-xs text-gray-500 line-clamp-1 max-w-[300px]">
+                          {course.shortDescription || course.description}
+                        </p>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
+                          {typeof course.categoryId === 'object' ? course.categoryId.name : '—'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${status.bg} ${status.text}`}>
+                          {status.label}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-sm text-gray-600">{course.duration}</span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-sm font-medium text-gray-900">
+                          {course.isFree ? 'Free' : `Rs. ${course.price}`}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-sm text-gray-600">
+                          {new Date(course.createdAt).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                          })}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => editModalOpen(course)}
+                            className="px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => openDeleteModal(course)}
+                            className="px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })
               )}
             </tbody>
           </table>

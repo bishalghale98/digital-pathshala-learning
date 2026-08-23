@@ -3,6 +3,7 @@
 
 import { useRouter } from 'next/navigation'
 import React from 'react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { ROUTES } from '@/lib/constants'
 import type { Lesson } from '@/store/lesson/lessonApi'
 
@@ -35,15 +36,7 @@ const CourseSyallabus: React.FC<CourseSyallabusProps> = ({ lessons, isLoading = 
                         onClick={() => router.push(ROUTES.STUDENT_MY_COURSES)}
                         className="flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm sm:text-base"
                     >
-                        <svg
-                            className="w-4 h-4 mr-2"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth={2}
-                            viewBox="0 0 24 24"
-                        >
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                        </svg>
+                        <ChevronLeft className="w-4 h-4 mr-2" />
                         Back
                     </button>
                 </div>
@@ -103,15 +96,7 @@ const CourseSyallabus: React.FC<CourseSyallabusProps> = ({ lessons, isLoading = 
                                 </div>
 
                                 {/* Chevron Icon */}
-                                <svg
-                                    className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 shrink-0 ml-2 sm:ml-4"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth={2}
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                                </svg>
+                                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 shrink-0 ml-2 sm:ml-4" />
                             </div>
                         ))}
             </div>

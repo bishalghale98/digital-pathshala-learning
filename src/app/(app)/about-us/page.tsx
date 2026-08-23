@@ -1,6 +1,17 @@
-'use client'
-
+import type { Metadata } from 'next';
 import React from 'react';
+
+export const metadata: Metadata = {
+  title: 'About Us',
+  description:
+    'Learn about BISAN LMS - our mission to provide accessible, high-quality online education to learners everywhere.',
+  openGraph: {
+    title: 'About Us | BISAN LMS',
+    description:
+      'Learn about BISAN LMS - our mission to provide accessible, high-quality online education.',
+    type: 'website',
+  },
+};
 
 const AboutUsPage = () => {
     return (

@@ -6,8 +6,9 @@ import "@/database/models/category.schema";
 export async function GET() {
   try {
     await dbConnect();
-    const courses = await Course.find()
+    const courses = await Course.find({ status: "published" })
       .populate("categoryId")
+      .populate("subcategoryId")
       .sort({ createdAt: -1 })
       .lean();
     return successResponse("Courses fetched successfully", courses, 200);
