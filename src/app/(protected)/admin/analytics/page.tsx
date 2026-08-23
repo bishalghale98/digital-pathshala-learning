@@ -55,7 +55,7 @@ const AnalyticsPage = () => {
     // Top courses by enrollment
     const courseEnrollmentMap = new Map<string, { title: string; count: number }>()
     for (const e of enrollments) {
-      const courseId = typeof e.courseId === 'string' ? e.courseId : e.courseId._id
+      const courseId = typeof e.courseId === 'string' ? e.courseId : e.courseId.id
       const courseTitle = typeof e.courseId === 'object' ? e.courseId.title : ''
       const existing = courseEnrollmentMap.get(courseId)
       if (existing) {

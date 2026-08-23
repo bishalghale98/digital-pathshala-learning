@@ -58,7 +58,7 @@ const CourseModal: React.FC<CourseModalProps> = ({
                 price: courseData.price || 0,
                 categoryId:
                     typeof courseData.categoryId === "object"
-                        ? courseData.categoryId._id
+                        ? courseData.categoryId.id
                         : courseData.categoryId || "",
             });
         }
@@ -67,8 +67,8 @@ const CourseModal: React.FC<CourseModalProps> = ({
 
     const onSubmit = async (data: CourseFormData) => {
         try {
-            if (isEditMode && courseData?._id) {
-                await updateCourse({ id: courseData._id, ...data }).unwrap();
+            if (isEditMode && courseData?.id) {
+                await updateCourse({ id: courseData.id, ...data }).unwrap();
             } else {
                 await createCourse(data).unwrap();
             }
@@ -197,7 +197,7 @@ const CourseModal: React.FC<CourseModalProps> = ({
                                 >
                                     <option value="">Select category</option>
                                     {categories.map((category) => (
-                                        <option key={category._id} value={category._id}>
+                                        <option key={category.id} value={category.id}>
                                             {category.name}
                                         </option>
                                     ))}

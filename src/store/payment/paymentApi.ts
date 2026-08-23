@@ -1,7 +1,7 @@
 import { baseApi } from "../api/base";
 
 export interface Payment {
-  _id: string;
+  id: string;
   amount: number;
   status: string;
   paymentMethod: string;
@@ -9,7 +9,7 @@ export interface Payment {
   transactionId?: string;
   createdAt: string;
   enrollment?: {
-    _id: string;
+    id: string;
     whatsapp?: string;
     enrollmentStatus?: string;
     enrolledAt: string;

@@ -84,7 +84,7 @@ const StudentsPage = () => {
                 </tr>
               ) : (
                 filteredStudents.map((student) => (
-                  <tr key={student._id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={student.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         {student.image ? (
@@ -108,8 +108,8 @@ const StudentsPage = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="text-xs text-gray-400 font-mono truncate max-w-[120px] block" title={student._id}>
-                        {student._id}
+                      <span className="text-xs text-gray-400 font-mono truncate max-w-[120px] block" title={student.id}>
+                        {student.id}
                       </span>
                     </td>
                   </tr>

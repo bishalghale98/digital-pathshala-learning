@@ -13,8 +13,8 @@ interface VideoPlaySectionProps {
     isLoading?: boolean
 }
 
-const getCourseId = (courseId: string | { _id: string; title?: string }) =>
-    typeof courseId === "string" ? courseId : courseId._id
+const getCourseId = (courseId: string | { id: string; title?: string }) =>
+    typeof courseId === "string" ? courseId : courseId.id
 
 const VideoPlaySection: React.FC<VideoPlaySectionProps> = ({
     lessons,
@@ -26,7 +26,7 @@ const VideoPlaySection: React.FC<VideoPlaySectionProps> = ({
     const backButton = () => { router.push(ROUTES.studentCourseSyllabus(getCourseId(activeLesson?.courseId ?? ''))) }
 
     const currentIndex = activeLesson
-        ? lessons.findIndex((l) => l._id === activeLesson._id)
+        ? lessons.findIndex((l) => l.id === activeLesson.id)
         : -1
 
     const prevLesson = currentIndex > 0 ? lessons[currentIndex - 1] : null
@@ -37,7 +37,7 @@ const VideoPlaySection: React.FC<VideoPlaySectionProps> = ({
 
     const navigateToLesson = (lesson: Lesson) => {
         router.push(
-            ROUTES.studentVideoPlay(getCourseId(lesson.courseId), lesson._id)
+                                                ROUTES.studentVideoPlay(getCourseId(lesson.courseId), lesson.id)
         )
     }
 
@@ -117,21 +117,21 @@ const VideoPlaySection: React.FC<VideoPlaySectionProps> = ({
                         <h3 className="text-lg font-semibold text-gray-800 mb-4">Course Lessons</h3>
 
                         {lessons?.map((lesson, i) => {
-                            const isActive = activeLesson?._id === lesson._id
+                            const isActive = activeLesson?.id === lesson.id
                             return (
                                 <div
                                     onClick={() =>
                                         router.push(
-                                            ROUTES.studentVideoPlay(getCourseId(lesson.courseId), lesson._id)
+                                            ROUTES.studentVideoPlay(getCourseId(lesson.courseId), lesson.id)
                                         )}
-                                    key={lesson._id}
+                                    key={lesson.id}
                                     role="button"
                                     tabIndex={0}
                                     onKeyDown={(e) => {
                                         if (e.key === 'Enter' || e.key === ' ') {
                                             e.preventDefault()
                                             router.push(
-                                                ROUTES.studentVideoPlay(getCourseId(lesson.courseId), lesson._id)
+            ROUTES.studentVideoPlay(getCourseId(lesson.courseId), lesson.id)
                                             )
                                         }
                                     }}

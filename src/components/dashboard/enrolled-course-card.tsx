@@ -33,7 +33,7 @@ const EnrolledCourseCard: React.FC<EnrolledCourseCardProps> = ({
   const courseId =
     typeof enrollment.courseId === 'string'
       ? enrollment.courseId
-      : (enrollment.courseId as Course)._id
+      : (enrollment.courseId as Course).id
 
   const handleContinue = () => {
     router.push(ROUTES.studentCourseSyllabus(courseId))

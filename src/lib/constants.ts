@@ -9,6 +9,7 @@ export const ROUTES = {
   COURSES: '/courses',
   ABOUT: '/about-us',
   SIGN_IN: '/sign-in',
+  SIGN_UP: '/sign-up',
   PROFILE: '/profile',
   UNAUTHORIZED: '/unauthorized',
 

@@ -14,7 +14,7 @@ export const createCategory = tryCatch(async (req: NextRequest) => {
     return errorResponse("Invalid category data", 400);
   }
 
-  const { name, slug, parent } = parsed.data;
+  const { name, slug, description, parent } = parsed.data;
 
   const trimmedName = name.trim();
 
@@ -48,6 +48,7 @@ export const createCategory = tryCatch(async (req: NextRequest) => {
     data: {
       name: trimmedName,
       slug: slug || undefined,
+      description: description || undefined,
       parentId: parentId || undefined,
     },
   });
@@ -59,18 +60,16 @@ export const getCategories = tryCatch(async () => {
   const categories = await prisma.category.findMany({
     orderBy: { createdAt: "desc" },
     include: {
-      children: true,
+      parent: {
+        select: { id: true, name: true, slug: true },
+      },
+      _count: {
+        select: { children: true },
+      },
     },
   });
 
-  const parentCategories = categories.filter((c) => !c.parentId);
-
-  const formattedCategories = parentCategories.map((category) => ({
-    ...category,
-    subcategories: category?.children,
-  }));
-
-  return successResponse("List of all categories", formattedCategories, 200);
+  return successResponse("List of all categories", categories, 200);
 });
 
 export const getCategory = tryCatch(async (req: NextRequest, id: string) => {
@@ -120,7 +119,7 @@ export const updateCategory = tryCatch(async (req: NextRequest, id: string) => {
     return errorResponse("Invalid category data", 400);
   }
 
-  const { name, slug } = parsed.data;
+  const { name, slug, description } = parsed.data;
 
   const existingCategory = await prisma.category.findUnique({
     where: { id },
@@ -150,6 +149,7 @@ export const updateCategory = tryCatch(async (req: NextRequest, id: string) => {
     data: {
       ...(trimmedName !== undefined && { name: trimmedName }),
       ...(slug !== undefined && { slug }),
+      ...(description !== undefined && { description }),
     },
   });
 

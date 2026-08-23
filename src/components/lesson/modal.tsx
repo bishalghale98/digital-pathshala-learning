@@ -17,7 +17,7 @@ interface ModalProps {
     id: string
     closeModal: () => void
     lessonData?: {
-        _id: string
+        id: string
         title: string
         description?: string
         videoUrl: string
@@ -60,7 +60,7 @@ const LessonModal: React.FC<ModalProps> = ({ closeModal, lessonData, id }) => {
         try {
             if (isEditMode && lessonData) {
                 await updateLesson({
-                    id: lessonData._id,
+                    id: lessonData.id,
                     courseId: id,
                     title: data.title,
                     description: data.description,

@@ -39,8 +39,8 @@ export default function CoursesPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {courses.map((course) => (
                             <Link
-                                key={course._id}
-                                href={ROUTES.courseDetail(course._id)}
+                                key={course.id}
+                                href={ROUTES.courseDetail(course.id)}
                                 className="group bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300"
                             >
                                 <div className="h-48 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">

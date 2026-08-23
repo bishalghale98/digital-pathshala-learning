@@ -23,7 +23,7 @@ const getCourse = (enrollment: MyCourse): Course | null => {
 const getLesson = (
   lesson: string | Lesson | undefined
 ): Lesson | null => {
-  if (lesson && typeof lesson === 'object' && '_id' in lesson) {
+  if (lesson && typeof lesson === 'object' && 'id' in lesson) {
     return lesson as Lesson
   }
   return null
@@ -45,10 +45,10 @@ const ContinueLearningCard: React.FC<ContinueLearningCardProps> = ({
     const courseId =
       typeof enrollment.courseId === 'string'
         ? enrollment.courseId
-        : (enrollment.courseId as Course)._id
+        : (enrollment.courseId as Course).id
 
     if (lastLesson) {
-      router.push(ROUTES.studentVideoPlay(courseId, lastLesson._id))
+      router.push(ROUTES.studentVideoPlay(courseId, lastLesson.id))
     } else {
       router.push(ROUTES.studentCourseSyllabus(courseId))
     }

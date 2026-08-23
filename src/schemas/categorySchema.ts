@@ -10,8 +10,8 @@ export const categoryCreateSchema = z.object({
     .min(2, "Slug must be at least 2 characters")
     .max(150, "Slug required")
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug must be lowercase and can contain hyphens"),
-
-  parent: z.string().optional()
+  description: z.string().optional(),
+  parent: z.string().optional(),
 });
 
 export const categoryUpdateSchema = z
@@ -27,6 +27,7 @@ export const categoryUpdateSchema = z
       .max(150, "Slug required")
       .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug must be lowercase and can contain hyphens")
       .optional(),
+    description: z.string().optional(),
   })
   .refine((data) => data.name !== undefined || data.slug !== undefined, {
     message: "At least one field (name or slug) is required",

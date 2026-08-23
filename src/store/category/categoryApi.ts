@@ -1,15 +1,16 @@
 import { baseApi } from "../api/base";
 
 export interface Category {
-  _id: string;
+  id: string;
   name: string;
   slug?: string;
-  parent?: { _id: string; name: string; slug?: string } | null;
-  subcategories?: Category[];
+  description?: string;
+  parent?: { id: string; name: string; slug?: string } | null;
+  _count?: { children: number };
   createdAt: string;
 }
 
-type CategoryPayload = { name: string; slug?: string; parent?: string | null };
+type CategoryPayload = { name: string; slug?: string; description?: string; parent?: string | null };
 
 export const categoryApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({

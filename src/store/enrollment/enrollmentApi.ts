@@ -4,7 +4,7 @@ import type { Course } from "../course/courseApi";
 import type { StudentUser } from "../student/studentApi";
 
 export interface Enrollment {
-  _id: string;
+  id: string;
   studentId: StudentUser | string;
   courseId: Course | string;
   enrolledAt: string;

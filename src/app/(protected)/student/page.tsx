@@ -23,7 +23,7 @@ import type { Course } from '@/store/course/courseApi'
 
 const getCourseId = (courseId: string | Course): string => {
   if (typeof courseId === 'string') return courseId
-  return courseId._id
+  return courseId.id
 }
 
 const CourseCardWithProgress = ({
@@ -167,7 +167,7 @@ const StudentDashboardPage = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {previewCourses.map((enrollment) => (
             <CourseCardWithProgress
-              key={enrollment._id}
+              key={enrollment.id}
               enrollment={enrollment}
             />
           ))}

@@ -38,7 +38,7 @@ const Courses = () => {
       const matchesCategory =
         !categoryFilter ||
         (typeof course.categoryId === 'object' &&
-          (course.categoryId as { _id: string })._id === categoryFilter)
+          (course.categoryId as { id: string }).id === categoryFilter)
       return matchesSearch && matchesCategory
     })
   }, [courses, search, categoryFilter])
@@ -60,7 +60,7 @@ const Courses = () => {
   const handleDelete = useCallback(async () => {
     if (!courseToDelete) return
     try {
-      await deleteCourse(courseToDelete._id).unwrap()
+      await deleteCourse(courseToDelete.id).unwrap()
       toast.success('Course deleted')
     } catch (error) {
       toast.error(getErrorMessage(error))
@@ -112,7 +112,7 @@ const Courses = () => {
         >
           <option value="">All Categories</option>
           {categories.map((cat) => (
-            <option key={cat._id} value={cat._id}>
+            <option key={cat.id} value={cat.id}>
               {cat.name}
             </option>
           ))}
@@ -168,9 +168,9 @@ const Courses = () => {
               ) : (
                 filteredCourses.map((course) => (
                   <tr
-                    key={course._id}
+                    key={course.id}
                     className="hover:bg-gray-50 transition-colors cursor-pointer"
-                    onClick={() => router.push(ROUTES.adminCourseLessons(course._id))}
+                    onClick={() => router.push(ROUTES.adminCourseLessons(course.id))}
                   >
                     <td className="px-6 py-4">
                       <p className="text-sm font-medium text-gray-900">{course.title}</p>

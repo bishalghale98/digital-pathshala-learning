@@ -186,7 +186,7 @@ const EnrollmentPage = () => {
                   const student = getStudent(enrollment)
                   const course = getCourse(enrollment)
                   return (
-                    <tr key={enrollment._id} className="hover:bg-gray-50 transition-colors">
+                    <tr key={enrollment.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4">
                         <p className="text-sm font-medium text-gray-900">{student?.name || '—'}</p>
                         <p className="text-xs text-gray-500">{student?.email || ''}</p>
@@ -213,7 +213,7 @@ const EnrollmentPage = () => {
                         <div className="flex items-center gap-1">
                           <button
                             onClick={() => {
-                              setSelectedId(enrollment._id)
+                              setSelectedId(enrollment.id)
                               setIsOpenModal(true)
                             }}
                             className="px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
@@ -222,7 +222,7 @@ const EnrollmentPage = () => {
                           </button>
                           {enrollment.enrollmentStatus !== EnrollmentStatus.Approved && (
                             <button
-                              onClick={() => handleApprove(enrollment._id)}
+                              onClick={() => handleApprove(enrollment.id)}
                               className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                               title="Approve"
                             >
@@ -231,7 +231,7 @@ const EnrollmentPage = () => {
                           )}
                           {enrollment.enrollmentStatus !== EnrollmentStatus.Rejected && (
                             <button
-                              onClick={() => handleReject(enrollment._id)}
+                              onClick={() => handleReject(enrollment.id)}
                               className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                               title="Reject"
                             >

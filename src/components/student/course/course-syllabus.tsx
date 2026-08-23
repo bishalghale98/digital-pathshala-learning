@@ -14,8 +14,8 @@ interface CourseSyallabusProps {
 
 
 
-const getCourseId = (courseId: string | { _id: string; title?: string }) =>
-    typeof courseId === "string" ? courseId : courseId._id
+const getCourseId = (courseId: string | { id: string; title?: string }) =>
+    typeof courseId === "string" ? courseId : courseId.id
 
 const CourseSyallabus: React.FC<CourseSyallabusProps> = ({ lessons, isLoading = false }) => {
     const router = useRouter()
@@ -56,10 +56,10 @@ const CourseSyallabus: React.FC<CourseSyallabusProps> = ({ lessons, isLoading = 
                         ? <p className="text-gray-500 text-sm">No lessons available for this course.</p>
                         : lessons.map((lesson, index) => (
                             <div
-                                key={lesson._id}
+                                key={lesson.id}
                                 onClick={() =>
                                     router.push(
-                                        ROUTES.studentVideoPlay(getCourseId(lesson.courseId), lesson._id)
+                                        ROUTES.studentVideoPlay(getCourseId(lesson.courseId), lesson.id)
                                     )
                                 }
                                 role="button"
@@ -68,7 +68,7 @@ const CourseSyallabus: React.FC<CourseSyallabusProps> = ({ lessons, isLoading = 
                                     if (e.key === 'Enter' || e.key === ' ') {
                                         e.preventDefault()
                                         router.push(
-                                            ROUTES.studentVideoPlay(getCourseId(lesson.courseId), lesson._id)
+                                            ROUTES.studentVideoPlay(getCourseId(lesson.courseId), lesson.id)
                                         )
                                     }
                                 }}

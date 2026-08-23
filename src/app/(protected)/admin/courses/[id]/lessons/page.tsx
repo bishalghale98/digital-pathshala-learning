@@ -49,7 +49,7 @@ const CourseLessonsPage = () => {
         if (!lessonToDelete) return;
 
         try {
-            await deleteLesson({ id: lessonToDelete._id, courseId }).unwrap();
+            await deleteLesson({ id: lessonToDelete.id, courseId }).unwrap();
             toast.success("Lesson deleted");
         } catch (error) {
             toast.error(getErrorMessage(error));
@@ -130,7 +130,7 @@ const CourseLessonsPage = () => {
                                     {/* Data State */}
                                     {isSuccess &&
                                         lessons.map((lesson) => (
-                                            <tr key={lesson._id} className="hover:bg-gray-50">
+                                            <tr key={lesson.id} className="hover:bg-gray-50">
                                                 <td className="px-6 py-4 font-medium">
                                                     {lesson.title}
                                                 </td>
@@ -171,12 +171,12 @@ const CourseLessonsPage = () => {
                                 id={courseId}
                                 lessonData={editingLesson
                                     ? {
-                                        _id: editingLesson._id,
+                                        id: editingLesson.id,
                                         title: editingLesson.title,
                                         description: editingLesson.description,
                                         videoUrl: editingLesson.videoUrl,
                                         courseId: typeof editingLesson.courseId === "object"
-                                            ? editingLesson.courseId._id
+                                            ? editingLesson.courseId.id
                                             : editingLesson.courseId,
                                     }
                                     : null

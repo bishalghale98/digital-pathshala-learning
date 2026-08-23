@@ -18,8 +18,8 @@ import type { Course } from '@/store/course/courseApi'
 const getCourse = (enroll: MyCourse): Course | null =>
   typeof enroll.courseId === 'object' ? (enroll.courseId as Course) : null
 
-const getCourseId = (courseId: string | { _id: string }) =>
-  typeof courseId === 'string' ? courseId : courseId._id
+const getCourseId = (courseId: string | { id: string }) =>
+  typeof courseId === 'string' ? courseId : courseId.id
 
 type FilterTab = 'all' | 'in-progress' | 'completed'
 
@@ -139,7 +139,7 @@ function MyCourseContent() {
   } = useGetStudentLessonsQuery(courseId ?? '', { skip: !courseId })
 
   const activeLesson: Lesson | undefined = useMemo(
-    () => lessons.find((lesson) => lesson._id === lessonId),
+    () => lessons.find((lesson) => lesson.id === lessonId),
     [lessons, lessonId]
   )
 
@@ -271,7 +271,7 @@ const CourseGrid = ({
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {filtered.map((enrollment) => (
         <MyCourseCard
-          key={enrollment._id}
+          key={enrollment.id}
           enrollment={enrollment}
           filter={filter}
         />

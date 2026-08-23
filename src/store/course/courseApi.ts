@@ -2,7 +2,7 @@ import { baseApi } from "../api/base";
 import type { Category } from "../category/categoryApi";
 
 export interface Course {
-  _id: string;
+  id: string;
   title: string;
   description: string;
   duration: number;

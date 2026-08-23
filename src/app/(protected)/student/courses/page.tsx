@@ -51,7 +51,7 @@ const CoursesPage = () => {
       const matchesCategory =
         !selectedCategory ||
         (typeof course.categoryId === 'object' &&
-          (course.categoryId as { _id: string })._id === selectedCategory)
+          (course.categoryId as { id: string }).id === selectedCategory)
 
       return matchesSearch && matchesCategory
     })
@@ -104,7 +104,7 @@ const CoursesPage = () => {
         >
           <option value="">All Categories</option>
           {categories.map((cat) => (
-            <option key={cat._id} value={cat._id}>
+            <option key={cat.id} value={cat.id}>
               {cat.name}
             </option>
           ))}
@@ -125,7 +125,7 @@ const CoursesPage = () => {
           )}
           {selectedCategory && (
             <span className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">
-              {categories.find((c) => c._id === selectedCategory)?.name}
+              {categories.find((c) => c.id === selectedCategory)?.name}
               <button onClick={() => setSelectedCategory(null)}>
                 <X className="w-3 h-3" />
               </button>
@@ -167,8 +167,8 @@ const CoursesPage = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCourses.map((course: Course) => (
             <CourseCard
-              key={course._id}
-              id={course._id}
+              key={course.id}
+              id={course.id}
               title={course.title}
               description={course.description}
               price={course.price}

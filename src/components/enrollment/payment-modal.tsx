@@ -250,7 +250,7 @@ const PaymentModal = ({ isOpen, onClose, selectedId }: Props) => {
                                             <button
                                                 onClick={() => {
                                                     // Copy payment ID to clipboard
-                                                    navigator.clipboard.writeText(payment._id);
+                                                    navigator.clipboard.writeText(payment.id);
                                                     // Add toast notification here
                                                 }}
                                                 className="flex-1 px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"

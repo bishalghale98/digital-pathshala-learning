@@ -2,7 +2,7 @@ import { baseApi } from "../api/base";
 import type { Course } from "../course/courseApi";
 
 export interface Lesson {
-  _id: string;
+  id: string;
   title: string;
   description?: string;
   videoUrl: string;

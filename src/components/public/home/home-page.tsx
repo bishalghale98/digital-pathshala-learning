@@ -173,8 +173,8 @@ export default function HomePage() {
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {displayCourses.map((course) => (
                                     <Link
-                                        key={course._id}
-                                        href={ROUTES.courseDetail(course._id)}
+                                        key={course.id}
+                                        href={ROUTES.courseDetail(course.id)}
                                         className="group bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300"
                                     >
                                         <div className="h-44 bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center relative">
@@ -284,7 +284,7 @@ export default function HomePage() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                             {categories.slice(0, 6).map((category) => (
                                 <Link
-                                    key={category._id}
+                                    key={category.id}
                                     href={ROUTES.COURSES}
                                     className="group flex items-center justify-between p-5 bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all"
                                 >

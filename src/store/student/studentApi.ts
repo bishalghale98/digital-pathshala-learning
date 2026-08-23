@@ -4,14 +4,14 @@ import type { Course } from "../course/courseApi";
 import type { EnrollmentStatus } from "@/types/models";
 
 export interface StudentUser {
-  _id: string;
+  id: string;
   name: string;
   email: string;
   image?: string;
 }
 
 export interface MyCourse {
-  _id: string;
+  id: string;
   courseId: Course | string;
   enrolledAt: string;
   enrollmentStatus: EnrollmentStatus;

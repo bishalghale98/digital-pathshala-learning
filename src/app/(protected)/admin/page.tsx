@@ -155,7 +155,7 @@ const AdminPage = () => {
                     const student = getStudent(enrollment)
                     const course = getCourse(enrollment)
                     return (
-                      <tr key={enrollment._id} className="hover:bg-gray-50 transition-colors">
+                      <tr key={enrollment.id} className="hover:bg-gray-50 transition-colors">
                         <td className="px-6 py-3">
                           <p className="text-sm font-medium text-gray-900">{student?.name || '—'}</p>
                           <p className="text-xs text-gray-500">{student?.email || ''}</p>
@@ -206,7 +206,7 @@ const AdminPage = () => {
           ) : (
             <div className="divide-y divide-gray-50">
               {recentStudents.map((student) => (
-                <div key={student._id} className="flex items-center gap-3 px-6 py-3 hover:bg-gray-50 transition-colors">
+                <div key={student.id} className="flex items-center gap-3 px-6 py-3 hover:bg-gray-50 transition-colors">
                   {student.image ? (
                     <img src={student.image} alt={student.name} className="w-9 h-9 rounded-full object-cover" />
                   ) : (
