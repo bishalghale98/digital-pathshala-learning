@@ -11,7 +11,9 @@ let connectionPromise: Promise<typeof mongoose> | null = null;
 const dbConnect = () => {
   if (!connectionPromise) {
     connectionPromise = mongoose.connect(MONGODB);
+    console.log("MongoDB connection established");
   }
+  console.log("MongoDB connection already established");
   return connectionPromise;
 };
 

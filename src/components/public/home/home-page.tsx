@@ -292,9 +292,9 @@ export default function HomePage() {
                                         <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
                                             {category.name}
                                         </h3>
-                                        {category.description && (
+                                        {category.slug && (
                                             <p className="text-sm text-gray-500 mt-0.5 line-clamp-1">
-                                                {category.description}
+                                                {category.slug}
                                             </p>
                                         )}
                                     </div>

@@ -10,7 +10,7 @@ import {
 } from '@/store/category/categoryApi'
 import { getErrorMessage } from '@/store/api/base'
 import { toast } from 'sonner'
-import { Search, X, Plus, Tag, ChevronRight, ChevronDown } from 'lucide-react'
+import { Search, X, Plus, Tag } from 'lucide-react'
 
 const CategoriesPage = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
@@ -18,48 +18,18 @@ const CategoriesPage = () => {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null)
-  const [expandedParents, setExpandedParents] = useState<Set<string>>(new Set())
 
   const { data: categories = [], isLoading } = useGetCategoriesQuery()
   const [deleteCategory] = useDeleteCategoryMutation()
 
-  const mainCategories = useMemo(
-    () => categories.filter((c) => !c.parent),
-    [categories]
-  )
-
   const filteredCategories = useMemo(() => {
     if (!searchTerm.trim()) return categories
-    const term = searchTerm.toLowerCase()
     return categories.filter(
       (category) =>
-        category.name.toLowerCase().includes(term) ||
-        category.description?.toLowerCase().includes(term)
+        category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        category.slug?.toLowerCase().includes(searchTerm.toLowerCase())
     )
   }, [categories, searchTerm])
-
-  const filteredMainCategories = useMemo(
-    () => filteredCategories.filter((c) => !c.parent),
-    [filteredCategories]
-  )
-
-  const getSubcategoriesFor = useCallback(
-    (parentId: string) =>
-      filteredCategories.filter((c) => c.parent === parentId),
-    [filteredCategories]
-  )
-
-  const toggleExpand = useCallback((parentId: string) => {
-    setExpandedParents((prev) => {
-      const next = new Set(prev)
-      if (next.has(parentId)) {
-        next.delete(parentId)
-      } else {
-        next.add(parentId)
-      }
-      return next
-    })
-  }, [])
 
   const openEditModal = useCallback((category: Category) => {
     setEditingCategory(category)
@@ -91,20 +61,13 @@ const CategoriesPage = () => {
     setCategoryToDelete(null)
   }, [categoryToDelete, deleteCategory])
 
-  const formatDate = (date: string) =>
-    new Date(date).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    })
-
   return (
     <div>
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Categories</h1>
-          <p className="text-sm text-gray-500 mt-1">Organize your courses into categories and subcategories</p>
+          <p className="text-sm text-gray-500 mt-1">Organize your courses</p>
         </div>
         <button
           onClick={openAddModal}
@@ -135,171 +98,112 @@ const CategoriesPage = () => {
         )}
       </div>
 
-      {/* Category Tree */}
+      {/* Table */}
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        {isLoading ? (
-          <div className="px-6 py-12 text-center text-sm text-gray-500">
-            Loading categories...
-          </div>
-        ) : filteredMainCategories.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12">
-            <Tag className="w-12 h-12 text-gray-300 mb-3" />
-            <p className="text-sm font-medium text-gray-900">
-              {searchTerm ? 'No categories found' : 'No categories yet'}
-            </p>
-            <p className="text-xs text-gray-500 mt-1">
-              {searchTerm
-                ? 'Try a different search term'
-                : 'Create your first category to organize courses'}
-            </p>
-            {!searchTerm && (
-              <button
-                onClick={openAddModal}
-                className="mt-3 inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-900 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                Add Category
-              </button>
-            )}
-          </div>
-        ) : (
-          <div className="divide-y divide-gray-100">
-            {filteredMainCategories.map((mainCategory) => {
-              const subs = getSubcategoriesFor(mainCategory._id)
-              const isExpanded = expandedParents.has(mainCategory._id) || searchTerm.trim().length > 0
-
-              return (
-                <div key={mainCategory._id}>
-                  {/* Main Category Row */}
-                  <div className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors">
-                    <div className="flex items-center gap-3">
-                      {subs.length > 0 ? (
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Category</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Slug</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Created</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {isLoading ? (
+                <tr>
+                  <td colSpan={4} className="px-6 py-12 text-center text-sm text-gray-500">
+                    Loading categories...
+                  </td>
+                </tr>
+              ) : filteredCategories.length === 0 ? (
+                <tr>
+                  <td colSpan={4}>
+                    <div className="flex flex-col items-center justify-center py-12">
+                      <Tag className="w-12 h-12 text-gray-300 mb-3" />
+                      <p className="text-sm font-medium text-gray-900">
+                        {searchTerm ? 'No categories found' : 'No categories yet'}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {searchTerm
+                          ? 'Try a different search term'
+                          : 'Create your first category to organize courses'}
+                      </p>
+                      {!searchTerm && (
                         <button
-                          onClick={() => toggleExpand(mainCategory._id)}
-                          className="p-0.5 text-gray-400 hover:text-gray-600"
+                          onClick={openAddModal}
+                          className="mt-3 inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-900 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                         >
-                          {isExpanded ? (
-                            <ChevronDown className="w-4 h-4" />
-                          ) : (
-                            <ChevronRight className="w-4 h-4" />
-                          )}
+                          <Plus className="w-4 h-4" />
+                          Add Category
                         </button>
-                      ) : (
-                        <div className="w-5" />
                       )}
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">
-                          {mainCategory.name}
-                        </p>
-                        {mainCategory.description && (
-                          <p className="text-xs text-gray-500 mt-0.5 line-clamp-1 max-w-[300px]">
-                            {mainCategory.description}
-                          </p>
-                        )}
-                      </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 hidden sm:block">
-                        {subs.length} sub{subs.length !== 1 ? 'categories' : 'category'}
+                  </td>
+                </tr>
+              ) : (
+                filteredCategories.map((category) => (
+                  <tr key={category._id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4">
+                      <p className="text-sm font-medium text-gray-900">{category.name}</p>
+                    </td>
+                    <td className="px-6 py-4">
+                      <p className="text-sm text-gray-600 line-clamp-2 max-w-[300px]">
+                        {category.slug || '—'}
+                      </p>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-sm text-gray-600">
+                        {new Date(category.createdAt).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric',
+                        })}
                       </span>
-                      <span className="text-xs text-gray-500 hidden md:block">
-                        {formatDate(mainCategory.createdAt)}
-                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-1">
                         <button
-                          onClick={() => openEditModal(mainCategory)}
+                          onClick={() => openEditModal(category)}
                           className="px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                         >
                           Edit
                         </button>
                         <button
-                          onClick={() => openDeleteModal(mainCategory)}
+                          onClick={() => openDeleteModal(category)}
                           className="px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                         >
                           Delete
                         </button>
                       </div>
-                    </div>
-                  </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
 
-                  {/* Subcategories */}
-                  {isExpanded && subs.length > 0 && (
-                    <div className="bg-gray-50 divide-y divide-gray-100">
-                      {subs.map((sub) => (
-                        <div
-                          key={sub._id}
-                          className="flex items-center justify-between pl-14 pr-6 py-3 hover:bg-gray-100 transition-colors"
-                        >
-                          <div>
-                            <p className="text-sm text-gray-700">{sub.name}</p>
-                            {sub.description && (
-                              <p className="text-xs text-gray-500 mt-0.5 line-clamp-1 max-w-[280px]">
-                                {sub.description}
-                              </p>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <span className="text-xs text-gray-500 hidden md:block">
-                              {formatDate(sub.createdAt)}
-                            </span>
-                            <div className="flex items-center gap-1">
-                              <button
-                                onClick={() => openEditModal(sub)}
-                                className="px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-                              >
-                                Edit
-                              </button>
-                              <button
-                                onClick={() => openDeleteModal(sub)}
-                                className="px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                              >
-                                Delete
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )
-            })}
-          </div>
-        )}
-
-        {!isLoading && filteredMainCategories.length > 0 && (
+        {!isLoading && filteredCategories.length > 0 && (
           <div className="px-6 py-3 bg-gray-50 border-t border-gray-200">
             <p className="text-xs text-gray-500">
-              Showing <span className="font-medium">{filteredMainCategories.length}</span> main{' '}
-              {filteredMainCategories.length !== 1 ? 'categories' : 'category'} with{' '}
-              <span className="font-medium">
-                {filteredCategories.filter((c) => c.parent).length}
-              </span>{' '}
-              subcategories
+              Showing <span className="font-medium">{filteredCategories.length}</span> of{' '}
+              <span className="font-medium">{categories.length}</span> categories
             </p>
           </div>
         )}
       </div>
 
-      {isAddModalOpen && (
-        <Modal closeModal={closeModal} mainCategories={mainCategories} />
-      )}
+      {isAddModalOpen && <Modal closeModal={closeModal} />}
       {isEditModalOpen && editingCategory && (
-        <Modal
-          closeModal={closeModal}
-          categoryData={editingCategory}
-          mainCategories={mainCategories}
-        />
+        <Modal closeModal={closeModal} categoryData={editingCategory} />
       )}
       <ConfirmationModal
         isOpen={!!categoryToDelete}
         onClose={() => setCategoryToDelete(null)}
         onConfirm={handleDelete}
-        title={
-          categoryToDelete
-            ? `Are you sure you want to delete "${categoryToDelete.name}"?`
-            : ''
-        }
+        title={categoryToDelete ? `Are you sure you want to delete "${categoryToDelete.name}"?` : ''}
         confirmText="Delete"
         cancelText="Cancel"
       />

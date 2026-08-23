@@ -3,24 +3,11 @@ import { baseApi } from "../api/base";
 export interface Category {
   _id: string;
   name: string;
-  slug: string;
-  description?: string | null;
-  image?: string | null;
-  parent?: string | null;
-  isActive: boolean;
-  sortOrder: number;
+  slug?: string;
   createdAt: string;
 }
 
-export type CategoryPayload = {
-  name: string;
-  slug?: string;
-  description?: string | null;
-  image?: string | null;
-  parent?: string | null;
-  isActive?: boolean;
-  sortOrder?: number;
-};
+type CategoryPayload = { name: string; slug?: string };
 
 export const categoryApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -33,15 +20,8 @@ export const categoryApi = baseApi.injectEndpoints({
       query: (body) => ({ url: "category", method: "POST", body }),
       invalidatesTags: [{ type: "Category", id: "LIST" }, "Course"],
     }),
-    updateCategory: builder.mutation<
-      Category,
-      CategoryPayload & { id: string }
-    >({
-      query: ({ id, ...body }) => ({
-        url: `category/${id}`,
-        method: "PUT",
-        body,
-      }),
+    updateCategory: builder.mutation<Category, CategoryPayload & { id: string }>({
+      query: ({ id, ...body }) => ({ url: `category/${id}`, method: "PUT", body }),
       invalidatesTags: (_r, _e, { id }) => [
         { type: "Category", id },
         { type: "Category", id: "LIST" },

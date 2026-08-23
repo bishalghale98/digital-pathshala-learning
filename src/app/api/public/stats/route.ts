@@ -1,14 +1,15 @@
 import dbConnect from "@/database/dbConnection";
 import Course from "@/database/models/course.schema";
 import Category from "@/database/models/category.schema";
+import "@/database/models/category.schema";
 import { successResponse, errorResponse } from "@/utils/response";
 
 export async function GET() {
   try {
     await dbConnect();
     const [courseCount, categoryCount] = await Promise.all([
-      Course.countDocuments({ status: "published" }),
-      Category.countDocuments({ isActive: true }),
+      Course.countDocuments(),
+      Category.countDocuments(),
     ]);
     return successResponse(
       "Stats fetched successfully",

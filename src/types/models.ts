@@ -10,32 +10,18 @@ export enum Status {
 // ====== Category Interface ======
 export interface ICategory extends Document {
   name: string;
-  slug: string;
-  description?: string | null;
-  image?: string | null;
-  parent?: Types.ObjectId | null;
-  isActive: boolean;
-  sortOrder: number;
+  slug?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
-// ====== Course Status ======
-export type CourseStatus = "draft" | "published" | "archived";
-
 // ====== Course Interface ======
 export interface ICourse extends Document {
   title: string;
-  slug: string;
   description: string;
-  shortDescription?: string | null;
-  thumbnail?: string | null;
   duration?: string;
   price: number;
-  isFree: boolean;
   categoryId: Types.ObjectId;
-  subcategoryId?: Types.ObjectId | null;
-  status: CourseStatus;
   lessons?: Types.ObjectId[];
   createdAt?: Date;
   updatedAt?: Date;

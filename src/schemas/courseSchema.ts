@@ -1,7 +1,5 @@
 import { z } from "zod";
 
-export const courseStatusEnum = z.enum(["draft", "published", "archived"]);
-
 export const createCourseSchema = z.object({
   title: z
     .string()
@@ -13,14 +11,7 @@ export const createCourseSchema = z.object({
     .string()
     .trim()
     .min(10, "Description must be at least 10 characters")
-    .max(2000, "Description must be less than 2000 characters"),
-
-  shortDescription: z
-    .string()
-    .trim()
-    .max(300, "Short description must be less than 300 characters")
-    .nullable()
-    .optional(),
+    .max(500, "Description must be less than 500 characters"),
 
   duration: z
     .string()
@@ -32,25 +23,8 @@ export const createCourseSchema = z.object({
 
   price: z
     .number()
-    .min(0, "Price cannot be negative")
-    .max(100000, "Price must be less than 100,000"),
+    .positive("Price must be a positive number")
+    .max(10000, "Price must be less than 10,000"),
 
-  isFree: z.boolean().default(false),
-
-  categoryId: z
-    .string()
-    .length(24, "Invalid category ID")
-    .refine((val) => /^[0-9a-fA-F]{24}$/.test(val), "Invalid category ID format"),
-
-  subcategoryId: z
-    .string()
-    .length(24, "Invalid subcategory ID")
-    .nullable()
-    .optional()
-    .refine(
-      (val) => !val || /^[0-9a-fA-F]{24}$/.test(val),
-      "Invalid subcategory ID format"
-    ),
-
-  status: courseStatusEnum.default("draft"),
+  categoryId: z.string().length(24, "Invalid category ID"),
 });

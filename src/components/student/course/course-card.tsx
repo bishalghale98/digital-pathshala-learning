@@ -1,5 +1,4 @@
 import React from 'react'
-import { Clock } from 'lucide-react'
 import ArrowIcon from '../../common/arrow-icon'
 
 
@@ -8,7 +7,7 @@ interface CourseCardProps {
   title: string
   description: string
   price: number
-  duration: string | number;
+  duration: number;
   category: string
   openModal: (id: string) => void
 }
@@ -48,7 +47,9 @@ const CourseCard: React.FC<CourseCardProps> = ({
               <div className="text-left sm:text-right">
                 <p className="text-2xl font-bold text-white">Rs.{price}</p>
                 <div className="flex items-center gap-1 text-white/60 text-sm mt-1">
-                  <Clock className="w-4 h-4" />
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                  </svg>
                   <span>{duration}</span>
                 </div>
               </div>

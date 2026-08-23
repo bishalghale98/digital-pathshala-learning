@@ -1,18 +1,6 @@
 import { baseApi } from "../api/base";
 import type { Course } from "../course/courseApi";
-
-export interface PublicCategory {
-  _id: string;
-  name: string;
-  slug: string;
-  description?: string | null;
-  image?: string | null;
-  parent?: string | null;
-  isActive: boolean;
-  sortOrder: number;
-  createdAt: string;
-  subcategories?: PublicCategory[];
-}
+import type { Category } from "../category/categoryApi";
 
 export interface PlatformStats {
   courses: number;
@@ -25,9 +13,9 @@ export const publicApi = baseApi.injectEndpoints({
       query: () => "public/course",
       transformResponse: (res: { data: Course[] }) => res.data,
     }),
-    getPublicCategories: builder.query<PublicCategory[], void>({
+    getPublicCategories: builder.query<Category[], void>({
       query: () => "public/category",
-      transformResponse: (res: { data: PublicCategory[] }) => res.data,
+      transformResponse: (res: { data: Category[] }) => res.data,
     }),
     getPublicStats: builder.query<PlatformStats, void>({
       query: () => "public/stats",
