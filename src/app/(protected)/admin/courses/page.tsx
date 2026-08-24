@@ -20,10 +20,13 @@ const CoursesPage = () => {
   const searchParams = useSearchParams();
 
   const type = searchParams.get("type");
+  const courseId = searchParams.get("courseId");
+
 
   const [courseToDelete, setCourseToDelete] = useState<Course | null>(null)
   const [search, setSearch] = useState('')
   const [categoryFilter, setCategoryFilter] = useState<string>('')
+  const [editingCourse, setEditingCourse] = useState<Course | null>(null)
 
   const { data: courses = [], isLoading } = useGetCoursesQuery()
   const { data: categories = [] } = useGetCategoriesQuery()
@@ -59,7 +62,10 @@ const CoursesPage = () => {
   }, [courseToDelete, deleteCourse])
 
   const handleAddCourse = () => { router.push(ROUTES.ADMIN_COURSE_CREATE) }
-  const handleEditCourse = (course: Course) => router.push(ROUTES.ADMIN_COURSES + `/${course.id}/edit`)
+  const handleEditCourse = (course: Course) => {
+    setEditingCourse(course)
+    router.push(ROUTES.ADMIN_COURSE_EDIT(course.id))
+  }
 
 
 
@@ -69,38 +75,44 @@ const CoursesPage = () => {
     )
   }
 
+  if (type === 'edit' && courseId) {
+    return (
+      <CourseForm editingCourse={editingCourse} />
+    )
+  }
 
 
-  return (
-    <div>
-      <CourseHeader onAddCourse={handleAddCourse} />
 
-      <CourseFilters
-        search={search}
-        onSearchChange={setSearch}
-        categoryFilter={categoryFilter}
-        onCategoryChange={setCategoryFilter}
-        categories={categories}
-      />
+    return (
+      <div>
+        <CourseHeader onAddCourse={handleAddCourse} />
 
-      <CourseTable
-        courses={filteredCourses}
-        totalCount={courses.length}
-        isLoading={isLoading}
-        onEdit={handleEditCourse}
-        onDelete={openDeleteModal}
-      />
+        <CourseFilters
+          search={search}
+          onSearchChange={setSearch}
+          categoryFilter={categoryFilter}
+          onCategoryChange={setCategoryFilter}
+          categories={categories}
+        />
 
-      <ConfirmationModal
-        isOpen={!!courseToDelete}
-        onClose={() => setCourseToDelete(null)}
-        onConfirm={handleDelete}
-        title={courseToDelete ? `Are you sure you want to delete "${courseToDelete.title}"?` : ''}
-        confirmText="Delete"
-        cancelText="Cancel"
-      />
-    </div>
-  )
-}
+        <CourseTable
+          courses={filteredCourses}
+          totalCount={courses.length}
+          isLoading={isLoading}
+          onEdit={handleEditCourse}
+          onDelete={openDeleteModal}
+        />
 
-export default CoursesPage
+        <ConfirmationModal
+          isOpen={!!courseToDelete}
+          onClose={() => setCourseToDelete(null)}
+          onConfirm={handleDelete}
+          title={courseToDelete ? `Are you sure you want to delete "${courseToDelete.title}"?` : ''}
+          confirmText="Delete"
+          cancelText="Cancel"
+        />
+      </div>
+    )
+  }
+
+  export default CoursesPage

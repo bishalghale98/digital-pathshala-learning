@@ -57,9 +57,9 @@ export const CourseTable: React.FC<CourseTableProps> = ({
                   onClick={() => router.push(ROUTES.adminCourseLessons(course.id))}
                 >
                   <td className="px-6 py-4">
-                    <p className="text-sm font-medium text-gray-900">{course.title}</p>
+                    <h2 className="text-xl font-medium text-gray-900">{course.title}</h2>
                     <p className="text-xs text-gray-500 line-clamp-1 max-w-[300px]">
-                      {course.description}
+                      {course.shortDescription || 'No description available.'}
                     </p>
                   </td>
                   <td className="px-6 py-4">

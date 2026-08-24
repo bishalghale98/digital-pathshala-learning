@@ -38,6 +38,8 @@ export const ROUTES = {
   ADMIN_SETTINGS: '/admin/settings',
 
   ADMIN_COURSE_CREATE: '/admin/courses?type=create',
+  ADMIN_COURSE_EDIT: (courseId: string) => `/admin/courses?type=edit&courseId=${courseId}`,
+
 
   // Admin dynamic
   adminCourseLessons: (courseId: string) => `/admin/courses/${courseId}/lessons`,

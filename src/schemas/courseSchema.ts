@@ -25,9 +25,7 @@ export const createCourseSchema = z.object({
 
   description: z
     .string()
-    .trim()
-    .min(10, "Description must be at least 10 characters")
-    .max(500, "Description must be less than 500 characters"),
+    .min(1, "Description is required"),
 
   duration: z
     .string()

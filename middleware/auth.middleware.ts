@@ -17,13 +17,13 @@ export const authMiddleware = async (
     headers: req.headers,
   });
 
-  if (!session) {
+  if (!session?.user) {
     return errorResponse("Unauthorized: Please login", 401);
   }
 
   const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
 
-  if (!roles.includes(session.user.role)) {
+  if (!roles.includes(session.user.role as string)) {
     return errorResponse(
       "Forbidden: You do not have access to this action",
       403

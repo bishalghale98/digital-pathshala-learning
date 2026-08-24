@@ -1,121 +1,402 @@
-import React from 'react';
+'use client'
 
-const CourseForm = () => {
-    return (
-        <div className="p-6  min-h-screen font-sans">
-            {/* Page Title */}
-            <div className="mb-6">
-                <h1 className="text-2xl font-semibold text-gray-800">Add New Course</h1>
+import React, { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
+import { getSlug } from '@/lib/helper/helper'
+import { getInputClass } from '@/lib/utils/form'
+import { ROUTES } from '@/lib/constants'
+import { createCourseSchema } from '@/schemas/courseSchema'
+import {
+  type Course,
+  useCreateCourseMutation,
+  useUpdateCourseMutation,
+} from '@/store/course/courseApi'
+import { useGetCategoriesQuery } from '@/store/category/categoryApi'
+import { getErrorMessage } from '@/store/api/base'
+import { RichTextEditor } from '@/components/editor'
+
+type FormData = z.infer<typeof createCourseSchema>
+
+interface CourseFormProps {
+  editingCourse?: Course | null
+}
+
+const CourseForm = ({ editingCourse }: CourseFormProps) => {
+  const router = useRouter()
+  const isEditing = !!editingCourse
+
+  const [createCourse, { isLoading: isCreating }] = useCreateCourseMutation()
+  const [updateCourse, { isLoading: isUpdating }] = useUpdateCourseMutation()
+  const { data: categories = [] } = useGetCategoriesQuery()
+
+  const isSubmitting = isCreating || isUpdating
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<FormData>({
+    resolver: zodResolver(createCourseSchema),
+    defaultValues: {
+      title: '',
+      slug: '',
+      shortDescription: '',
+      description: '',
+      duration: '',
+      price: 0,
+      thumbnail: '',
+      whatsappGroupLink: '',
+      keywords: '',
+      status: 'DRAFT',
+      categoryId: '',
+    },
+  })
+
+  const watchedTitle = watch('title')
+
+  useEffect(() => {
+    if (!isEditing) {
+      const slug = getSlug(watchedTitle ?? '')
+      setValue('slug', slug, { shouldValidate: true, shouldDirty: true })
+    }
+  }, [watchedTitle, setValue, isEditing])
+
+  useEffect(() => {
+    if (editingCourse) {
+      reset({
+        title: editingCourse.title || '',
+        slug: editingCourse.slug || '',
+        shortDescription: editingCourse.shortDescription || '',
+        description: editingCourse.description || '',
+        duration: editingCourse.duration || '',
+        price: editingCourse.price || 0,
+        thumbnail: editingCourse.thumbnail || '',
+        whatsappGroupLink: editingCourse.whatsappGroupLink || '',
+        keywords: editingCourse.keywords || '',
+        status: editingCourse.status || 'DRAFT',
+        categoryId: editingCourse.categoryId || '',
+      })
+    } else {
+      reset({
+        title: '',
+        slug: '',
+        shortDescription: '',
+        description: '',
+        duration: '',
+        price: 0,
+        thumbnail: '',
+        whatsappGroupLink: '',
+        keywords: '',
+        status: 'DRAFT',
+        categoryId: '',
+      })
+    }
+  }, [editingCourse, reset])
+
+  const onSubmit = async (data: FormData) => {
+    try {
+      if (isEditing && editingCourse) {
+        await updateCourse({ id: editingCourse.id, ...data }).unwrap()
+        toast.success('Course updated successfully')
+      } else {
+        await createCourse(data).unwrap()
+        toast.success('Course created successfully')
+      }
+      reset()
+      router.push(ROUTES.ADMIN_COURSES)
+    } catch (error) {
+      toast.error(getErrorMessage(error))
+    }
+  }
+
+  return (
+    <div className="p-6 min-h-screen font-sans">
+      <div className="mb-6">
+        <h1 className="text-2xl font-semibold text-gray-800">
+          {isEditing ? 'Edit Course' : 'Add New Course'}
+        </h1>
+      </div>
+
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Left Column */}
+          <div className="flex-1 space-y-6">
+            {/* Title */}
+            <div>
+              <input
+                type="text"
+                placeholder="Enter Course Title"
+                {...register('title')}
+                className="w-full px-4 py-3 text-lg border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+              {errors.title && (
+                <p className="mt-1 text-sm text-red-500">{errors.title.message}</p>
+              )}
             </div>
 
-            {/* Main Container: Two Columns */}
-            <div className="flex flex-col lg:flex-row gap-6">
+            {/* Slug */}
+            <div>
+              <label
+                htmlFor="slug"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Slug
+              </label>
 
-                {/* Left Column (Main Editor & Meta Boxes) */}
-                <div className="flex-1 space-y-6">
+              <div className="flex items-center rounded border border-gray-200 bg-gray-50 px-3 py-2">
+                <span className="text-sm text-gray-400">/courses/</span>
+                <input
+                  id="slug"
+                  type="text"
+                  {...register('slug')}
+                  className="flex-1 bg-transparent px-1 text-sm text-gray-600 outline-none"
+                  placeholder="course-slug"
+                />
+              </div>
 
-                    {/* Title Input */}
-                    <div>
-                        <input
-                            type="text"
-                            placeholder='Enter Course Title'
-                            className="w-full px-4 py-3 text-lg border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                        />
-                    </div>
+              <p className="mt-1 text-xs text-gray-500">
+                Automatically generated from the course title.
+              </p>
 
-                    {/* Editor Toolbar & Text Area */}
-                    {/* here should be rich text editor import here tiptap here should be shown */}
-
-                    {/* Accordion Panels (Excerpt, Custom Fields, etc.) */}
-                    <div className="bg-white border border-gray-300 rounded shadow-sm p-4 flex justify-between items-center text-gray-700 font-medium cursor-pointer">
-                        <span>Instructor Details</span>
-                        <span className="text-sm text-gray-400">▼</span>
-                    </div>
-
-
-
-                </div>
-
-                {/* Right Column (Sidebar Widgets) */}
-                <div className="w-full lg:w-80 space-y-6">
-
-                    {/* Publish Box */}
-                    <div className="bg-white border border-gray-300 rounded shadow-sm">
-                        <div className="px-4 py-3 border-b border-gray-200 font-semibold text-gray-700 bg-gray-50">
-                            Publish
-                        </div>
-                        <div className="p-4 space-y-3 text-sm text-gray-600">
-                            <div className="flex gap-2">
-                                <button className="px-3 py-1.5 border border-gray-300 rounded text-gray-700 bg-white hover:bg-gray-50 font-medium">Save Draft</button>
-                                <button className="px-3 py-1.5 border border-gray-300 rounded text-gray-700 bg-white hover:bg-gray-50 font-medium">Preview</button>
-                            </div>
-                            <p>📍 Status: <span className="font-semibold text-gray-800">Draft</span> <a href="#edit" className="text-blue-600 hover:underline">Edit</a></p>
-                            <p>👁️ Visibility: <span className="font-semibold text-gray-800">Public</span> <a href="#edit" className="text-blue-600 hover:underline">Edit</a></p>
-                            <p>📅 Publish immediately <a href="#edit" className="text-blue-600 hover:underline">Edit</a></p>
-                        </div>
-                        <div className="px-4 py-3 bg-gray-50 border-t border-gray-200 flex justify-between items-center">
-                            <span className="text-red-600 hover:underline text-sm cursor-pointer">Move to Trash</span>
-                            <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded shadow">Publish</button>
-                        </div>
-                    </div>
-
-                    {/* Course Categories Box */}
-                    <div className="bg-white border border-gray-300 rounded shadow-sm">
-                        <div className="px-4 py-3 border-b border-gray-200 font-semibold text-gray-700 bg-gray-50">
-                            Course Categories
-                        </div>
-                        <div className="p-4 space-y-3">
-                            <div className="text-sm border-b border-gray-200 pb-2 flex gap-4">
-                                <span className="text-blue-600 border-b-2 border-blue-600 pb-2 -mb-2 font-medium cursor-pointer">All Categories</span>
-                            </div>
-
-                            {/* list of categories */}
-                            <div className="space-y-2 max-h-40 overflow-y-auto text-sm text-gray-700">
-                                <label className="flex items-center space-x-2">
-                                    <input type="checkbox" defaultChecked className="rounded border-gray-300" />
-                                    <span>Web Development</span>
-                                </label>
-                                <label className="flex items-center space-x-2">
-                                    <input type="checkbox" className="rounded border-gray-300" />
-                                    <span>Data Science</span>
-                                </label>
-                                <label className="flex items-center space-x-2">
-                                    <input type="checkbox" className="rounded border-gray-300" />
-                                    <span>UI/UX Design</span>
-                                </label>
-                                <label className="flex items-center space-x-2">
-                                    <input type="checkbox" className="rounded border-gray-300" />
-                                    <span>Business Strategy</span>
-                                </label>
-                            </div>
-                            <button className="text-blue-600 hover:underline text-sm font-medium mt-2 block">+ Add New Category</button>
-                        </div>
-                    </div>
-
-                    {/* Course Tags Box */}
-                    <div className="bg-white border border-gray-300 rounded shadow-sm">
-                        <div className="px-4 py-3 border-b border-gray-200 font-semibold text-gray-700 bg-gray-50">
-                            Course Tags
-                        </div>
-                        <div className="p-4 space-y-3">
-                            <div className="flex gap-2">
-                                <input
-                                    type="text"
-                                    defaultValue="React, Frontend, JavaScript"
-                                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none"
-                                    readOnly
-                                />
-                                <button className="px-3 py-1.5 bg-gray-100 border border-gray-300 rounded text-sm text-gray-700 hover:bg-gray-200">Add</button>
-                            </div>
-                            <p className="text-xs text-gray-500">Separate tags with commas</p>
-                        </div>
-                    </div>
-
-                </div>
-
+              {errors.slug && (
+                <p className="mt-1 text-xs text-red-500">
+                  {errors.slug.message}
+                </p>
+              )}
             </div>
+
+            {/* Rich Text Editor for Description */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Description
+              </label>
+              <RichTextEditor
+                value={watch('description') ?? ''}
+                onChange={(html) =>
+                  setValue('description', html, {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                  })
+                }
+                placeholder="Write your course description..."
+              />
+              {errors.description && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.description.message}
+                </p>
+              )}
+            </div>
+
+            {/* Short Description */}
+            <div>
+              <label
+                htmlFor="shortDescription"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Short Description
+              </label>
+              <textarea
+                id="shortDescription"
+                rows={2}
+                {...register('shortDescription')}
+                className={getInputClass(!!errors.shortDescription)}
+                placeholder="Brief summary of the course (max 200 characters)"
+              />
+              {errors.shortDescription && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.shortDescription.message}
+                </p>
+              )}
+            </div>
+
+            {/* Instructor Details placeholder */}
+            <div className="bg-white border border-gray-300 rounded shadow-sm p-4 flex justify-between items-center text-gray-700 font-medium cursor-pointer">
+              <span>Instructor Details</span>
+              <span className="text-sm text-gray-400">&#9660;</span>
+            </div>
+          </div>
+
+          {/* Right Column (Sidebar) */}
+          <div className="w-full lg:w-80 space-y-6">
+            {/* Publish Box */}
+            <div className="bg-white border border-gray-300 rounded shadow-sm">
+              <div className="px-4 py-3 border-b border-gray-200 font-semibold text-gray-700 bg-gray-50">
+                Publish
+              </div>
+              <div className="p-4 space-y-3 text-sm text-gray-600">
+                <div>
+                  <label
+                    htmlFor="status"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Status
+                  </label>
+                  <select
+                    id="status"
+                    {...register('status')}
+                    className={getInputClass(!!errors.status)}
+                  >
+                    <option value="DRAFT">Draft</option>
+                    <option value="PUBLISHED">Published</option>
+                    <option value="ARCHIVED">Archived</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="duration"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Duration
+                  </label>
+                  <input
+                    id="duration"
+                    type="text"
+                    {...register('duration')}
+                    className={getInputClass(!!errors.duration)}
+                    placeholder='e.g., "8 weeks"'
+                  />
+                  {errors.duration && (
+                    <p className="mt-1 text-xs text-red-500">
+                      {errors.duration.message}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="price"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Price
+                  </label>
+                  <input
+                    id="price"
+                    type="number"
+                    step="0.01"
+                    {...register('price', { valueAsNumber: true })}
+                    className={getInputClass(!!errors.price)}
+                    placeholder="0.00"
+                  />
+                  {errors.price && (
+                    <p className="mt-1 text-xs text-red-500">
+                      {errors.price.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="px-4 py-3 bg-gray-50 border-t border-gray-200">
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded shadow disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {isSubmitting
+                    ? 'Saving...'
+                    : isEditing
+                      ? 'Update Course'
+                      : 'Publish'}
+                </button>
+              </div>
+            </div>
+
+            {/* Course Categories */}
+            <div className="bg-white border border-gray-300 rounded shadow-sm">
+              <div className="px-4 py-3 border-b border-gray-200 font-semibold text-gray-700 bg-gray-50">
+                Course Categories
+              </div>
+              <div className="p-4 space-y-3">
+                <select
+                  {...register('categoryId')}
+                  className={getInputClass(!!errors.categoryId)}
+                >
+                  <option value="">Select a category</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+                {errors.categoryId && (
+                  <p className="mt-1 text-xs text-red-500">
+                    {errors.categoryId.message}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Thumbnail URL */}
+            <div className="bg-white border border-gray-300 rounded shadow-sm">
+              <div className="px-4 py-3 border-b border-gray-200 font-semibold text-gray-700 bg-gray-50">
+                Course Thumbnail
+              </div>
+              <div className="p-4 space-y-3">
+                <input
+                  type="url"
+                  {...register('thumbnail')}
+                  className={getInputClass(!!errors.thumbnail)}
+                  placeholder="https://example.com/image.jpg"
+                />
+                {errors.thumbnail && (
+                  <p className="mt-1 text-xs text-red-500">
+                    {errors.thumbnail.message}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Keywords */}
+            <div className="bg-white border border-gray-300 rounded shadow-sm">
+              <div className="px-4 py-3 border-b border-gray-200 font-semibold text-gray-700 bg-gray-50">
+                Keywords
+              </div>
+              <div className="p-4 space-y-3">
+                <input
+                  type="text"
+                  {...register('keywords')}
+                  className={getInputClass(!!errors.keywords)}
+                  placeholder="React, Frontend, JavaScript"
+                />
+                <p className="text-xs text-gray-500">Separate tags with commas</p>
+                {errors.keywords && (
+                  <p className="mt-1 text-xs text-red-500">
+                    {errors.keywords.message}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* WhatsApp Group Link */}
+            <div className="bg-white border border-gray-300 rounded shadow-sm">
+              <div className="px-4 py-3 border-b border-gray-200 font-semibold text-gray-700 bg-gray-50">
+                WhatsApp Group
+              </div>
+              <div className="p-4 space-y-3">
+                <input
+                  type="url"
+                  {...register('whatsappGroupLink')}
+                  className={getInputClass(!!errors.whatsappGroupLink)}
+                  placeholder="https://chat.whatsapp.com/..."
+                />
+                {errors.whatsappGroupLink && (
+                  <p className="mt-1 text-xs text-red-500">
+                    {errors.whatsappGroupLink.message}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
-    );
-};
+      </form>
+    </div>
+  )
+}
 
-export default CourseForm;
+export default CourseForm
