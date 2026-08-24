@@ -48,9 +48,9 @@ export default function CoursesPage() {
                                 </div>
                                 <div className="p-5">
                                     <div className="flex items-center gap-2 mb-2">
-                                        {typeof course.categoryId === 'object' && course.categoryId && (
+                                        {course.categories && course.categories.length > 0 && (
                                             <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
-                                                {course.categoryId.name}
+                                                {course.categories[0].category.name}
                                             </span>
                                         )}
                                     </div>

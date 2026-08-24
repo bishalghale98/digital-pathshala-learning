@@ -4,6 +4,7 @@ import React from 'react'
 import { useRouter } from 'next/navigation'
 import { ROUTES } from '@/lib/constants'
 import type { Course } from '@/store/course/courseApi'
+import { Pencil, Trash2 } from 'lucide-react'
 
 interface CourseTableProps {
   courses: Course[]
@@ -63,9 +64,17 @@ export const CourseTable: React.FC<CourseTableProps> = ({
                     </p>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
-                      {course.category?.name || '—'}
-                    </span>
+                    <div className="flex flex-wrap gap-1">
+                      {course.categories && course.categories.length > 0 ? (
+                        course.categories.map((cc) => (
+                          <span key={cc.id} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
+                            {cc.category.name}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-xs text-gray-400">—</span>
+                      )}
+                    </div>
                   </td>
                   <td className="px-6 py-4">
                     <span className="text-sm text-gray-600">{course.duration}</span>
@@ -86,15 +95,17 @@ export const CourseTable: React.FC<CourseTableProps> = ({
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => onEdit(course)}
-                        className="px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                        className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                        title="Edit"
                       >
-                        Edit
+                        <Pencil className="size-4" />
                       </button>
                       <button
                         onClick={() => onDelete(course)}
-                        className="px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Delete"
                       >
-                        Delete
+                        <Trash2 className="size-4" />
                       </button>
                     </div>
                   </td>

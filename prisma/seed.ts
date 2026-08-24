@@ -359,7 +359,9 @@ async function main() {
         price: courseData.price,
         keywords: courseData.keywords,
         status: courseData.status,
-        categoryId,
+        categories: {
+          create: [{ categoryId }],
+        },
         lessons: {
           create: courseData.lessons.map((l) => ({
             title: l.title,

@@ -50,13 +50,13 @@ const AdminPage = () => {
     return {
       totalStudents: students.length,
       totalCourses: courses.length,
-      totalCategories: categories.length,
+      totalCategories: categories.reduce((acc, cat) => acc + 1 + (cat.children?.length ?? 0), 0),
       approvedEnrollments: approved,
       pendingEnrollments: pending,
       rejectedEnrollments: rejected,
       totalEnrollments: enrollments.length,
     }
-  }, [students.length, courses.length, categories.length, enrollments])
+  }, [students.length, courses.length, categories, enrollments])
 
   const recentEnrollments = useMemo(() => {
     return [...enrollments]

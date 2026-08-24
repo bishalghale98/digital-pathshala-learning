@@ -2,7 +2,6 @@ import prisma from "@/database/prisma";
 import { categoryCreateSchema, categoryUpdateSchema } from "@/schemas/categorySchema";
 import { errorResponse, successResponse } from "@/utils/response";
 import { tryCatch } from "@/utils/tryCatch";
-import { Category } from "@prisma/client";
 import { NextRequest } from "next/server";
 
 export const createCategory = tryCatch(async (req: NextRequest) => {
@@ -58,13 +57,22 @@ export const createCategory = tryCatch(async (req: NextRequest) => {
 
 export const getCategories = tryCatch(async () => {
   const categories = await prisma.category.findMany({
+    where: { parentId: null },
     orderBy: { createdAt: "desc" },
-    include: {
-      parent: {
-        select: { id: true, name: true, slug: true },
-      },
-      _count: {
-        select: { children: true },
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      description: true,
+      children: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          description: true,
+          parentId: true,
+        },
+        orderBy: { name: "asc" },
       },
     },
   });

@@ -50,8 +50,7 @@ const CoursesPage = () => {
 
       const matchesCategory =
         !selectedCategory ||
-        (typeof course.categoryId === 'object' &&
-          (course.categoryId as { id: string }).id === selectedCategory)
+        course.categories?.some((cc) => cc.categoryId === selectedCategory)
 
       return matchesSearch && matchesCategory
     })
@@ -104,9 +103,12 @@ const CoursesPage = () => {
         >
           <option value="">All Categories</option>
           {categories.map((cat) => (
-            <option key={cat.id} value={cat.id}>
-              {cat.name}
-            </option>
+            <optgroup key={cat.id} label={cat.name}>
+              <option value={cat.id}>{cat.name}</option>
+              {cat.children?.map((child) => (
+                <option key={child.id} value={child.id}>{child.name}</option>
+              ))}
+            </optgroup>
           ))}
         </select>
       </div>
@@ -125,7 +127,14 @@ const CoursesPage = () => {
           )}
           {selectedCategory && (
             <span className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">
-              {categories.find((c) => c.id === selectedCategory)?.name}
+              {(() => {
+                for (const cat of categories) {
+                  if (cat.id === selectedCategory) return cat.name
+                  const child = cat.children?.find((c) => c.id === selectedCategory)
+                  if (child) return child.name
+                }
+                return ''
+              })()}
               <button onClick={() => setSelectedCategory(null)}>
                 <X className="w-3 h-3" />
               </button>
@@ -174,8 +183,8 @@ const CoursesPage = () => {
               price={course.price}
               duration={course.duration}
               category={
-                typeof course.categoryId === 'object'
-                  ? (course.categoryId as { name: string }).name
+                course.categories && course.categories.length > 0
+                  ? course.categories[0].category.name
                   : ''
               }
               openModal={openModal}

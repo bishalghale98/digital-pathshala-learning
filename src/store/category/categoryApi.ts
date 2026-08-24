@@ -1,5 +1,21 @@
 import { baseApi } from "../api/base";
 
+export interface CategoryChild {
+  id: string;
+  name: string;
+  slug?: string;
+  description?: string;
+  parentId?: string | null;
+}
+
+export interface CategoryTree {
+  id: string;
+  name: string;
+  slug?: string;
+  description?: string;
+  children?: CategoryChild[];
+}
+
 export interface Category {
   id: string;
   name: string;
@@ -14,9 +30,9 @@ type CategoryPayload = { name: string; slug?: string; description?: string; pare
 
 export const categoryApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getCategories: builder.query<Category[], void>({
+    getCategories: builder.query<CategoryTree[], void>({
       query: () => "category",
-      transformResponse: (res: { data: Category[] }) => res.data,
+      transformResponse: (res: { data: CategoryTree[] }) => res.data,
       providesTags: [{ type: "Category", id: "LIST" }],
     }),
     createCategory: builder.mutation<Category, CategoryPayload>({

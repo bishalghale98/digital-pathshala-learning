@@ -40,8 +40,7 @@ const CoursesPage = () => {
         course.description?.toLowerCase().includes(search.toLowerCase())
       const matchesCategory =
         !categoryFilter ||
-        (typeof course.categoryId === 'object' &&
-          (course.categoryId as { id: string }).id === categoryFilter)
+        course.categories?.some((cc) => cc.categoryId === categoryFilter)
       return matchesSearch && matchesCategory
     })
   }, [courses, search, categoryFilter])

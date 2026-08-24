@@ -15,7 +15,7 @@ import {
   useCreateCourseMutation,
   useUpdateCourseMutation,
 } from '@/store/course/courseApi'
-import { useGetCategoriesQuery } from '@/store/category/categoryApi'
+import { useGetCategoriesQuery, type CategoryTree } from '@/store/category/categoryApi'
 import { getErrorMessage } from '@/store/api/base'
 import { RichTextEditor } from '@/components/editor'
 
@@ -55,11 +55,12 @@ const CourseForm = ({ editingCourse }: CourseFormProps) => {
       whatsappGroupLink: '',
       keywords: '',
       status: 'DRAFT',
-      categoryId: '',
+      categoryId: [],
     },
   })
 
   const watchedTitle = watch('title')
+  const watchedCategoryIds = watch('categoryId')
 
   useEffect(() => {
     if (!isEditing) {
@@ -70,6 +71,7 @@ const CourseForm = ({ editingCourse }: CourseFormProps) => {
 
   useEffect(() => {
     if (editingCourse) {
+      const categoryIds = editingCourse.categories?.map((c) => c.categoryId) ?? []
       reset({
         title: editingCourse.title || '',
         slug: editingCourse.slug || '',
@@ -81,7 +83,7 @@ const CourseForm = ({ editingCourse }: CourseFormProps) => {
         whatsappGroupLink: editingCourse.whatsappGroupLink || '',
         keywords: editingCourse.keywords || '',
         status: editingCourse.status || 'DRAFT',
-        categoryId: editingCourse.categoryId || '',
+        categoryId: categoryIds,
       })
     } else {
       reset({
@@ -95,10 +97,29 @@ const CourseForm = ({ editingCourse }: CourseFormProps) => {
         whatsappGroupLink: '',
         keywords: '',
         status: 'DRAFT',
-        categoryId: '',
+        categoryId: [],
       })
     }
   }, [editingCourse, reset])
+
+  const handleCategoryToggle = (id: string, parent?: CategoryTree) => {
+    const current = watchedCategoryIds ?? []
+    const isSelected = current.includes(id)
+
+    let updated: string[]
+
+    if (isSelected) {
+      updated = current.filter((cId) => cId !== id)
+    } else {
+      updated = [...current, id]
+
+      if (parent && !current.includes(parent.id)) {
+        updated = [...updated, parent.id]
+      }
+    }
+
+    setValue('categoryId', updated, { shouldValidate: true, shouldDirty: true })
+  }
 
   const onSubmit = async (data: FormData) => {
     try {
@@ -312,20 +333,39 @@ const CourseForm = ({ editingCourse }: CourseFormProps) => {
               <div className="px-4 py-3 border-b border-gray-200 font-semibold text-gray-700 bg-gray-50">
                 Course Categories
               </div>
-              <div className="p-4 space-y-3">
-                <select
-                  {...register('categoryId')}
-                  className={getInputClass(!!errors.categoryId)}
-                >
-                  <option value="">Select a category</option>
+              <div className="p-4">
+                <div className="space-y-3 max-h-60 overflow-y-auto">
                   {categories.map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </option>
+                    <div key={cat.id}>
+                      <label className="flex items-center gap-2 py-1 px-1 rounded hover:bg-gray-50 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={watchedCategoryIds?.includes(cat.id) ?? false}
+                          onChange={() => handleCategoryToggle(cat.id)}
+                          className="size-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        />
+                        <span className="text-sm font-semibold text-gray-900">{cat.name}</span>
+                      </label>
+                      {cat.children && cat.children.length > 0 && (
+                        <div className="ml-5 mt-1 pl-4 border-l-2 border-gray-200 space-y-1">
+                          {cat.children.map((child) => (
+                            <label key={child.id} className="flex items-center gap-2 py-0.5 px-1 rounded hover:bg-gray-50 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={watchedCategoryIds?.includes(child.id) ?? false}
+                                onChange={() => handleCategoryToggle(child.id, cat)}
+                                className="size-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                              />
+                              <span className="text-sm text-gray-600">{child.name}</span>
+                            </label>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   ))}
-                </select>
+                </div>
                 {errors.categoryId && (
-                  <p className="mt-1 text-xs text-red-500">
+                  <p className="mt-2 text-xs text-red-500">
                     {errors.categoryId.message}
                   </p>
                 )}

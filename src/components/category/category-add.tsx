@@ -3,6 +3,7 @@
 import { getSlug } from "@/lib/helper/helper";
 import { categoryCreateSchema } from "@/schemas/categorySchema";
 import { useCreateCategoryMutation, useUpdateCategoryMutation } from "@/store/category/categoryApi";
+import type { CategoryTree } from "@/store/category/categoryApi";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -10,17 +11,8 @@ import { z } from "zod";
 import { toast } from "sonner";
 
 interface CategoryAddProps {
-    parentOptions: {
-        id: string;
-        name: string;
-    }[];
-    editingCategory?: {
-        id: string;
-        name: string;
-        slug?: string;
-        description?: string;
-        parent?: { id: string; name: string; slug?: string } | null;
-    } | null;
+    parentOptions: CategoryTree[];
+    editingCategory?: CategoryTree | null;
     onSuccess?: () => void;
 }
 
@@ -59,11 +51,15 @@ const CategoryAdd = ({ parentOptions, editingCategory, onSuccess }: CategoryAddP
 
     useEffect(() => {
         if (editingCategory) {
+            const parentId = parentOptions.find((p) =>
+                p.children?.some((child) => child.id === editingCategory.id)
+            )?.id;
+
             reset({
                 name: editingCategory.name || "",
                 slug: editingCategory.slug || "",
                 description: editingCategory.description || "",
-                parent: editingCategory.parent?.id || undefined,
+                parent: parentId || undefined,
             });
         } else {
             reset({
@@ -73,7 +69,7 @@ const CategoryAdd = ({ parentOptions, editingCategory, onSuccess }: CategoryAddP
                 parent: undefined,
             });
         }
-    }, [editingCategory, reset]);
+    }, [editingCategory, reset, parentOptions]);
 
     const [createCategory, { isLoading: isCreating }] = useCreateCategoryMutation();
     const [updateCategory, { isLoading: isUpdating }] = useUpdateCategoryMutation();
@@ -91,7 +87,7 @@ const CategoryAdd = ({ parentOptions, editingCategory, onSuccess }: CategoryAddP
             }
             reset();
             onSuccess?.();
-        } catch (error) {
+        } catch {
             toast.error("Failed to save category");
         }
     };

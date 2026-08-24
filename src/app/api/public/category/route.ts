@@ -4,20 +4,26 @@ import { successResponse, errorResponse } from "@/utils/response";
 export async function GET() {
   try {
     const categories = await prisma.category.findMany({
+      where: { parentId: null },
       orderBy: { createdAt: "desc" },
-      include: {
-        children: true,
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        description: true,
+        children: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            description: true,
+          },
+          orderBy: { name: "asc" },
+        },
       },
     });
 
-    const mainCategories = categories.filter((cat) => !cat.parentId);
-
-    const tree = mainCategories.map((main) => ({
-      ...main,
-      subcategories: main.children,
-    }));
-
-    return successResponse("Categories fetched successfully", tree, 200);
+    return successResponse("Categories fetched successfully", categories, 200);
   } catch (error) {
     console.error(error);
     return errorResponse("Failed to fetch categories", 500);

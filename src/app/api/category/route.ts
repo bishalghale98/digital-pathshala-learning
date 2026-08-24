@@ -20,5 +20,5 @@ export async function GET(req: NextRequest): Promise<Response> {
     
     return checkAuth;
   }
-  return getCategories(req);
+  return getCategories();
 }

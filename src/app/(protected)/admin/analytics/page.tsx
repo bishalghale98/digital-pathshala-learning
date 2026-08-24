@@ -72,7 +72,7 @@ const AnalyticsPage = () => {
       totalStudents: students.length,
       totalCourses: courses.length,
       totalEnrollments: enrollments.length,
-      totalCategories: categories.length,
+      totalCategories: categories.reduce((acc, cat) => acc + 1 + (cat.children?.length ?? 0), 0),
       approvedEnrollments: approved,
       pendingEnrollments: pending,
       rejectedEnrollments: rejected,
@@ -80,7 +80,7 @@ const AnalyticsPage = () => {
       topCourses,
       approvalRate: enrollments.length > 0 ? Math.round((approved / enrollments.length) * 100) : 0,
     }
-  }, [students.length, courses.length, enrollments, categories.length])
+  }, [students.length, courses.length, enrollments, categories])
 
   const maxMonthly = Math.max(...analytics.monthlyEnrollments.map((m) => m.count), 1)
 

@@ -62,5 +62,5 @@ export const createCourseSchema = z.object({
 
   status: courseStatusEnum.optional(),
 
-  categoryId: z.string().min(1, "Category is required"),
+  categoryId: z.array(z.string().min(1)).min(1, "At least one category is required"),
 });

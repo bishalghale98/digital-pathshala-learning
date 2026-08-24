@@ -67,10 +67,14 @@ export const createCourse = tryCatch(async (req: NextRequest) => {
       whatsappGroupLink: whatsappGroupLink || undefined,
       keywords: keywords || undefined,
       status: status || "DRAFT",
-      categoryId,
+      categories: {
+        create: categoryId.map((id) => ({ categoryId: id })),
+      },
     },
     include: {
-      category: true,
+      categories: {
+        include: { category: true },
+      },
     },
   });
 
@@ -80,7 +84,9 @@ export const createCourse = tryCatch(async (req: NextRequest) => {
 export const getCourses = tryCatch(async () => {
   const courses = await prisma.course.findMany({
     include: {
-      category: true,
+      categories: {
+        include: { category: true },
+      },
     },
     orderBy: { createdAt: "desc" },
   });
@@ -92,7 +98,9 @@ export const getCourse = tryCatch(async (req: NextRequest, id: string) => {
   const course = await prisma.course.findUnique({
     where: { id },
     include: {
-      category: true,
+      categories: {
+        include: { category: true },
+      },
     },
   });
 
@@ -161,6 +169,10 @@ export const updateCourse = tryCatch(async (req: NextRequest, id: string) => {
     }
   }
 
+  await prisma.courseCategory.deleteMany({
+    where: { courseId: id },
+  });
+
   const updatedCourse = await prisma.course.update({
     where: { id },
     data: {
@@ -174,10 +186,14 @@ export const updateCourse = tryCatch(async (req: NextRequest, id: string) => {
       whatsappGroupLink: whatsappGroupLink || undefined,
       keywords: keywords || undefined,
       status: status || "DRAFT",
-      categoryId,
+      categories: {
+        create: categoryId.map((catId) => ({ categoryId: catId })),
+      },
     },
     include: {
-      category: true,
+      categories: {
+        include: { category: true },
+      },
     },
   });
 

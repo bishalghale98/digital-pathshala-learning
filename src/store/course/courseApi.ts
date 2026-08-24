@@ -1,6 +1,13 @@
 import { baseApi } from "../api/base";
 import type { Category } from "../category/categoryApi";
 
+export interface CourseCategory {
+  id: string;
+  courseId: string;
+  categoryId: string;
+  category: Category;
+}
+
 export interface Course {
   id: string;
   title: string;
@@ -13,8 +20,7 @@ export interface Course {
   whatsappGroupLink?: string;
   keywords?: string;
   status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
-  categoryId: string;
-  category: Category;
+  categories: CourseCategory[];
   createdAt: string;
   updatedAt: string;
 }
@@ -30,7 +36,7 @@ export type CoursePayload = {
   whatsappGroupLink?: string;
   keywords?: string;
   status?: "DRAFT" | "PUBLISHED" | "ARCHIVED";
-  categoryId: string;
+  categoryId: string[];
 };
 
 export const courseApi = baseApi.injectEndpoints({

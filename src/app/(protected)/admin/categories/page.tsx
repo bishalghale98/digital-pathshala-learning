@@ -6,7 +6,7 @@ import CategoryAdd from '@/components/category/category-add'
 import {
   useDeleteCategoryMutation,
   useGetCategoriesQuery,
-  type Category,
+  type CategoryTree,
 } from '@/store/category/categoryApi'
 import { getErrorMessage } from '@/store/api/base'
 import { toast } from 'sonner'
@@ -14,8 +14,8 @@ import { ChevronDown, ChevronRight, Pencil, Trash2 } from 'lucide-react'
 
 
 const CategoriesPage = () => {
-  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null)
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null)
+  const [categoryToDelete, setCategoryToDelete] = useState<CategoryTree | null>(null)
+  const [editingCategory, setEditingCategory] = useState<CategoryTree | null>(null)
   const [expandedParents, setExpandedParents] = useState<Set<string>>(new Set())
 
   const { data: categories = [], isLoading } = useGetCategoriesQuery()
@@ -35,37 +35,28 @@ const CategoriesPage = () => {
 
   const hasSubcategories = useCallback(
     (categoryId: string) => {
-      return categories.some((c) => c.parent?.id === categoryId)
+      const cat = categories.find((c) => c.id === categoryId)
+      return (cat?.children?.length ?? 0) > 0
     },
     [categories]
   )
 
   const getSubcategoryCount = useCallback(
-    (category: Category) => {
-      return category._count?.children ?? 0
+    (category: CategoryTree) => {
+      return category.children?.length ?? 0
     },
     []
   )
 
-  const parentOptions = useMemo(() => {
-    return categories.filter((cat) => !cat.parent)
-  }, [categories])
-
-
+  const parentOptions = categories
 
   const sortedCategories = useMemo(() => {
-    const parentCats = categories.filter((c) => !c.parent)
-    const subCats = categories.filter((c) => c.parent)
+    const result: { category: CategoryTree; level: number }[] = []
 
-    const result: { category: Category; level: number }[] = []
-
-    for (const parent of parentCats) {
+    for (const parent of categories) {
       result.push({ category: parent, level: 0 })
       if (expandedParents.has(parent.id)) {
-        const children = subCats.filter(
-          (c) => c.parent?.id === parent.id
-        )
-        for (const child of children) {
+        for (const child of parent.children ?? []) {
           result.push({ category: child, level: 1 })
         }
       }
@@ -85,7 +76,7 @@ const CategoriesPage = () => {
     setCategoryToDelete(null)
   }, [categoryToDelete, deleteCategory])
 
-  const handleEdit = useCallback((category: Category) => {
+  const handleEdit = useCallback((category: CategoryTree) => {
     setEditingCategory(category)
   }, [])
 
@@ -103,7 +94,11 @@ const CategoriesPage = () => {
       <div className="p-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column: Add New Category Form */}
-          <CategoryAdd parentOptions={parentOptions} editingCategory={editingCategory} onSuccess={() => setEditingCategory(null)} />
+          <CategoryAdd
+            parentOptions={parentOptions}
+            editingCategory={editingCategory}
+            onSuccess={() => setEditingCategory(null)}
+          />
 
           {/* Right Column: Search, Table, and Actions */}
           <div className="lg:col-span-2">

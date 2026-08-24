@@ -18,5 +18,5 @@ export async function GET(req: NextRequest): Promise<Response> {
   if (checkAuth.status !== 200) {
     return checkAuth;
   }
-  return getCourses(req);
+  return getCourses();
 }

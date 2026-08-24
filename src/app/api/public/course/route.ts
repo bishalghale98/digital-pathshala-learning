@@ -5,7 +5,9 @@ export async function GET() {
   try {
     const courses = await prisma.course.findMany({
       include: {
-        category: true,
+        categories: {
+          include: { category: true },
+        },
       },
       orderBy: { createdAt: "desc" },
     });

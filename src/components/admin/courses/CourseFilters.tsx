@@ -2,18 +2,14 @@
 
 import React from 'react'
 import { Search, X } from 'lucide-react'
-
-interface Category {
-  id: string
-  name: string
-}
+import type { CategoryTree } from '@/store/category/categoryApi'
 
 interface CourseFiltersProps {
   search: string
   onSearchChange: (value: string) => void
   categoryFilter: string
   onCategoryChange: (value: string) => void
-  categories: Category[]
+  categories: CategoryTree[]
 }
 
 export const CourseFilters: React.FC<CourseFiltersProps> = ({
@@ -50,9 +46,12 @@ export const CourseFilters: React.FC<CourseFiltersProps> = ({
       >
         <option value="">All Categories</option>
         {categories.map((cat) => (
-          <option key={cat.id} value={cat.id}>
-            {cat.name}
-          </option>
+          <optgroup key={cat.id} label={cat.name}>
+            <option value={cat.id}>{cat.name}</option>
+            {cat.children?.map((child) => (
+              <option key={child.id} value={child.id}>{child.name}</option>
+            ))}
+          </optgroup>
         ))}
       </select>
     </div>

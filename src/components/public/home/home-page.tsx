@@ -179,9 +179,9 @@ export default function HomePage() {
                                     >
                                         <div className="h-44 bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center relative">
                                             <BookOpen className="w-10 h-10 text-white/70" />
-                                            {typeof course.categoryId === 'object' && course.categoryId && (
+                                            {course.categories && course.categories.length > 0 && (
                                                 <span className="absolute top-3 left-3 text-xs font-medium text-white bg-white/20 backdrop-blur-sm px-2.5 py-1 rounded-full">
-                                                    {course.categoryId.name}
+                                                    {course.categories[0].category.name}
                                                 </span>
                                             )}
                                         </div>
