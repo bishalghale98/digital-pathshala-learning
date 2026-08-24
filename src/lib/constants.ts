@@ -37,6 +37,8 @@ export const ROUTES = {
   ADMIN_ANALYTICS: '/admin/analytics',
   ADMIN_SETTINGS: '/admin/settings',
 
+  ADMIN_COURSE_CREATE: '/admin/courses?type=create',
+
   // Admin dynamic
   adminCourseLessons: (courseId: string) => `/admin/courses/${courseId}/lessons`,
 } as const;

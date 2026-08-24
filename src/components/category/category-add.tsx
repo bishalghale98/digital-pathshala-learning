@@ -50,7 +50,7 @@ const CategoryAdd = ({ parentOptions, editingCategory, onSuccess }: CategoryAddP
     const watchedName = watch("name");
 
     useEffect(() => {
-        const slug = getSlug(watchedName || "");
+        const slug = getSlug(watchedName ?? "");
         setValue("slug", slug, {
             shouldValidate: true,
             shouldDirty: true,

@@ -4,6 +4,15 @@ import { errorResponse, successResponse } from "@/utils/response";
 import { tryCatch } from "@/utils/tryCatch";
 import { NextRequest } from "next/server";
 
+function generateSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
+}
+
 export const createCourse = tryCatch(async (req: NextRequest) => {
   const body = await req.json();
 
@@ -14,7 +23,19 @@ export const createCourse = tryCatch(async (req: NextRequest) => {
     return errorResponse("Invalid course data", 400);
   }
 
-  const { title, description, duration, price, categoryId } = parsed.data;
+  const {
+    title,
+    slug,
+    shortDescription,
+    description,
+    duration,
+    price,
+    thumbnail,
+    whatsappGroupLink,
+    keywords,
+    status,
+    categoryId,
+  } = parsed.data;
 
   const existingCourse = await prisma.course.findFirst({
     where: { title },
@@ -24,12 +45,28 @@ export const createCourse = tryCatch(async (req: NextRequest) => {
     return errorResponse("Course already exists", 409);
   }
 
+  const courseSlug = slug || generateSlug(title);
+
+  const existingSlug = await prisma.course.findUnique({
+    where: { slug: courseSlug },
+  });
+
+  if (existingSlug) {
+    return errorResponse("A course with this slug already exists", 409);
+  }
+
   const course = await prisma.course.create({
     data: {
       title,
+      slug: courseSlug,
+      shortDescription: shortDescription || "",
       description,
       duration,
       price,
+      thumbnail: thumbnail || undefined,
+      whatsappGroupLink: whatsappGroupLink || undefined,
+      keywords: keywords || undefined,
+      status: status || "DRAFT",
       categoryId,
     },
     include: {
@@ -94,15 +131,49 @@ export const updateCourse = tryCatch(async (req: NextRequest, id: string) => {
     return errorResponse("Invalid course data", 400);
   }
 
-  const { title, description, duration, price, categoryId } = parsed.data;
+  const {
+    title,
+    slug,
+    shortDescription,
+    description,
+    duration,
+    price,
+    thumbnail,
+    whatsappGroupLink,
+    keywords,
+    status,
+    categoryId,
+  } = parsed.data;
+
+  const existingCourse = await prisma.course.findUnique({ where: { id } });
+  if (!existingCourse) {
+    return errorResponse("Course not found", 404);
+  }
+
+  const courseSlug = slug || generateSlug(title);
+
+  if (courseSlug !== existingCourse.slug) {
+    const slugConflict = await prisma.course.findUnique({
+      where: { slug: courseSlug },
+    });
+    if (slugConflict) {
+      return errorResponse("A course with this slug already exists", 409);
+    }
+  }
 
   const updatedCourse = await prisma.course.update({
     where: { id },
     data: {
       title,
+      slug: courseSlug,
+      shortDescription: shortDescription || "",
       description,
       duration,
       price,
+      thumbnail: thumbnail || undefined,
+      whatsappGroupLink: whatsappGroupLink || undefined,
+      keywords: keywords || undefined,
+      status: status || "DRAFT",
       categoryId,
     },
     include: {

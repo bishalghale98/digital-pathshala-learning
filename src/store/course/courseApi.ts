@@ -4,18 +4,32 @@ import type { Category } from "../category/categoryApi";
 export interface Course {
   id: string;
   title: string;
+  slug: string;
+  shortDescription?: string;
   description: string;
-  duration: number;
+  thumbnail?: string;
+  duration: string;
   price: number;
-  categoryId: Category | string;
+  whatsappGroupLink?: string;
+  keywords?: string;
+  status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
+  categoryId: string;
+  category: Category;
   createdAt: string;
+  updatedAt: string;
 }
 
 export type CoursePayload = {
   title: string;
+  slug?: string;
+  shortDescription?: string;
   description: string;
   duration: string | number;
   price: number;
+  thumbnail?: string;
+  whatsappGroupLink?: string;
+  keywords?: string;
+  status?: "DRAFT" | "PUBLISHED" | "ARCHIVED";
   categoryId: string;
 };
 
@@ -24,7 +38,9 @@ export const courseApi = baseApi.injectEndpoints({
     //get all courses
     getCourses: builder.query<Course[], void>({
       query: () => "course",
-      transformResponse: (res: { data: Course[] }) => res.data,
+      transformResponse: (res: { data: Course[] }) => {
+        return res.data
+      },
       providesTags: [{ type: "Course", id: "LIST" }],
     }),
     // create course

@@ -1,5 +1,5 @@
 export const getSlug = (value: string): string => {
-    return value
+    return (value || "")
         .toLowerCase()
         .trim()
         .replace(/[^a-z0-9\s-]/g, "")

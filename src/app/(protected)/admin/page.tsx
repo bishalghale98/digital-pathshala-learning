@@ -205,20 +205,20 @@ const AdminPage = () => {
             <div className="p-6 text-sm text-gray-500 text-center">No users yet</div>
           ) : (
             <div className="divide-y divide-gray-50">
-              {recentStudents.map((student) => (
+                  {recentStudents.map((student) => (
                 <div key={student.id} className="flex items-center gap-3 px-6 py-3 hover:bg-gray-50 transition-colors">
                   {student.image ? (
                     <img src={student.image} alt={student.name} className="w-9 h-9 rounded-full object-cover" />
                   ) : (
                     <div className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center">
                       <span className="text-sm font-medium text-gray-600">
-                        {student.name.charAt(0).toUpperCase()}
+                        {student.name?.charAt(0)?.toUpperCase() || '?'}
                       </span>
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">{student.name}</p>
-                    <p className="text-xs text-gray-500 truncate">{student.email}</p>
+                    <p className="text-sm font-medium text-gray-900 truncate">{student.name || 'Unknown'}</p>
+                    <p className="text-xs text-gray-500 truncate">{student.email || ''}</p>
                   </div>
                 </div>
               ))}

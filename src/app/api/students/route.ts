@@ -10,5 +10,5 @@ export async function GET(req: NextRequest) {
     return checkAuth;
   }
 
-  return getStudents(req);
+  return getStudents();
 }

@@ -1,4 +1,5 @@
 import prisma from "@/database/prisma";
+import { Roles } from "@/lib/constants";
 import { successResponse } from "@/utils/response";
 import { tryCatch } from "@/utils/tryCatch";
 import { NextRequest } from "next/server";
@@ -7,18 +8,11 @@ export const getStudents = tryCatch(async () => {
   // Note: Students are managed by Better Auth in a separate table
   // For now, we return enrollments as a proxy for students
   // In a real implementation, you would query the Better Auth user table
-  const enrollments = await prisma.enrollment.findMany({
-    select: {
-      studentId: true,
+  const students = await prisma.user.findMany({
+    where: {
+      role: Roles.Student,
     },
-    distinct: ["studentId"],
-    orderBy: { createdAt: "desc" },
   });
-
-  const students = enrollments.map((e) => ({
-    id: e.studentId,
-  }));
-
   return successResponse("Student fetch successfully", students);
 });
 

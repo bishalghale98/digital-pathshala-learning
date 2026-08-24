@@ -92,11 +92,11 @@ const StudentsPage = () => {
                         ) : (
                           <div className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center">
                             <span className="text-sm font-medium text-gray-600">
-                              {student.name.charAt(0).toUpperCase()}
+                              {student.name?.charAt(0)?.toUpperCase() || '?'}
                             </span>
                           </div>
                         )}
-                        <span className="text-sm font-medium text-gray-900">{student.name}</span>
+                        <span className="text-sm font-medium text-gray-900">{student.name || 'Unknown'}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
