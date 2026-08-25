@@ -33,6 +33,9 @@ export const getCourses = cache(async () => {
                 },
             },
         },
+        orderBy: {
+            createdAt: "desc",
+        }
     });
 });
 
