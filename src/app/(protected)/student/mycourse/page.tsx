@@ -13,13 +13,7 @@ import { BookOpen, Play, Clock, ArrowRight } from 'lucide-react'
 import { ROUTES } from '@/lib/constants'
 import type { Lesson } from '@/store/lesson/lessonApi'
 import type { MyCourse } from '@/store/student/studentApi'
-import type { Course } from '@/store/course/courseApi'
-
-const getCourse = (enroll: MyCourse): Course | null =>
-  typeof enroll.courseId === 'object' ? (enroll.courseId as Course) : null
-
-const getCourseId = (courseId: string | { id: string }) =>
-  typeof courseId === 'string' ? courseId : courseId.id
+import { getCourse, getCourseId } from '@/lib/utils/enrollment'
 
 type FilterTab = 'all' | 'in-progress' | 'completed'
 

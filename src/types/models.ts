@@ -1,10 +1,3 @@
-// ====== Status Enum ======
-export enum Status {
-  Pending = "Pending",
-  Completed = "Completed",
-  Failed = "Failed",
-}
-
 // ====== Enrollment Status Enum ======
 export enum EnrollmentStatus {
   Approved = "Approved",

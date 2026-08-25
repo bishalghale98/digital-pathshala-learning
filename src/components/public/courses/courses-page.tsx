@@ -5,9 +5,16 @@ import Link from 'next/link';
 import { useGetPublicCoursesQuery } from '@/store/public/publicApi';
 import { ROUTES } from '@/lib/constants';
 import { BookOpen, Clock, ArrowRight, Loader2 } from 'lucide-react';
+import { PublicCourse } from '@/lib/queries/course';
 
-export default function CoursesPage() {
-    const { data: courses = [], isLoading, error } = useGetPublicCoursesQuery();
+
+type CoursesPageProps = {
+    courses: PublicCourse[]
+}
+
+
+export default function CoursesPage({ courses }: CoursesPageProps) {
+
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -21,15 +28,7 @@ export default function CoursesPage() {
 
             {/* Course Grid */}
             <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {isLoading ? (
-                    <div className="flex items-center justify-center py-20">
-                        <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
-                    </div>
-                ) : error ? (
-                    <div className="text-center py-20">
-                        <p className="text-gray-500">Failed to load courses. Please try again later.</p>
-                    </div>
-                ) : courses.length === 0 ? (
+                {courses.length === 0 ? (
                     <div className="text-center py-20">
                         <BookOpen className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                         <p className="text-gray-500 text-lg">No courses available yet.</p>
@@ -40,7 +39,7 @@ export default function CoursesPage() {
                         {courses.map((course) => (
                             <Link
                                 key={course.id}
-                                href={ROUTES.courseDetail(course.id)}
+                                href={ROUTES.courseDetail(course.slug)}
                                 className="group bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300"
                             >
                                 <div className="h-48 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">

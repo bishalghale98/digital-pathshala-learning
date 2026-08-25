@@ -1,11 +1,5 @@
 import React from 'react'
-
-interface DashboardStatCardProps {
-  title: string
-  value: string | number
-  icon: React.ReactNode
-  color: 'blue' | 'green' | 'purple' | 'yellow'
-}
+import type { StatCardProps } from './types'
 
 const colorMap = {
   blue: 'bg-blue-50 text-blue-600',
@@ -14,7 +8,7 @@ const colorMap = {
   yellow: 'bg-yellow-50 text-yellow-600',
 }
 
-const DashboardStatCard: React.FC<DashboardStatCardProps> = ({
+const DashboardStatCard: React.FC<StatCardProps> = ({
   title,
   value,
   icon,

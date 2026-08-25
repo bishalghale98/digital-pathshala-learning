@@ -14,7 +14,7 @@ export const ROUTES = {
   UNAUTHORIZED: '/unauthorized',
 
   // Dynamic public
-  courseDetail: (id: string) => `/courses/${id}`,
+  courseDetail: (slug: string) => `/courses/${slug}`,
 
   // Student dashboard
   STUDENT_DASHBOARD: '/student',

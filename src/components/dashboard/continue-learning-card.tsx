@@ -5,19 +5,12 @@ import { useRouter } from 'next/navigation'
 import { ROUTES } from '@/lib/constants'
 import { Play, Clock, BookOpen } from 'lucide-react'
 import type { MyCourse } from '@/store/student/studentApi'
-import type { Course } from '@/store/course/courseApi'
 import type { Lesson } from '@/store/lesson/lessonApi'
+import { getCourse } from '@/lib/utils/enrollment'
 
 interface ContinueLearningCardProps {
   enrollment: MyCourse
   totalLessons: number
-}
-
-const getCourse = (enrollment: MyCourse): Course | null => {
-  if (typeof enrollment.courseId === 'object' && enrollment.courseId !== null) {
-    return enrollment.courseId as Course
-  }
-  return null
 }
 
 const getLesson = (
@@ -42,10 +35,7 @@ const ContinueLearningCard: React.FC<ContinueLearningCardProps> = ({
   if (!course) return null
 
   const handleContinue = () => {
-    const courseId =
-      typeof enrollment.courseId === 'string'
-        ? enrollment.courseId
-        : (enrollment.courseId as Course).id
+    const courseId = enrollment.courseId as string
 
     if (lastLesson) {
       router.push(ROUTES.studentVideoPlay(courseId, lastLesson.id))

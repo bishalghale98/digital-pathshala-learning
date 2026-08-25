@@ -15,10 +15,6 @@ export const enrollmentCreateSchema = z.object({
   paymentMethod: z.enum([PaymentMethod.Esewa, PaymentMethod.Khalti]),
 });
 
-export const enrollmentUpdateSchema = z.object({
-  whatsApp: z.string().optional(),
-});
-
 export const enrollmentStatusSchema = z.object({
   enrollmentStatus: z.enum([
     EnrollmentStatus.Approved,

@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
   if (checkAuth.status !== 200) {
     return checkAuth;
   }
-  return getLessons(req);
+  return getLessons();
 }
 
 export async function POST(req: NextRequest) {

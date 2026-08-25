@@ -2,9 +2,9 @@ import prisma from "@/database/prisma";
 import { enrollmentCreateSchema, enrollmentStatusSchema } from "@/schemas/enrollmentSchema";
 import { errorResponse, successResponse } from "@/utils/response";
 import { tryCatch } from "@/utils/tryCatch";
-import axios from "axios";
+
 import { NextRequest } from "next/server";
-import { populateStudentObj, populateStudents } from "./helper.controller";
+
 
 export const getEnrollments = tryCatch(async () => {
   const enrollments = await prisma.enrollment.findMany({
@@ -14,9 +14,7 @@ export const getEnrollments = tryCatch(async () => {
     orderBy: { createdAt: "desc" },
   });
 
-  const populatedEnrollments = await populateStudents(enrollments);
-
-  return successResponse("Successfully fetched enrollments", populatedEnrollments, 200);
+  return successResponse("Successfully fetched enrollments", enrollments, 200);
 });
 
 export const createEnrollment = tryCatch(async (req: NextRequest) => {
@@ -78,30 +76,37 @@ export const createEnrollment = tryCatch(async (req: NextRequest) => {
     const data = {
       return_url: `${base_url}/student/courses`,
       website_url: `${base_url}`,
-      amount: Math.round(courseData.price * 100),
+      amount: Number(courseData.price),
       purchase_order_id: enrollment.id,
       purchase_order_name: courseData.title,
     };
 
     try {
-      const res = await axios.post(
+      const res = await fetch(
         "https://dev.khalti.com/api/v2/epayment/initiate/",
-        data,
         {
+          method: "POST",
           headers: {
+            "Content-Type": "application/json",
             Authorization: `key ${khaltiSecretKey}`,
           },
+          body: JSON.stringify(data),
         }
       );
 
-      payment_url = res.data.payment_url;
+      if (!res.ok) {
+        throw new Error(`Khalti API error: ${res.status}`);
+      }
+
+      const responseData = await res.json();
+      payment_url = responseData.payment_url;
 
       await prisma.payment.create({
         data: {
           enrollmentId: enrollment.id,
-          amount: courseData.price,
+          amount: Number(courseData.price),
           paymentMethod: "khalti",
-          pidx: res.data.pidx as string,
+          pidx: responseData.pidx as string,
         },
       });
     } catch {
@@ -133,9 +138,7 @@ export const getEnrollment = tryCatch(async (req: NextRequest, id: string) => {
     return errorResponse("Enrollment not found", 404);
   }
 
-  const populatedEnrollments = await populateStudents([enrollment]);
-
-  return successResponse("Successfully fetched enrollment", populatedEnrollments?.[0] || enrollment, 200);
+  return successResponse("Successfully fetched enrollment", enrollment, 200);
 });
 
 export const deleteEnrollment = tryCatch(async (req: NextRequest, id: string) => {
@@ -172,7 +175,5 @@ export const changeEnrollmentStatus = tryCatch(async (req: NextRequest, id: stri
     },
   });
 
-  const populatedEnrollments = await populateStudentObj(updatedEnrollment);
-
-  return successResponse("Enrollment status updated successfully", populatedEnrollments, 200);
+  return successResponse("Enrollment status updated successfully", updatedEnrollment, 200);
 });

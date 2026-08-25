@@ -5,18 +5,11 @@ import { useRouter } from 'next/navigation'
 import { ROUTES } from '@/lib/constants'
 import { Play, BookOpen } from 'lucide-react'
 import type { MyCourse } from '@/store/student/studentApi'
-import type { Course } from '@/store/course/courseApi'
+import { getCourse } from '@/lib/utils/enrollment'
 
 interface EnrolledCourseCardProps {
   enrollment: MyCourse
   totalLessons: number
-}
-
-const getCourse = (enrollment: MyCourse): Course | null => {
-  if (typeof enrollment.courseId === 'object' && enrollment.courseId !== null) {
-    return enrollment.courseId as Course
-  }
-  return null
 }
 
 const EnrolledCourseCard: React.FC<EnrolledCourseCardProps> = ({
@@ -30,11 +23,7 @@ const EnrolledCourseCard: React.FC<EnrolledCourseCardProps> = ({
 
   if (!course) return null
 
-  const courseId =
-    typeof enrollment.courseId === 'string'
-      ? enrollment.courseId
-      : (enrollment.courseId as Course).id
-
+  const courseId = enrollment.courseId as string
   const handleContinue = () => {
     router.push(ROUTES.studentCourseSyllabus(courseId))
   }

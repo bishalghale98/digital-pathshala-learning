@@ -6,16 +6,12 @@ import React from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { ROUTES } from '@/lib/constants'
 import type { Lesson } from '@/store/lesson/lessonApi'
+import { getCourseId } from '@/lib/utils/enrollment'
 
 interface CourseSyallabusProps {
     lessons: Lesson[]
     isLoading?: boolean
 }
-
-
-
-const getCourseId = (courseId: string | { id: string; title?: string }) =>
-    typeof courseId === "string" ? courseId : courseId.id
 
 const CourseSyallabus: React.FC<CourseSyallabusProps> = ({ lessons, isLoading = false }) => {
     const router = useRouter()

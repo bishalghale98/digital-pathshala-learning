@@ -23,7 +23,7 @@ export const createLesson = tryCatch(async (req: NextRequest) => {
     return errorResponse("Invalid lesson data", 400);
   }
 
-  const { courseId, title, description, videoUrl, lessonNumber } = parsed.data;
+  const { courseId, title, description, videoUrl } = parsed.data;
 
   const lesson = await prisma.lesson.create({
     data: {
@@ -31,7 +31,6 @@ export const createLesson = tryCatch(async (req: NextRequest) => {
       title,
       description: description || undefined,
       videoUrl: videoUrl || undefined,
-      lessonNumber: lessonNumber || 0,
     },
     include: {
       course: true,
@@ -80,7 +79,7 @@ export const updateLesson = tryCatch(async (req: NextRequest, id: string) => {
     return errorResponse("Invalid lesson data", 400);
   }
 
-  const { courseId, title, description, videoUrl, lessonNumber } = parsed.data;
+  const { courseId, title, description, videoUrl } = parsed.data;
 
   const updatedLesson = await prisma.lesson.update({
     where: { id },
@@ -89,7 +88,6 @@ export const updateLesson = tryCatch(async (req: NextRequest, id: string) => {
       ...(title !== undefined && { title }),
       ...(description !== undefined && { description }),
       ...(videoUrl !== undefined && { videoUrl }),
-      ...(lessonNumber !== undefined && { lessonNumber }),
     },
     include: {
       course: true,

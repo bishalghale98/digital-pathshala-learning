@@ -1,5 +1,5 @@
 import React from 'react'
-import ArrowIcon from '../../common/arrow-icon'
+import { ArrowRight } from 'lucide-react'
 
 
 interface CourseCardProps {
@@ -7,7 +7,7 @@ interface CourseCardProps {
   title: string
   description: string
   price: number
-  duration: number;
+  duration: string;
   category: string
   openModal: (id: string) => void
 }
@@ -68,7 +68,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
         <button onClick={() => openModal(id)} className="flex items-center justify-between  w-full px-5 py-4  bg-white/10 hover:bg-white/20  backdrop-blur-sm rounded-xl  text-white transition-all duration-300 group/btnborder border-white/20 hover:border-white/30 hover:scale-[1.02] ">
           <span className="font-semibold text-sm tracking-wide">Enroll To Course</span>
           <div className="flex items-center">
-            <ArrowIcon />
+            <ArrowRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
           </div>
         </button>
 

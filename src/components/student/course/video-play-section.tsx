@@ -6,15 +6,13 @@ import React from 'react'
 import { ROUTES } from '@/lib/constants'
 import { ArrowLeft, ChevronLeft, ChevronRight, Play } from 'lucide-react'
 import type { Lesson } from '@/store/lesson/lessonApi'
+import { getCourseId } from '@/lib/utils/enrollment'
 
 interface VideoPlaySectionProps {
     lessons: Lesson[]
     activeLesson: Lesson | null
     isLoading?: boolean
 }
-
-const getCourseId = (courseId: string | { id: string; title?: string }) =>
-    typeof courseId === "string" ? courseId : courseId.id
 
 const VideoPlaySection: React.FC<VideoPlaySectionProps> = ({
     lessons,

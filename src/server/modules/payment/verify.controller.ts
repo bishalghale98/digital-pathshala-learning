@@ -1,7 +1,7 @@
 import prisma from "@/database/prisma";
 import { errorResponse, successResponse } from "@/utils/response";
 import { tryCatch } from "@/utils/tryCatch";
-import axios from "axios";
+
 import { NextRequest } from "next/server";
 
 export const paymentVerification = tryCatch(async (req: NextRequest) => {
@@ -11,7 +11,7 @@ export const paymentVerification = tryCatch(async (req: NextRequest) => {
     return errorResponse("pidx is required", 400);
   }
 
-  const payment = await prisma.payment.findUnique({
+  const payment = await prisma.payment.findFirst({
     where: { pidx },
     include: {
       enrollment: true,
@@ -22,17 +22,24 @@ export const paymentVerification = tryCatch(async (req: NextRequest) => {
     return errorResponse("Payment record not found for this pidx", 404);
   }
 
-  const res = await axios.post(
+  const res = await fetch(
     "https://dev.khalti.com/api/v2/epayment/lookup/",
-    { pidx },
     {
+      method: "POST",
       headers: {
+        "Content-Type": "application/json",
         Authorization: `key ${process.env.KHALTI_SECRET_KEY}`,
       },
+      body: JSON.stringify({ pidx }),
     }
   );
 
-  const { status, transaction_id, total_amount } = res.data;
+  if (!res.ok) {
+    return errorResponse("Failed to verify payment with Khalti", 502);
+  }
+
+  const responseData = await res.json();
+  const { status, transaction_id, total_amount } = responseData;
 
   const updatedPayment = await prisma.payment.update({
     where: { id: payment.id },

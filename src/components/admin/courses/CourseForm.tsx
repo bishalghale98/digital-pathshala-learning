@@ -17,7 +17,7 @@ import {
 } from '@/store/course/courseApi'
 import { useGetCategoriesQuery, type CategoryTree } from '@/store/category/categoryApi'
 import { getErrorMessage } from '@/store/api/base'
-import { RichTextEditor } from '@/components/editor'
+import { RichTextEditor } from '@/components/editor/rich-text-editor'
 
 type FormData = z.infer<typeof createCourseSchema>
 

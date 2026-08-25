@@ -3,15 +3,7 @@ import { createCourseSchema } from "@/schemas/courseSchema";
 import { errorResponse, successResponse } from "@/utils/response";
 import { tryCatch } from "@/utils/tryCatch";
 import { NextRequest } from "next/server";
-
-function generateSlug(title: string): string {
-  return title
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-");
-}
+import { getSlug } from "@/lib/helper/helper";
 
 export const createCourse = tryCatch(async (req: NextRequest) => {
   const body = await req.json();
@@ -45,7 +37,7 @@ export const createCourse = tryCatch(async (req: NextRequest) => {
     return errorResponse("Course already exists", 409);
   }
 
-  const courseSlug = slug || generateSlug(title);
+  const courseSlug = slug || getSlug(title);
 
   const existingSlug = await prisma.course.findUnique({
     where: { slug: courseSlug },
@@ -158,7 +150,7 @@ export const updateCourse = tryCatch(async (req: NextRequest, id: string) => {
     return errorResponse("Course not found", 404);
   }
 
-  const courseSlug = slug || generateSlug(title);
+  const courseSlug = slug || getSlug(title);
 
   if (courseSlug !== existingCourse.slug) {
     const slugConflict = await prisma.course.findUnique({

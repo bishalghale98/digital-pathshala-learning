@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
     
     return checkAuth;
   }
-  return getEnrollments(req);
+  return getEnrollments();
 }
 
 export async function POST(req: NextRequest) {

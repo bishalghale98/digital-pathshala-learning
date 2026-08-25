@@ -1,4 +1,4 @@
-import { RichTextContent } from "@/components/editor";
+import CourseDetailPage from "@/components/public/courses/course-detail-page";
 import { prisma } from "@/database/prisma";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -10,6 +10,19 @@ const getCourseDetailBySlug = async (slug: string) => {
             categories: {
                 include: {
                     category: true,
+                },
+            },
+            lessons: {
+                orderBy: { lessonNumber: "asc" },
+                select: {
+                    id: true,
+                    title: true,
+                    lessonNumber: true,
+                },
+            },
+            _count: {
+                select: {
+                    enrollments: true,
                 },
             },
         },
@@ -123,11 +136,7 @@ const CourseDetail = async ({
     }
 
     return (
-        <div>
-            <h1>{course.title}</h1>
-
-            <RichTextContent content={course.description} />
-        </div>
+        <CourseDetailPage course={JSON.parse(JSON.stringify(course))} />
     );
 };
 

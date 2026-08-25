@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback, useState, useMemo } from 'react'
+import React, { Suspense, useCallback, useState, useMemo } from 'react'
 import ConfirmationModal from '@/components/common/delete-modal'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ROUTES } from '@/lib/constants'
@@ -15,7 +15,7 @@ import { toast } from 'sonner'
 import { CourseHeader, CourseFilters, CourseTable } from '@/components/admin/courses'
 import CourseForm from '@/components/admin/courses/CourseForm';
 
-const CoursesPage = () => {
+const CoursesPageContent = () => {
   const router = useRouter()
   const searchParams = useSearchParams();
 
@@ -113,5 +113,11 @@ const CoursesPage = () => {
       </div>
     )
   }
+
+const CoursesPage = () => (
+  <Suspense>
+    <CoursesPageContent />
+  </Suspense>
+)
 
   export default CoursesPage

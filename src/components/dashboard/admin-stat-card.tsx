@@ -1,9 +1,4 @@
-interface StatCardProps {
-    title: string
-    value: string | number
-    icon: React.ReactNode
-    color: 'blue' | 'green' | 'purple' | 'yellow'
-}
+import type { StatCardProps } from './types'
 
 const colors = {
     blue: 'bg-blue-100 text-blue-700',

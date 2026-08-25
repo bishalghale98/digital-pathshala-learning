@@ -1,5 +1,8 @@
 import type { Metadata } from 'next';
 import CoursesPage from '@/components/public/courses/courses-page';
+import { getCourses } from '@/lib/queries/course';
+
+
 
 export const metadata: Metadata = {
   title: 'Courses',
@@ -13,6 +16,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default function CoursesRoute() {
-  return <CoursesPage />;
+export default async function CoursesRoute() {
+
+  const courses = await getCourses();
+
+
+
+  return <CoursesPage courses={JSON.parse(JSON.stringify(courses))} />;
 }
