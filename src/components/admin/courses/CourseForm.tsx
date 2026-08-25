@@ -18,6 +18,7 @@ import {
 import { useGetCategoriesQuery, type CategoryTree } from '@/store/category/categoryApi'
 import { getErrorMessage } from '@/store/api/base'
 import { RichTextEditor } from '@/components/editor/rich-text-editor'
+import { ImageUpload } from '@/components/common/image-upload'
 
 type FormData = z.infer<typeof createCourseSchema>
 
@@ -372,17 +373,23 @@ const CourseForm = ({ editingCourse }: CourseFormProps) => {
               </div>
             </div>
 
-            {/* Thumbnail URL */}
+            {/* Thumbnail */}
             <div className="bg-white border border-gray-300 rounded shadow-sm">
               <div className="px-4 py-3 border-b border-gray-200 font-semibold text-gray-700 bg-gray-50">
                 Course Thumbnail
               </div>
               <div className="p-4 space-y-3">
-                <input
-                  type="url"
-                  {...register('thumbnail')}
-                  className={getInputClass(!!errors.thumbnail)}
-                  placeholder="https://example.com/image.jpg"
+                <ImageUpload
+                  value={watch('thumbnail') ?? ''}
+                  onChange={(key) =>
+                    setValue('thumbnail', key, {
+                      shouldValidate: true,
+                      shouldDirty: true,
+                    })
+                  }
+                  context="course"
+                  entityId={editingCourse?.id}
+                  disabled={isSubmitting}
                 />
                 {errors.thumbnail && (
                   <p className="mt-1 text-xs text-red-500">

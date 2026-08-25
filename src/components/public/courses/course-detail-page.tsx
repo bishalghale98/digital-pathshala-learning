@@ -10,6 +10,7 @@ import EnrollModal from '@/components/student/course/enroll-modal'
 import Link from 'next/link'
 import { ROUTES } from '@/lib/constants'
 import { PublicCourse } from '@/lib/queries/course';
+import { resolveImageUrl } from '@/lib/storage/url'
 
 
 type CourseDetailPageProps = {
@@ -20,6 +21,9 @@ const CourseDetailPage = ({ course }: CourseDetailPageProps) => {
     const [showAllLessons, setShowAllLessons] = useState(false)
     const [enrollOpen, setEnrollOpen] = useState(false)
     const formattedPrice = course.price.toString()
+    const thumbnailUrl = resolveImageUrl(course.thumbnail)
+
+    console.log('thumbnailUrl', thumbnailUrl)
 
 
 
@@ -100,10 +104,10 @@ const CourseDetailPage = ({ course }: CourseDetailPageProps) => {
 
                         {/* Right: Thumbnail */}
                         <div className="hidden lg:block">
-                            {course.thumbnail ? (
+                            {thumbnailUrl ? (
                                 <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl border border-white/10">
                                     <Image
-                                        src={course.thumbnail}
+                                        src={thumbnailUrl}
                                         alt={course.title}
                                         fill
                                         className="object-cover"
@@ -121,11 +125,11 @@ const CourseDetailPage = ({ course }: CourseDetailPageProps) => {
             </section>
 
             {/* Mobile Thumbnail */}
-            {course.thumbnail && (
+            {thumbnailUrl && (
                 <div className="lg:hidden -mt-8 relative z-10 px-4">
                     <div className="relative aspect-video rounded-2xl overflow-hidden shadow-xl border border-gray-200">
                         <Image
-                            src={course.thumbnail}
+                            src={thumbnailUrl}
                             alt={course.title}
                             fill
                             className="object-cover"

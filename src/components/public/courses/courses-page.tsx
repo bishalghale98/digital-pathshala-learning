@@ -2,10 +2,12 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useGetPublicCoursesQuery } from '@/store/public/publicApi';
 import { ROUTES } from '@/lib/constants';
 import { BookOpen, Clock, ArrowRight, Loader2 } from 'lucide-react';
 import { PublicCourse } from '@/lib/queries/course';
+import { resolveImageUrl } from '@/lib/storage/url';
 
 
 type CoursesPageProps = {
@@ -36,14 +38,27 @@ export default function CoursesPage({ courses }: CoursesPageProps) {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {courses.map((course) => (
+                        {courses.map((course) => {
+                            const thumbnailUrl = resolveImageUrl(course.thumbnail)
+                            return (
                             <Link
                                 key={course.id}
                                 href={ROUTES.courseDetail(course.slug)}
                                 className="group bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300"
                             >
-                                <div className="h-48 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                                    <BookOpen className="w-12 h-12 text-white/80" />
+                                <div className="h-48 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center overflow-hidden">
+                                    {thumbnailUrl ? (
+                                        <Image
+                                            src={thumbnailUrl}
+                                            alt={course.title}
+                                            width={400}
+                                            height={200}
+                                            className="w-full h-full object-cover"
+                                            unoptimized
+                                        />
+                                    ) : (
+                                        <BookOpen className="w-12 h-12 text-white/80" />
+                                    )}
                                 </div>
                                 <div className="p-5">
                                     <div className="flex items-center gap-2 mb-2">
@@ -74,7 +89,7 @@ export default function CoursesPage({ courses }: CoursesPageProps) {
                                     </div>
                                 </div>
                             </Link>
-                        ))}
+                        )})}
                     </div>
                 )}
             </section>

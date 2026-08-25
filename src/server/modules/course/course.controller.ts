@@ -4,6 +4,7 @@ import { errorResponse, successResponse } from "@/utils/response";
 import { tryCatch } from "@/utils/tryCatch";
 import { NextRequest } from "next/server";
 import { getSlug } from "@/lib/helper/helper";
+import { deleteFromR2, isR2Key } from "@/lib/storage/r2";
 
 export const createCourse = tryCatch(async (req: NextRequest) => {
   const body = await req.json();
@@ -112,6 +113,14 @@ export const deleteCourse = tryCatch(async (req: NextRequest, id: string) => {
     return errorResponse("Course not found", 404);
   }
 
+  if (course.thumbnail && isR2Key(course.thumbnail)) {
+    try {
+      await deleteFromR2(course.thumbnail);
+    } catch {
+      // Log but don't fail the delete if R2 cleanup fails
+    }
+  }
+
   await prisma.lesson.deleteMany({
     where: { courseId: id },
   });
@@ -161,6 +170,21 @@ export const updateCourse = tryCatch(async (req: NextRequest, id: string) => {
     }
   }
 
+  const newThumbnail = thumbnail || undefined;
+
+  if (
+    newThumbnail &&
+    existingCourse.thumbnail &&
+    newThumbnail !== existingCourse.thumbnail &&
+    isR2Key(existingCourse.thumbnail)
+  ) {
+    try {
+      await deleteFromR2(existingCourse.thumbnail);
+    } catch {
+      // Log but don't fail the update if R2 cleanup fails
+    }
+  }
+
   await prisma.courseCategory.deleteMany({
     where: { courseId: id },
   });
@@ -174,7 +198,7 @@ export const updateCourse = tryCatch(async (req: NextRequest, id: string) => {
       description,
       duration,
       price,
-      thumbnail: thumbnail || undefined,
+      thumbnail: newThumbnail,
       whatsappGroupLink: whatsappGroupLink || undefined,
       keywords: keywords || undefined,
       status: status || "DRAFT",

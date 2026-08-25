@@ -2,6 +2,7 @@ import CourseDetailPage from "@/components/public/courses/course-detail-page";
 import { prisma } from "@/database/prisma";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { resolveImageUrl } from "@/lib/storage/url";
 
 const getCourseDetailBySlug = async (slug: string) => {
     const course = await prisma.course.findUnique({
@@ -92,14 +93,19 @@ export async function generateMetadata({
             description,
             type: "article",
 
-            ...(course.thumbnail && {
-                images: [
-                    {
-                        url: course.thumbnail,
-                        alt: course.title,
-                    },
-                ],
-            }),
+            ...(() => {
+                const thumbnailUrl = resolveImageUrl(course.thumbnail);
+                return thumbnailUrl
+                    ? {
+                        images: [
+                            {
+                                url: thumbnailUrl,
+                                alt: course.title,
+                            },
+                        ],
+                    }
+                    : {};
+            })(),
         },
 
         twitter: {
@@ -107,9 +113,12 @@ export async function generateMetadata({
             title: course.title,
             description,
 
-            ...(course.thumbnail && {
-                images: [course.thumbnail],
-            }),
+            ...(() => {
+                const thumbnailUrl = resolveImageUrl(course.thumbnail);
+                return thumbnailUrl
+                    ? { images: [thumbnailUrl] }
+                    : {};
+            })(),
         },
 
         alternates: {

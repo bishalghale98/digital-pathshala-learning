@@ -43,7 +43,6 @@ export const createCourseSchema = z.object({
   thumbnail: z
     .string()
     .trim()
-    .url("Thumbnail must be a valid URL")
     .optional()
     .or(z.literal("")),
 
