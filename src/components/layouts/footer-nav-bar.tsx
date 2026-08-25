@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { authClient } from '@/lib/auth-client';
@@ -12,13 +12,16 @@ const FooterNavBar = () => {
     const pathname = usePathname();
     const { data: session } = authClient.useSession();
     const role = session?.user.role;
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => { setMounted(true); }, []);
 
     const navLinks = [
         { name: 'Home', href: ROUTES.HOME, icon: <Home size={20} /> },
         { name: 'Courses', href: ROUTES.COURSES, icon: <BookOpen size={20} /> },
         {
             name: session?.user ? 'Dashboard' : 'Sign In',
-            href: session?.user ? getDashboardPath(role) : ROUTES.SIGN_IN,
+            href: mounted && session?.user ? getDashboardPath(role) : ROUTES.SIGN_IN,
             icon: <LayoutDashboard size={20} />
         },
     ];

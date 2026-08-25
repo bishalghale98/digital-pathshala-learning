@@ -7,6 +7,7 @@ import Underline from '@tiptap/extension-underline'
 import Highlight from '@tiptap/extension-highlight'
 import Link from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
+import Image from '@tiptap/extension-image'
 import { cn } from '@/lib/utils'
 import { EditorToolbar } from './editor-toolbar'
 
@@ -45,6 +46,10 @@ export function RichTextEditor({
       }),
       Placeholder.configure({
         placeholder,
+      }),
+      Image.configure({
+        inline: false,
+        allowBase64: false,
       }),
     ],
     content: value || '',

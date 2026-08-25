@@ -18,12 +18,10 @@ type CourseDetailPageProps = {
 }
 
 const CourseDetailPage = ({ course }: CourseDetailPageProps) => {
-    const [showAllLessons, setShowAllLessons] = useState(false)
     const [enrollOpen, setEnrollOpen] = useState(false)
     const formattedPrice = course.price.toString()
     const thumbnailUrl = resolveImageUrl(course.thumbnail)
 
-    console.log('thumbnailUrl', thumbnailUrl)
 
 
 

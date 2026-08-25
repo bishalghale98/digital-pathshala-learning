@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useRef } from 'react'
 import type { Editor } from '@tiptap/react'
 import {
   Bold,
@@ -19,9 +19,11 @@ import {
   Heading2,
   Heading3,
   Pilcrow,
+  ImagePlus,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { EditorLinkDialog } from './editor-link-dialog'
+import { resolveImageUrl } from '@/lib/storage/url'
 
 interface EditorToolbarProps {
   editor: Editor | null
@@ -148,6 +150,59 @@ function HeadingDropdown({ editor }: HeadingDropdownProps) {
   )
 }
 
+function ImageUploadButton({ editor }: { editor: Editor }) {
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [uploading, setUploading] = useState(false)
+
+  const handleUpload = useCallback(async (file: File) => {
+    setUploading(true)
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('context', 'editor')
+
+      const res = await fetch('/api/upload', { method: 'POST', body: formData })
+      const data = await res.json()
+
+      if (!data.success) throw new Error(data.message || 'Upload failed')
+
+      const src = resolveImageUrl(data.data.key)
+      if (src) {
+        editor.chain().focus().setImage({ src }).run()
+      }
+    } catch (err) {
+      console.error('Image upload failed:', err)
+    } finally {
+      setUploading(false)
+    }
+  }, [editor])
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) handleUpload(file)
+    e.target.value = ''
+  }
+
+  return (
+    <>
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp,image/avif"
+        onChange={handleChange}
+        className="hidden"
+      />
+      <ToolbarButton
+        onClick={() => inputRef.current?.click()}
+        disabled={uploading}
+        label={uploading ? 'Uploading image...' : 'Insert image'}
+      >
+        <ImagePlus className="size-4" />
+      </ToolbarButton>
+    </>
+  )
+}
+
 export function EditorToolbar({ editor }: EditorToolbarProps) {
   if (!editor) return null
 
@@ -251,6 +306,8 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
       <div className="w-px h-5 bg-gray-200 mx-1" />
 
       <EditorLinkDialog editor={editor} />
+
+      <ImageUploadButton editor={editor} />
 
       <div className="w-px h-5 bg-gray-200 mx-1" />
 
