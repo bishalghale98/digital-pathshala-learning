@@ -284,6 +284,22 @@ async function main() {
     },
   });
 
+  const instructor = await prisma.user.create({
+    data: {
+      name: "Instructor",
+      email: "instructor@bisanlms.com",
+      emailVerified: true,
+      role: "instructor",
+      accounts: {
+        create: {
+          accountId: "instructor@bisanlms.com",
+          providerId: "email",
+          password,
+        },
+      },
+    },
+  });
+
   const students = await Promise.all(
     STUDENTS.map((s, i) =>
       prisma.user.create({
@@ -304,7 +320,7 @@ async function main() {
     )
   );
 
-  console.log(`✅ Created admin (${admin.email}) and ${students.length} students`);
+  console.log(`✅ Created admin (${admin.email}), instructor (${instructor.email}), and ${students.length} students`);
   console.log("   All passwords: password123");
 
   // ── 2. Categories ────────────────────────────────────────────────────
@@ -472,6 +488,7 @@ async function main() {
 
   console.log("\n🔐 Login Credentials:");
   console.log("   Admin:  admin@bisanlms.com / password123");
+  console.log("   Instructor: instructor@bisanlms.com / password123");
   console.log("   Students: ram@student.com, sita@student.com, etc. / password123");
 
   console.log("\n🎉 Seeding complete!");

@@ -1,6 +1,7 @@
 export const Roles = {
   Admin: "admin",
   Student: "student",
+  Instructor: "instructor",
 } as const;
 
 export const ROUTES = {
@@ -43,4 +44,12 @@ export const ROUTES = {
 
   // Admin dynamic
   adminCourseLessons: (courseId: string) => `/admin/courses/${courseId}/lessons`,
+
+  // Instructor dashboard
+  INSTRUCTOR_DASHBOARD: '/instructor',
+  INSTRUCTOR_COURSES: '/instructor/courses',
+  INSTRUCTOR_SETTINGS: '/instructor/settings',
+
+  // Instructor dynamic
+  instructorCourseLessons: (courseId: string) => `/instructor/courses/${courseId}/lessons`,
 } as const;

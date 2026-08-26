@@ -6,5 +6,6 @@ import { ROUTES } from "./constants";
  */
 export const getDashboardPath = (role?: string | null): string => {
   if (role === Roles.Admin) return ROUTES.ADMIN_DASHBOARD;
+  if (role === Roles.Instructor) return ROUTES.INSTRUCTOR_DASHBOARD;
   return ROUTES.STUDENT_DASHBOARD;
 };
