@@ -5,6 +5,7 @@ import { useGetStudentsQuery } from '@/store/student/studentApi'
 import { useGetCoursesQuery } from '@/store/course/courseApi'
 import { useGetEnrollmentsQuery } from '@/store/enrollment/enrollmentApi'
 import { useGetCategoriesQuery } from '@/store/category/categoryApi'
+import { getEnrolledCourse } from '@/lib/utils/enrollment'
 import { EnrollmentStatus } from '@/types/models'
 import {
   Users,
@@ -56,12 +57,12 @@ const AnalyticsPage = () => {
     const courseEnrollmentMap = new Map<string, { title: string; count: number }>()
     for (const e of enrollments) {
       const courseId = typeof e.courseId === 'string' ? e.courseId : e.courseId.id
-      const courseTitle = typeof e.courseId === 'object' ? e.courseId.title : ''
       const existing = courseEnrollmentMap.get(courseId)
       if (existing) {
         existing.count++
       } else {
-        courseEnrollmentMap.set(courseId, { title: courseTitle, count: 1 })
+        const course = getEnrolledCourse(courses, e)
+        courseEnrollmentMap.set(courseId, { title: course?.title ?? 'Unknown Course', count: 1 })
       }
     }
     const topCourses = Array.from(courseEnrollmentMap.values())
@@ -80,7 +81,7 @@ const AnalyticsPage = () => {
       topCourses,
       approvalRate: enrollments.length > 0 ? Math.round((approved / enrollments.length) * 100) : 0,
     }
-  }, [students.length, courses.length, enrollments, categories])
+  }, [students.length, courses, courses.length, enrollments, categories])
 
   const maxMonthly = Math.max(...analytics.monthlyEnrollments.map((m) => m.count), 1)
 

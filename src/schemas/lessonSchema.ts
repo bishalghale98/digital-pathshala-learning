@@ -1,10 +1,11 @@
 import { z } from "zod";
+import { courseIdField } from "./shared-fields";
 
 /**
  * Base lesson fields (reusable)
  */
 const lessonBaseSchema = {
-  courseId: z.string().length(24, "Invalid course ID"),
+  courseId: courseIdField,
   title: z.string().trim().min(3, "Title must be at least 3 characters long"),
   description: z
     .string()

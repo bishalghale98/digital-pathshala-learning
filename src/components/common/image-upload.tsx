@@ -6,6 +6,7 @@ import { Upload, X, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { getInputClass } from '@/lib/utils/form'
 import { resolveImageUrl } from '@/lib/storage/url'
+import { isAllowedImageType, getMaxFileSize, formatFileSize } from '@/lib/storage/validation'
 
 interface ImageUploadProps {
   value?: string
@@ -70,14 +71,13 @@ export function ImageUpload({
 
   const handleFileSelect = useCallback(
     (file: File) => {
-      const maxSize = context === 'avatar' ? 2 * 1024 * 1024 : 5 * 1024 * 1024
+      const maxSize = getMaxFileSize(context)
       if (file.size > maxSize) {
-        setError(`File too large. Max: ${context === 'avatar' ? '2 MB' : '5 MB'}`)
+        setError(`File too large. Max: ${formatFileSize(maxSize)}`)
         return
       }
 
-      const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/avif']
-      if (!allowed.includes(file.type)) {
+      if (!isAllowedImageType(file.type)) {
         setError('Invalid file type. Allowed: JPEG, PNG, WebP, AVIF')
         return
       }

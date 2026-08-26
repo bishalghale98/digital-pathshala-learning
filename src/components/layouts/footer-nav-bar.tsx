@@ -20,7 +20,7 @@ const FooterNavBar = () => {
         { name: 'Home', href: ROUTES.HOME, icon: <Home size={20} /> },
         { name: 'Courses', href: ROUTES.COURSES, icon: <BookOpen size={20} /> },
         {
-            name: session?.user ? 'Dashboard' : 'Sign In',
+            name: mounted && session?.user ? 'Dashboard' : 'Sign In',
             href: mounted && session?.user ? getDashboardPath(role) : ROUTES.SIGN_IN,
             icon: <LayoutDashboard size={20} />
         },

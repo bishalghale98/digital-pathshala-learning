@@ -2,7 +2,11 @@
 
 import React, { useState, useMemo } from 'react'
 import { useGetStudentsQuery } from '@/store/student/studentApi'
-import { Search, X, Users } from 'lucide-react'
+import { PageHeader } from '@/components/common/page-header'
+import { SearchInput } from '@/components/common/search-input'
+import { Avatar } from '@/components/common/avatar'
+import { TableLoading, TableEmptyState, TableFooter } from '@/components/common/data-table'
+import { Users } from 'lucide-react'
 
 const StudentsPage = () => {
   const [searchTerm, setSearchTerm] = useState('')
@@ -19,32 +23,10 @@ const StudentsPage = () => {
 
   return (
     <div>
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Students</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Manage all registered students
-          </p>
-        </div>
-        <div className="relative w-full sm:w-72">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search by name or email..."
-            className="w-full pl-10 pr-10 py-2.5 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-300 transition-colors"
-          />
-          {searchTerm && (
-            <button
-              onClick={() => setSearchTerm('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          )}
-        </div>
+      <PageHeader title="Students" subtitle="Manage all registered students" />
+
+      <div className="relative w-full sm:w-72 mb-6">
+        <SearchInput value={searchTerm} onChange={setSearchTerm} placeholder="Search by name or email..." />
       </div>
 
       {/* Table */}
@@ -61,41 +43,23 @@ const StudentsPage = () => {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {isLoading ? (
-                <tr>
-                  <td colSpan={4} className="px-6 py-12 text-center text-sm text-gray-500">
-                    Loading students...
-                  </td>
-                </tr>
+                <TableLoading colSpan={4} message="Loading students..." />
               ) : filteredStudents.length === 0 ? (
-                <tr>
-                  <td colSpan={4}>
-                    <div className="flex flex-col items-center justify-center py-12">
-                      <Users className="w-12 h-12 text-gray-300 mb-3" />
-                      <p className="text-sm font-medium text-gray-900">
-                        {searchTerm ? 'No students found' : 'No students yet'}
-                      </p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {searchTerm
-                          ? 'Try adjusting your search'
-                          : 'Students will appear here once they register'}
-                      </p>
-                    </div>
-                  </td>
-                </tr>
+                <TableEmptyState
+                  icon={Users}
+                  colSpan={4}
+                  hasFilter={!!searchTerm}
+                  filteredLabel="No students found"
+                  emptyLabel="No students yet"
+                  filteredSubtitle="Try adjusting your search"
+                  emptySubtitle="Students will appear here once they register"
+                />
               ) : (
                 filteredStudents.map((student) => (
                   <tr key={student.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        {student.image ? (
-                          <img src={student.image} alt={student.name} className="w-9 h-9 rounded-full object-cover" />
-                        ) : (
-                          <div className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center">
-                            <span className="text-sm font-medium text-gray-600">
-                              {student.name?.charAt(0)?.toUpperCase() || '?'}
-                            </span>
-                          </div>
-                        )}
+                        <Avatar src={student.image} name={student.name} />
                         <span className="text-sm font-medium text-gray-900">{student.name || 'Unknown'}</span>
                       </div>
                     </td>
@@ -120,12 +84,7 @@ const StudentsPage = () => {
         </div>
 
         {!isLoading && filteredStudents.length > 0 && (
-          <div className="px-6 py-3 bg-gray-50 border-t border-gray-200">
-            <p className="text-xs text-gray-500">
-              Showing <span className="font-medium">{filteredStudents.length}</span> of{' '}
-              <span className="font-medium">{students.length}</span> students
-            </p>
-          </div>
+          <TableFooter filteredCount={filteredStudents.length} totalCount={students.length} label="students" />
         )}
       </div>
     </div>

@@ -23,11 +23,6 @@ const CourseDetailPage = ({ course }: CourseDetailPageProps) => {
     const thumbnailUrl = resolveImageUrl(course.thumbnail)
 
 
-
-
-
-
-
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Hero Section */}

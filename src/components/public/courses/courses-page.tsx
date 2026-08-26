@@ -38,7 +38,7 @@ export default function CoursesPage({ courses }: CoursesPageProps) {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {courses.map((course) => {
+                        {courses.map((course, index) => {
                             const thumbnailUrl = resolveImageUrl(course.thumbnail)
                             return (
                             <Link
@@ -54,6 +54,7 @@ export default function CoursesPage({ courses }: CoursesPageProps) {
                                             width={400}
                                             height={200}
                                             className="w-full h-full object-cover"
+                                            loading={index === 0 ? "eager" : "lazy"}
                                             unoptimized
                                         />
                                     ) : (

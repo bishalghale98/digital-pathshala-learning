@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { slugField } from "./shared-fields";
 
 export const courseStatusEnum = z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"]);
 
@@ -9,13 +10,7 @@ export const createCourseSchema = z.object({
     .min(3, "Title must be at least 3 characters")
     .max(100, "Title must be less than 100 characters"),
 
-  slug: z
-    .string()
-    .trim()
-    .min(2, "Slug must be at least 2 characters")
-    .max(150, "Slug must be less than 150 characters")
-    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug must be lowercase and can contain hyphens")
-    .optional(),
+  slug: slugField.optional(),
 
   shortDescription: z
     .string()

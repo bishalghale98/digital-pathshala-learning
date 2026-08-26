@@ -23,10 +23,27 @@ import { EnrollmentStatus } from '@/types/models'
 import { authClient } from '@/lib/auth-client'
 import { ROUTES } from '@/lib/constants'
 
-const getStudent = (e: Enrollment) =>
-  typeof e.studentId === 'object' ? e.studentId : null
-const getCourse = (e: Enrollment) =>
-  typeof e.courseId === 'object' ? e.courseId : null
+type GetStudentProps = {
+  students: Array<{ id: string; name: string | null; email: string | null }>;
+  enrollment: Enrollment
+}
+
+
+const getStudent = ({ students, enrollment }: GetStudentProps) => {
+  const enrolledStudent = students.find((student) => student.id === enrollment.studentId)
+  return enrolledStudent;
+}
+
+type GetCourseProps = {
+  courses: Array<{ id: string; title: string | null }>;
+  enrollment: Enrollment
+}
+
+const getCourse = ({ courses, enrollment }: GetCourseProps) => {
+  const enrolledCourse = courses.find((course) => course.id === enrollment.courseId)
+  return enrolledCourse;
+}
+
 
 const AdminPage = () => {
   const router = useRouter()
@@ -152,8 +169,8 @@ const AdminPage = () => {
                 </thead>
                 <tbody className="divide-y divide-gray-50">
                   {recentEnrollments.map((enrollment) => {
-                    const student = getStudent(enrollment)
-                    const course = getCourse(enrollment)
+                    const student = getStudent({ students, enrollment })
+                    const course = getCourse({courses, enrollment })
                     return (
                       <tr key={enrollment.id} className="hover:bg-gray-50 transition-colors">
                         <td className="px-6 py-3">
@@ -205,7 +222,7 @@ const AdminPage = () => {
             <div className="p-6 text-sm text-gray-500 text-center">No users yet</div>
           ) : (
             <div className="divide-y divide-gray-50">
-                  {recentStudents.map((student) => (
+              {recentStudents.map((student) => (
                 <div key={student.id} className="flex items-center gap-3 px-6 py-3 hover:bg-gray-50 transition-colors">
                   {student.image ? (
                     <img src={student.image} alt={student.name} className="w-9 h-9 rounded-full object-cover" />

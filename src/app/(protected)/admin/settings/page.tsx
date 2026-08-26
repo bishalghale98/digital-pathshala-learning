@@ -2,6 +2,9 @@
 
 import React from 'react'
 import { authClient } from '@/lib/auth-client'
+import { PageHeader } from '@/components/common/page-header'
+import { Avatar } from '@/components/common/avatar'
+import { InfoRow } from '@/components/common/info-row'
 import { Mail, User, Shield, Calendar } from 'lucide-react'
 
 const AdminSettingsPage = () => {
@@ -10,13 +13,7 @@ const AdminSettingsPage = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="text-sm text-gray-500 mt-1">
-          Manage your account settings
-        </p>
-      </div>
+      <PageHeader title="Settings" subtitle="Manage your account settings" />
 
       {/* Profile Section */}
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
@@ -28,19 +25,7 @@ const AdminSettingsPage = () => {
         <div className="p-6">
           {/* Avatar + Name */}
           <div className="flex items-center gap-4 mb-8">
-            {user?.image ? (
-              <img
-                src={user.image}
-                alt={user.name || 'Admin'}
-                className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
-              />
-            ) : (
-              <div className="w-16 h-16 rounded-full bg-gray-900 flex items-center justify-center border-2 border-gray-200">
-                <span className="text-xl font-bold text-white">
-                  {(user?.name || 'A').charAt(0).toUpperCase()}
-                </span>
-              </div>
-            )}
+            <Avatar src={user?.image} name={user?.name} size="lg" className="bg-gray-900 text-white" />
             <div>
               <h3 className="text-lg font-semibold text-gray-900">
                 {user?.name || 'Admin'}
@@ -51,26 +36,10 @@ const AdminSettingsPage = () => {
 
           {/* Info rows */}
           <div className="space-y-4">
-            <InfoRow
-              icon={<User className="w-4 h-4" />}
-              label="Name"
-              value={user?.name || '—'}
-            />
-            <InfoRow
-              icon={<Mail className="w-4 h-4" />}
-              label="Email"
-              value={user?.email || '—'}
-            />
-            <InfoRow
-              icon={<Shield className="w-4 h-4" />}
-              label="Role"
-              value={user?.role || 'admin'}
-            />
-            <InfoRow
-              icon={<Calendar className="w-4 h-4" />}
-              label="Status"
-              value="Active"
-            />
+            <InfoRow icon={<User className="w-4 h-4" />} label="Name" value={user?.name || '—'} />
+            <InfoRow icon={<Mail className="w-4 h-4" />} label="Email" value={user?.email || '—'} />
+            <InfoRow icon={<Shield className="w-4 h-4" />} label="Role" value={user?.role || 'admin'} />
+            <InfoRow icon={<Calendar className="w-4 h-4" />} label="Status" value="Active" />
           </div>
         </div>
       </div>
@@ -92,23 +61,5 @@ const AdminSettingsPage = () => {
     </div>
   )
 }
-
-const InfoRow = ({
-  icon,
-  label,
-  value,
-}: {
-  icon: React.ReactNode
-  label: string
-  value: string
-}) => (
-  <div className="flex items-center justify-between py-3 border-b border-gray-50 last:border-0">
-    <div className="flex items-center gap-3 text-sm text-gray-500">
-      {icon}
-      {label}
-    </div>
-    <span className="text-sm font-medium text-gray-900">{value}</span>
-  </div>
-)
 
 export default AdminSettingsPage

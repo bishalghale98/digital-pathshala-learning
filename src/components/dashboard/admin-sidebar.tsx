@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { authClient } from '@/lib/auth-client'
 import { ROUTES } from '@/lib/constants'
+import { Avatar } from '@/components/common/avatar'
 import {
   LayoutDashboard,
   Users,
@@ -15,7 +16,6 @@ import {
   Settings,
   LogOut,
 } from 'lucide-react'
-import Image from 'next/image';
 
 const navGroups = [
   {
@@ -110,21 +110,7 @@ export const SidebarContent = ({ onNavigate }: SidebarContentProps) => {
       {/* User Profile */}
       <div className="border-t border-gray-100 p-4">
         <div className="flex items-center gap-3 mb-3">
-          {session?.user.image ? (
-            <Image
-              src={session.user.image}
-              alt={session.user.name || 'Admin'}
-              width={36}
-              height={36}
-              className="w-9 h-9 rounded-full object-cover"
-            />
-          ) : (
-            <div className="w-9 h-9 rounded-full bg-gray-900 flex items-center justify-center">
-              <span className="text-sm font-medium text-white">
-                {(session?.user.name || 'A').charAt(0).toUpperCase()}
-              </span>
-            </div>
-          )}
+          <Avatar src={session?.user.image} name={session?.user.name} className="bg-gray-900 text-white" />
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-gray-900 truncate">
               {session?.user.name || 'Admin'}
@@ -146,12 +132,4 @@ export const SidebarContent = ({ onNavigate }: SidebarContentProps) => {
   )
 }
 
-const AdminSidebar = () => {
-  return (
-    <div className="hidden md:flex flex-col w-64 bg-white border-r border-gray-200 h-full">
-      <SidebarContent />
-    </div>
-  )
-}
-
-export default AdminSidebar
+export default SidebarContent
